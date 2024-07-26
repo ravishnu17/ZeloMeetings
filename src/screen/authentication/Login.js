@@ -1,13 +1,16 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions, ActivityIndicator, Image, ScrollView } from 'react-native';
+import { View, StyleSheet, Dimensions, ActivityIndicator, Image, ScrollView} from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { loginUser } from '../../apiservices/Apiservices';
-import LaiaLogo from '../../assets/Logo_Zelo.png';
+import LaiaLogo from '../../assets/image031.png';
 import Toast from 'react-native-simple-toast';
 import {TostColor} from '../utils/ToastColors';
+import googleAccount from '../../assets/btn_google_signin_dark_normal_web.png';
+import microsoft from '../../assets/microsoft.jpg';
+
 
 // import { ToastColor } from '../utils/ToastColor';
 const Login = ( ) => {
@@ -166,6 +169,36 @@ const Login = ( ) => {
       <Button mode="contained" onPress={handleSubmit(onSignInPress)} style={styles.button}>
         SIGN-IN
       </Button>
+  {/* <View >
+  <Svg width="50" height="50" viewBox="0 0 20 20">
+      <Path
+        d="M 9.503906 9.503906 L 0 9.503906 L 0 0 L 9.503906 0 Z M 9.503906 9.503906"
+        fill="rgb(94.509804%,31.764706%,10.588235%)"
+      />
+      <Path
+        d="M 20 9.503906 L 10.496094 9.503906 L 10.496094 0 L 19.996094 0 L 19.996094 9.503906 Z M 20 9.503906"
+        fill="rgb(50.196078%,80%,15.686275%)"
+      />
+      <Path
+        d="M 9.503906 20 L 0 20 L 0 10.496094 L 9.503906 10.496094 Z M 9.503906 20"
+        fill="rgb(0%,67.843137%,93.72549%)"
+      />
+      <Path
+        d="M 20 20 L 10.496094 20 L 10.496094 10.496094 L 19.996094 10.496094 L 19.996094 20 Z M 20 20"
+        fill="rgb(98.431373%,73.72549%,3.529412%)"
+      />
+    </Svg>
+    <Text style={styles.text}>Microsoft</Text>
+
+  </View> */}
+{/* <Image source={microsoft}  />
+  <Image source={googleAccount} />  */}
+
+<View style={styles.imageContainer}>
+      <Image source={microsoft} style={styles.image} />
+      <Image source={googleAccount} style={styles.image} />
+    </View>
+    
       {loading && <ActivityIndicator size="large" color="#3498db" />}
     </View>
   </ScrollView>
@@ -264,6 +297,17 @@ const styles = StyleSheet.create({
       height: 280, // Adjust the height as needed
       resizeMode: 'contain',
     },
+    image: {
+      width: 200, // Adjust the width as needed
+      height: 200, // Adjust the height as needed
+      resizeMode: 'contain',
+    },
+    imageContainer: {
+        flexDirection: 'row', // Align children horizontally
+        justifyContent: 'center', // Center images horizontally
+        alignItems: 'center', // Center images vertically
+        padding: 10,
+      },
 });
 
 export default Login;
