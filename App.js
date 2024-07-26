@@ -3,13 +3,16 @@ import React from 'react';
 import {StyleSheet} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import AppNavigator from './src/navigation/Appnav';
-
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 // create a component
 const App = () => {
   return (
-    <NavigationContainer>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+ <NavigationContainer>
       <AppNavigator />
     </NavigationContainer>
+    </GestureHandlerRootView>
+   
   );
 };
 
