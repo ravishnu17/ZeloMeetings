@@ -8,11 +8,9 @@ import { loginUser } from '../../apiservices/Apiservices';
 import LaiaLogo from '../../assets/image031.png';
 import Toast from 'react-native-simple-toast';
 import {TostColor} from '../utils/ToastColors';
-import googleAccount from '../../assets/btn_google_signin_dark_normal_web.png';
-import microsoft from '../../assets/microsoft.jpg';
+import m_logo from '../../assets/M_logo.png';
+import g_logo from '../../assets/google_logo.png';
 
-
-// import { ToastColor } from '../utils/ToastColor';
 const Login = ( ) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -66,40 +64,15 @@ const Login = ( ) => {
     setLoading(false);
   };
 
-//   const handleLogin = () => {
-//     // Implement your authentication logic here
-//     // if (username === 'user' && password === 'pass') {
-//     //   navigation.navigate('HomeScreen');
-//     // } else {
-//     //   Alert.alert('Invalid credentials', 'Please check your username and password');
-//     // }
-//     navigation.navigate('HomeScreen');
-//   };
+
 
   return (
-    // <View style={styles.container}>
-    //   <Text style={styles.title}>Laia Meetings</Text>
-    //   <TextInput
-    //     style={styles.input}
-    //     placeholder="Username"
-    //     value={username}
-    //     onChangeText={setUsername}
-    //   />
-    //   <TextInput
-    //     style={styles.input}
-    //     placeholder="Password"
-    //     value={password}
-    //     onChangeText={setPassword}
-    //     secureTextEntry
-    //   />
-    //   <Button title="Login" onPress={handleLogin} />
-    // </View>
+    
     <ScrollView style={styles.container}>
     {/* Top Container with 50% border-radius */}
     <View style={styles.topContainer}>
       <View style={styles.welcomeContainer}>
-        {/* <Text style={styles.welcomeText}>Welcome to Zelo Visits</Text> */}
-        {/* You can replace the image source with your actual welcome image */}
+      
      <Image source={LaiaLogo} style={styles.welcomeImage} /> 
       </View>
     </View>
@@ -169,35 +142,18 @@ const Login = ( ) => {
       <Button mode="contained" onPress={handleSubmit(onSignInPress)} style={styles.button}>
         SIGN-IN
       </Button>
-  {/* <View >
-  <Svg width="50" height="50" viewBox="0 0 20 20">
-      <Path
-        d="M 9.503906 9.503906 L 0 9.503906 L 0 0 L 9.503906 0 Z M 9.503906 9.503906"
-        fill="rgb(94.509804%,31.764706%,10.588235%)"
-      />
-      <Path
-        d="M 20 9.503906 L 10.496094 9.503906 L 10.496094 0 L 19.996094 0 L 19.996094 9.503906 Z M 20 9.503906"
-        fill="rgb(50.196078%,80%,15.686275%)"
-      />
-      <Path
-        d="M 9.503906 20 L 0 20 L 0 10.496094 L 9.503906 10.496094 Z M 9.503906 20"
-        fill="rgb(0%,67.843137%,93.72549%)"
-      />
-      <Path
-        d="M 20 20 L 10.496094 20 L 10.496094 10.496094 L 19.996094 10.496094 L 19.996094 20 Z M 20 20"
-        fill="rgb(98.431373%,73.72549%,3.529412%)"
-      />
-    </Svg>
-    <Text style={styles.text}>Microsoft</Text>
-
-  </View> */}
-{/* <Image source={microsoft}  />
-  <Image source={googleAccount} />  */}
+  
 
 <View style={styles.imageContainer}>
-      <Image source={microsoft} style={styles.image} />
-      <Image source={googleAccount} style={styles.image} />
-    </View>
+          <View style={styles.imageWrapper}>
+            <Image source={m_logo} style={styles.image} />
+            <Text style={styles.text}>Microsoft</Text>
+          </View>
+          <View style={styles.imageWrapper}>
+            <Image source={g_logo} style={styles.image} />
+            <Text style={styles.text}>Google</Text>
+          </View>
+        </View>
     
       {loading && <ActivityIndicator size="large" color="#3498db" />}
     </View>
@@ -297,17 +253,40 @@ const styles = StyleSheet.create({
       height: 280, // Adjust the height as needed
       resizeMode: 'contain',
     },
-    image: {
-      width: 200, // Adjust the width as needed
-      height: 200, // Adjust the height as needed
-      resizeMode: 'contain',
-    },
+    // image: {
+    //   width: 200, // Adjust the width as needed
+    //   height: 200, // Adjust the height as needed
+    //   resizeMode: 'contain',
+    // },
+    // imageContainer: {
+    //     flexDirection: 'row', // Align children horizontally
+    //     justifyContent: 'center', // Center images horizontally
+    //     alignItems: 'center', // Center images vertically
+    //     padding: 10,
+    //   },
+
     imageContainer: {
-        flexDirection: 'row', // Align children horizontally
-        justifyContent: 'center', // Center images horizontally
-        alignItems: 'center', // Center images vertically
-        padding: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        width: '100%',
+        // padding: 20,
       },
+      imageWrapper: {
+        marginTop: 10,
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginHorizontal: 10,
+      },
+      image: {
+        width: 50,
+        height: 50,
+        marginRight: 10,
+      },
+      text: {
+        fontSize: 16,
+      },
+    
 });
 
 export default Login;

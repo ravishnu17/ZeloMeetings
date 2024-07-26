@@ -29,8 +29,10 @@ const Appnav = () => {
 //       return 'LoginScreen';
 //     }
 //   };
+
+// initialRouteName='HomeScreen'
   return (
-    <Stack.Navigator   screenOptions={{headerShown:false}} initialRouteName='HomeScreen'>
+    <Stack.Navigator   screenOptions={{headerShown:false}} >
     <Stack.Screen name="LoginScreen"  component={Login} />
     <Stack.Screen name="HomeScreen"  component={HomeScreen} />
     </Stack.Navigator>
