@@ -38,16 +38,31 @@ const HomeScreen = () => {
         }
         rightComponent={
           <View style={styles.header_container}>
-            <TouchableOpacity>
-              <Image source={require('../../assets/passcode.png')} style={styles.passcode} />
-            </TouchableOpacity>
-            <TouchableOpacity >
-              <Icon
-                source="qrcode"
-                size={30}
-                color="#fff"
-              />
-            </TouchableOpacity>
+            {
+              index === 0 &&
+              <>
+                <TouchableOpacity>
+                  <Image source={require('../../assets/passcode.png')} style={styles.passcode} />
+                </TouchableOpacity>
+                <TouchableOpacity >
+                  <Icon
+                    source="qrcode"
+                    size={30}
+                    color="#fff"
+                  />
+                </TouchableOpacity>
+              </>
+            }
+            {
+              index === 2 &&
+              <TouchableOpacity>
+                <Icon
+                  source="filter"
+                  size={30}
+                  color="#fff"
+                />
+              </TouchableOpacity>
+            }
           </View>
         }
       />
@@ -90,8 +105,8 @@ const styles = StyleSheet.create({
     padding: 3
   },
   logo: {
-    width: 140,
-    height: 40,
+    width: 130,
+    height: 30,
   },
   passcode: {
     width: 30,
