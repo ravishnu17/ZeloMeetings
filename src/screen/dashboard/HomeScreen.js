@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { Header } from 'react-native-elements';
 import { BottomNavigation, Icon } from 'react-native-paper';
 import Dashboard from './Dashboard';
-import Calendar from './Calendar';
+import Calendar from './CalendarVIew';
 import Rooms from './Rooms';
 import Report from './Report';
 import Profile from './Profile';

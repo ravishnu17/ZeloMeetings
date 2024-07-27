@@ -6,7 +6,7 @@ import { useForm, Controller } from 'react-hook-form';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 import { loginUser } from '../../apiservices/Apiservices';
-import LaiaLogo from '../../assets/image031.png';
+import LaiaLogo from '../../assets/zelo_logo.png';
 import Toast from 'react-native-simple-toast';
 import { TostColor } from '../utils/ToastColors';
 import m_logo from '../../assets/M_logo.png';
