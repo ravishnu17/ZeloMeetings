@@ -1,9 +1,10 @@
 import React from 'react'
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { ScrollView, StyleSheet, Text, ToastAndroid, TouchableOpacity, View } from 'react-native'
 import { BackgroundImage } from 'react-native-elements/dist/config';
 import { Icon } from 'react-native-paper';
 import room1 from '../../assets/room.jpg';
 import room2 from '../../assets/room1.jpg';
+import Toast from 'react-native-toast-message';
 
 const Rooms = () => {
   const rooms = [
@@ -28,7 +29,15 @@ const Rooms = () => {
       status: 'Available',
       img: room1
     }
-  ]
+  ];
+
+  const viewPlant = () => {
+    Toast.show({
+      type: 'info',
+      text1: 'Coming soon!',
+      position: 'bottom'
+    });
+  }
   return (
     <ScrollView style={style.container}>
       {
@@ -54,7 +63,7 @@ const Rooms = () => {
                 <Text style={style.menuText}>Service</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={style.menuItem}>
+              <TouchableOpacity style={style.menuItem} onPress={viewPlant}>
                 <Text style={style.menuText}>View Plant</Text>
               </TouchableOpacity>
 
@@ -65,8 +74,6 @@ const Rooms = () => {
           </View>
         ))
       }
-
-      <View style={{...style.card, width: '10%', height: 20}} />
     </ScrollView>
   )
 };
@@ -81,8 +88,8 @@ const style = StyleSheet.create({
     borderRadius: 3,
     marginBottom: 18,
     overflow: 'hidden',
-    borderColor:'#e4e4e4b0',
-    borderWidth:1,
+    borderColor: '#e4e4e4b0',
+    borderWidth: 1,
     borderBottomWidth: 0,
     borderBottomEndRadius: 3,
     borderBottomStartRadius: 3,
