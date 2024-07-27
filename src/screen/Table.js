@@ -1,37 +1,26 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 
-const Table = ({cols}) => {
+const Table = ({cols, rows}) => {
   return (
     <>
       {/* Table Header */}
       <View style={styles.row}>
         {cols.map((col, index) => 
-          <Text style={[styles.cell, styles.header]} key={index}>{col}</Text>)}
+          <Text style={styles.cell} key={index}>{col}</Text>)}
       </View>
 
       {/* Table Rows */}
-      <View style={styles.row}>
-        <Text style={styles.cell}>Row 1, Cell 1</Text>
-        <Text style={styles.cell}>Row 1, Cell 1</Text>
-        <Text style={styles.cell}>Row 1, Cell 1</Text>
-        <Text style={styles.cell}>Row 1, Cell 2</Text>
-        <Text style={styles.cell}>Row 1, Cell 3</Text>
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.cell}>Row 1, Cell 1</Text>
-        <Text style={styles.cell}>Row 1, Cell 1</Text>
-        <Text style={styles.cell}>Row 2, Cell 1</Text>
-        <Text style={styles.cell}>Row 2, Cell 2</Text>
-        <Text style={styles.cell}>Row 2, Cell 3</Text>
-      </View>
-      <View style={styles.row}>
-        <Text style={styles.cell}>Row 1, Cell 1</Text>
-        <Text style={styles.cell}>Row 1, Cell 1</Text>
-        <Text style={styles.cell}>Row 3, Cell 1</Text>
-        <Text style={styles.cell}>Row 3, Cell 2</Text>
-        <Text style={styles.cell}>Row 3, Cell 3</Text>
-      </View>
+      {
+        rows?.length > 0 ?
+        rows.map((row, index) => 
+          <View style={styles.row} key={index}>
+            {row.map((cell, index) => 
+              <Text style={styles.cell} key={index}>{cell}</Text>)}
+          </View>)
+          :
+          <Text style={styles.nodata}>Data Not Found!</Text>
+      }
     </>
   );
 };
@@ -44,13 +33,16 @@ const styles = StyleSheet.create({
   },
   cell: {
     flex: 1,
-    padding: 15,
+    padding: 5,
+    marginTop: 15,
     textAlign: 'center',
   },
-  header: {
+  nodata: {
+    marginTop: '20%',
+    fontSize: 17,
+    textAlign: 'center',
     fontWeight: 'bold',
-    backgroundColor: '#fafafa',
-  },
+  }
 });
 
 export default Table;

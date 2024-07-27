@@ -12,8 +12,8 @@ const Dashboard = () => {
                     items.map((item, index) => 
                         <View key={index} style={{ flex: 1 }}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }} >
-                                <Text style={{ fontSize: 12 }}>{item} (0.0%)</Text>
-                                <Text style={{ fontSize: 12 }}>0/0</Text>
+                                <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{item} (0.0%)</Text>
+                                <Text style={{ fontSize: 11, fontWeight: 'bold' }}>0/0</Text>
                             </View>
                             <View style={style.progressContainer}>
                                 <View style={[style.filler, { width: `${90}%` }]} />
@@ -31,8 +31,8 @@ const Dashboard = () => {
             </View>
 
             <View style={{ marginTop: 25 }}>
-                <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Room / Desk booking requests</Text>
-                <Table cols={cols} />
+                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Room / Desk booking requests</Text>
+                <Table cols={cols} rows={[]} />
             </View>
 
         </ScrollView>
