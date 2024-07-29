@@ -1,12 +1,17 @@
-import React from 'react'
-import { ScrollView, StyleSheet, Text, ToastAndroid, TouchableOpacity, View } from 'react-native'
+import React, { useState } from 'react'
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, Modal, Pressable } from 'react-native'
 import { BackgroundImage } from 'react-native-elements/dist/config';
 import { Icon } from 'react-native-paper';
+import Toast from 'react-native-simple-toast';
+import { ToastColor } from '../utils/ToastColors';
+
 import room1 from '../../assets/room.jpg';
 import room2 from '../../assets/room1.jpg';
-import Toast from 'react-native-toast-message';
+import { useNavigation } from '@react-navigation/native';
 
 const Rooms = () => {
+  const navigation = useNavigation();
+  const [showModel, setShowModel] = useState(false);
   const rooms = [
     {
       id: 1,
@@ -32,56 +37,99 @@ const Rooms = () => {
   ];
 
   const viewPlant = () => {
-    Toast.show({
-      type: 'info',
-      text1: 'Coming soon!',
-      position: 'bottom'
-    });
+    Toast.showWithGravity(
+      'Coming Soon!',
+      Toast.SHORT,
+      Toast.BOTTOM,
+      ToastColor.ERROR
+    );
   }
   return (
-    <ScrollView style={style.container}>
-      {
-        rooms.map((item, index) => (
-          <View key={index} style={style.card}>
-            <BackgroundImage source={item.img} style={style.backgroundImage} >
-              <View style={style.row}>
-                <View style={style.labelcard}>
-                  <Text style={style.label}>{item.name}</Text>
+    <View style={style.container}>
+      <ScrollView>
+        {
+          rooms.map((item, index) => (
+            <View key={index} style={style.card}>
+              <BackgroundImage source={item.img} style={style.backgroundImage} >
+                <View style={style.row}>
+                  <View style={[style.labelcard, { borderEndColor: '#fff', borderEndWidth: 1 }]}>
+                    <Text style={style.label}>{item.name}</Text>
+                  </View>
+                  <View style={style.labelcard}>
+                    <Icon
+                      source="map-marker"
+                      size={25}
+                      color="#fff"
+                    />
+                    <Text style={style.label}>{item.location}</Text>
+                  </View>
                 </View>
-                <View style={style.labelcard}>
-                  <Icon
-                    source="map-marker"
-                    size={25}
-                    color="#fff"
-                  />
-                  <Text style={style.label}>{item.location}</Text>
-                </View>
+              </BackgroundImage>
+              <View style={style.menu}>
+                <TouchableOpacity style={style.menuItem} onPress={() => setShowModel(true)}>
+                  <Text style={style.menuText}>Service</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={style.menuItem} onPress={viewPlant}>
+                  <Text style={style.menuText}>View Plant</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={style.menuItem} >
+                  <Text style={style.menuText}>Book</Text>
+                </TouchableOpacity>
               </View>
-            </BackgroundImage>
-            <View style={style.menu}>
-              <TouchableOpacity style={style.menuItem}>
-                <Text style={style.menuText}>Service</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={style.menuItem} onPress={viewPlant}>
-                <Text style={style.menuText}>View Plant</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={style.menuItem}>
-                <Text style={style.menuText}>Book</Text>
-              </TouchableOpacity>
             </View>
+          ))
+        }
+      </ScrollView>
+
+      <Modal animationType="slide" transparent={true} visible={showModel} onDismiss={() => setShowModel(false)}
+        onRequestClose={() => setShowModel(false)} >
+        <View style={style.modal} >
+          <View style={style.modalContainer}>
+            {/* Header */}
+            <View style={{ borderBottomWidth: 1, borderBottomColor: '#ccc', padding: 8, marginBottom: 5 }}>
+              <Text style={{ fontWeight: 'bold', fontSize: 18, textAlign: 'center' }}>Services</Text>
+            </View>
+            {/* Body content */}
+            <View style={{ padding: 10 }}>
+              <Text style={style.modelTitle}>Equipment</Text>
+              <View style={style.modelitem}>
+                <Icon
+                  source="wifi-alert"
+                  size={20}
+                  color="#000000"
+                />
+                <Text style={{ marginLeft: 5 }}>Equipment</Text>
+              </View>
+              <View style={style.modelitem}>
+                <Icon
+                  source="calendar"
+                  size={20}
+                  color="#000000"
+                />
+                <Text style={{ marginLeft: 5 }}>System</Text>
+              </View>
+              <Text style={style.modelTitle}>catering</Text>
+              <Text style={style.modelTitle}>IT Support</Text>
+              <Text style={style.modelTitle}>mobile Equipments</Text>
+              <Text style={style.modelTitle}>Special Services</Text>
+
+            </View>
+            <TouchableOpacity style={style.button} onPress={() => setShowModel(false)}>
+              <Text style={{ color: '#fff', fontSize: 14, textAlign: 'center' }}>OK</Text>
+            </TouchableOpacity>
           </View>
-        ))
-      }
-    </ScrollView>
+        </View>
+      </Modal >
+    </View >
   )
 };
 
 const style = StyleSheet.create({
   container: {
     padding: 7,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#ffffff'
   },
   card: {
     backgroundColor: '#ffffff',
@@ -90,13 +138,12 @@ const style = StyleSheet.create({
     overflow: 'hidden',
     borderColor: '#e4e4e4b0',
     borderWidth: 1,
-    borderBottomWidth: 0,
-    borderBottomEndRadius: 3,
-    borderBottomStartRadius: 3,
+    borderBottomEndRadius: 4,
+    borderBottomStartRadius: 4,
     borderTopWidth: 0,
     shadowColor: "#303030",
     shadowOffset: {
-      width: 0,
+      width: 1,
       height: 1,
     },
     shadowOpacity: 0.22,
@@ -115,8 +162,7 @@ const style = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: 'row',
-    flex: 1,
-    columnGap: 2
+    flex: 1
   },
   labelcard: {
     flex: 1,
@@ -145,7 +191,42 @@ const style = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     textAlign: 'center'
+  },
+  modal: {
+    flex: 1,
+    padding: 15,
+    backgroundColor: '#00000060',
+  },
+  modalContainer: {
+    height: '100%',
+    backgroundColor: '#ffffff',
+    borderRadius: 3,
+  },
+  modelTitle:{
+    backgroundColor: '#ccc',
+    padding: 5,
+    fontWeight: 'bold',
+    fontSize: 15,
+    marginBottom: 18
+  },
+  modelitem:{
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    marginBottom: 15
+  },
+  button: {
+    position: 'absolute',
+    bottom: 0,
+    alignSelf: 'center',
+    padding: 8,
+    backgroundColor: '#035676',
+    borderRadius: 5,
+    width: 100,
+    textAlign: 'center',
+    margin: 10
   }
 })
+
 
 export default Rooms

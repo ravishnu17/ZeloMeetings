@@ -42,12 +42,12 @@ const Dashboard = () => {
 const style = StyleSheet.create({
     container: {
         padding: 10,
-        marginTop: 15,
         backgroundColor: '#ffffff',
     },
     row: {
         flexDirection: 'row',
-        columnGap: 15
+        columnGap: 15,
+        marginTop: 15,
     },
     progressContainer: {
         height: 50,
