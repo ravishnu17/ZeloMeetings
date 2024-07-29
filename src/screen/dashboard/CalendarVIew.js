@@ -4,10 +4,12 @@ import { Calendar } from 'react-native-calendars';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { useNavigation } from '@react-navigation/native';
 
 const CalendarView = () => {
+  const navigation=useNavigation();
   const [events, setEvents] = useState({});
-  const [selectedDate, setSelectedDate] = useState('2024-07-26'); // Default selected date
+  const [selectedDate, setSelectedDate] = useState(); // Default selected date
   const [itemsLocations, setItemsLocations] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [openLocation, setOpenLocation] = useState(false);
@@ -152,11 +154,13 @@ const CalendarView = () => {
         }}
         markedDates={events}
       />
+      
 
+<Text style={styles.selectedLocationText}>Location</Text>
 <DropDownPicker
         placeholder="Select Location"
         searchPlaceholder="Search  Location..."
-        searchable={true}
+        // searchable={true}
         open={openLocation}
         value={selectedLocation}
         items={itemsLocations}
@@ -194,8 +198,8 @@ const CalendarView = () => {
         {selectedDate ? renderEventDetails(selectedDate) : <Text>Select a date to see details</Text>}
         </ScrollView>
       </View>
-      <TouchableOpacity style={styles.addIcon} onPress={() => {/* Handle add action */}}>
-        <Icon name="plus" size={30} color="blue" />
+      <TouchableOpacity style={styles.addIcon} onPress={() => { navigation?.navigate('AddBooking');}}>
+        <Icon name="plus" size={30} color="white" />
       </TouchableOpacity>
     </SafeAreaView>
     
@@ -253,12 +257,19 @@ const styles = StyleSheet.create({
   },
   addIcon: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 10,
     right: 20,
-    backgroundColor: '#fff',
-    borderRadius: 50,
+    backgroundColor: '#1D7DB7',
+    borderRadius:55,
     padding: 10,
     elevation: 5,
+  },
+  selectedLocationText: {
+    fontSize: 16,
+    marginVertical: 10,
+    paddingLeft: 10,
+    color: '#000',
+    marginTop: 20
   },
 
 });
