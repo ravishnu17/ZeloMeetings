@@ -8,6 +8,7 @@ import Profile from '../screen/dashboard/Profile';
 import HeadBar from '../screen/HeadBar';
 import Footer from '../screen/Footer';
 import { StyleSheet, View } from 'react-native';
+import AddBooking from '../screen/dashboard/AddBooking';
 
 const Stack = createNativeStackNavigator();
 
