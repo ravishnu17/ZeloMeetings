@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View, Modal, Pressable } from 'react-native'
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View, Modal } from 'react-native'
 import { BackgroundImage } from 'react-native-elements/dist/config';
 import { Icon } from 'react-native-paper';
 import Toast from 'react-native-simple-toast';
@@ -7,10 +7,8 @@ import { ToastColor } from '../utils/ToastColors';
 
 import room1 from '../../assets/room.jpg';
 import room2 from '../../assets/room1.jpg';
-import { useNavigation } from '@react-navigation/native';
 
 const Rooms = () => {
-  const navigation = useNavigation();
   const [showModel, setShowModel] = useState(false);
   const rooms = [
     {

@@ -34,7 +34,7 @@ const Footer = ({active, setActive}) => {
             id: 5,
             name: '...',
             icon: 'dots-horizontal',
-            link: 'ProfileScreen'
+            link: 'MenuScreen'
         },
     ];
     const color=(id)=>{

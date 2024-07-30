@@ -1,16 +1,42 @@
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { Text, TouchableWithoutFeedback } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Image, Modal } from 'react-native';
 import { Header } from 'react-native-elements';
-import { Icon } from 'react-native-paper';
+import { Icon, RadioButton } from 'react-native-paper';
 
 
-const HeadBar = ({ index }) => {
+const HeadBar = ({ index, setActive, preState }) => {
+  const navigation = useNavigation();
+  const [showModel, setShowModel] = useState(false);
 
+  const back = () => {
+    setActive(preState.id);
+    navigation.navigate(preState.name);
+  }
   return (
     <View>
       <Header backgroundColor='#035676' statusBarProps={{ barStyle: 'light-content', backgroundColor: '#034a66' }}
+        leftComponent={
+          <View>
+            {
+              index === 6 &&
+              <TouchableOpacity
+                style={{ marginTop: 5, flexDirection: 'row', columnGap: 5 }} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                onPress={back}
+              >
+                <Icon
+                  source="arrow-left"
+                  size={25}
+                  color="#fff"
+                /> 
+                <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>{index === 6 && 'My Profile'}</Text>
+              </TouchableOpacity>
+            }
+          </View>
+        }
         centerComponent={
-          <View style={styles.logoView}>
+        index !== 6 &&  <View style={styles.logoView}>
             <Image source={require('../assets/zelo_logo.png')} style={styles.logo} />
           </View>
         }
@@ -41,9 +67,43 @@ const HeadBar = ({ index }) => {
                 />
               </TouchableOpacity>
             }
+            {
+              index === 6 &&
+              <TouchableOpacity onPress={() => setShowModel(true)} >
+                <Image
+                  source={require('../assets/portugal.png')} style={{ width: 50, height: 30 }} />
+              </TouchableOpacity>
+            }
           </View>
         }
       />
+      <Modal animationType="fade" transparent={true} visible={showModel} onDismiss={() => setShowModel(false)}
+        onRequestClose={() => setShowModel(false)} >
+        <TouchableWithoutFeedback onPress={() => setShowModel(false)}>
+          <View style={styles.modal} >
+            <TouchableWithoutFeedback>
+              <View style={styles.modalContainer}>
+                <Text style={{ fontWeight: 'bold', fontSize: 18, textAlign: 'center', marginBottom: 20 }}>Language</Text>
+                <View style={styles.modelItem}>
+                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" />
+                  <Image source={require('../assets/US.png')} style={styles.modelImg} />
+                  <Text>English</Text>
+                </View>
+                <View style={styles.modelItem}>
+                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" />
+                  <Image source={require('../assets/portugal.png')} style={styles.modelImg} />
+                  <Text>Portuguese</Text>
+                </View>
+                <View style={styles.modelItem}>
+                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" />
+                  <Image source={require('../assets/spain.png')} style={styles.modelImg} />
+                  <Text>Spanish</Text>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal >
     </View>
   );
 };
@@ -72,6 +132,29 @@ const styles = StyleSheet.create({
   qr: {
     width: 25,
     height: 25
+  },
+  modal: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 15,
+    backgroundColor: '#00000060',
+  },
+  modalContainer: {
+    // height: '100%',
+    backgroundColor: '#ffffff',
+    borderRadius: 3,
+    padding: 30
+  },
+  modelItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    columnGap: 10,
+    padding: 10,
+    marginBottom: 10,
+  },
+  modelImg: {
+    width: 70,
+    height: 40
   }
 });
 
