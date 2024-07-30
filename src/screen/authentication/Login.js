@@ -12,10 +12,8 @@ import { TostColor } from '../utils/ToastColors';
 import m_logo from '../../assets/M_logo.png';
 import g_logo from '../../assets/google_logo.png';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Login = () => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
     const navigation = useNavigation();
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -58,9 +56,9 @@ const Login = () => {
             console.log("login result", result?.response.role);
             if (result?.response?.code === 200 && result?.response.role !== 'BACK OFFICE ADMIN') {
                 // let rights = result?.response?.rights.toUpperCase()
-                // AsyncStorage.setItem('user_token', result?.response?.Authorization);
+                AsyncStorage.setItem('user_token', result?.response?.Authorization);
                 // AsyncStorage.setItem('rights', rights);
-                // AsyncStorage.setItem('userId', result?.response?.id);
+                AsyncStorage.setItem('userId', result?.response?.id);
                 navigation?.navigate('HomeScreen');
             } else {
                 Toast.showWithGravity(
