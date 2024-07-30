@@ -1,12 +1,18 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Text, TouchableWithoutFeedback } from 'react-native';
 import { View, StyleSheet, TouchableOpacity, Image, Modal } from 'react-native';
 import { Header } from 'react-native-elements';
 import { Icon, RadioButton } from 'react-native-paper';
+import { context } from '../navigation/Appnav';
 
 
-const HeadBar = ({ index, setActive, preState }) => {
+const HeadBar = () => {
+  const props = useContext(context);
+  const index = props.active;
+  const setActive = props.setActive;
+  const preState = props.pre;
+
   const navigation = useNavigation();
   const [showModel, setShowModel] = useState(false);
 
@@ -14,31 +20,44 @@ const HeadBar = ({ index, setActive, preState }) => {
     setActive(preState.id);
     navigation.navigate(preState.name);
   }
+
+  const menuName = () => {
+    if (index === 6)
+      return 'My Profile'
+    else if (index === 7)
+      return 'Privacy Policy'
+    else if (index === 8)
+      return 'Contact Us'
+    else if (index === 9)
+      return 'Feedback'
+  }
   return (
     <View>
-      <Header backgroundColor='#035676' statusBarProps={{ barStyle: 'light-content', backgroundColor: '#034a66' }}
+      <Header placement={index <= 5 ? 'center' : 'left'} backgroundColor='#035676' statusBarProps={{ barStyle: 'light-content', backgroundColor: '#034a66' }}
         leftComponent={
           <View>
             {
-              index === 6 &&
+              index > 5 &&
               <TouchableOpacity
-                style={{ marginTop: 5, flexDirection: 'row', columnGap: 5 }} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                style={styles.backMenu}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 onPress={back}
               >
                 <Icon
                   source="arrow-left"
                   size={25}
                   color="#fff"
-                /> 
-                <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>{index === 6 && 'My Profile'}</Text>
+                />
               </TouchableOpacity>
             }
           </View>
         }
         centerComponent={
-        index !== 6 &&  <View style={styles.logoView}>
+          index <= 5 ? <View style={styles.logoView}>
             <Image source={require('../assets/zelo_logo.png')} style={styles.logo} />
           </View>
+            :
+            <Text style={styles.menuTitle}>{menuName()}</Text>
         }
         rightComponent={
           <View style={styles.header_container}>
@@ -59,7 +78,7 @@ const HeadBar = ({ index, setActive, preState }) => {
             }
             {
               index === 3 &&
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => props?.setHeaderProps({ showFilter: true })}>
                 <Icon
                   source="filter"
                   size={30}
@@ -124,14 +143,24 @@ const styles = StyleSheet.create({
     width: 130,
     height: 30,
   },
+  backMenu: {
+    marginTop: 7,
+    flexDirection: 'row',
+    columnGap: 5
+  },
+  menuTitle: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginTop: 7,
+    alignSelf: 'flex-start',
+    width: 130,
+    height: 30,
+  },
   passcode: {
     width: 30,
     height: 30,
     marginRight: 15
-  },
-  qr: {
-    width: 25,
-    height: 25
   },
   modal: {
     flex: 1,

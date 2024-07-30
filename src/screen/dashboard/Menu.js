@@ -1,8 +1,9 @@
 import { useNavigation } from '@react-navigation/native'
 import React, { useContext, useEffect } from 'react'
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Icon } from 'react-native-paper'
 import { context } from '../../navigation/Appnav'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Menu = () => {
   const navigation = useNavigation();
@@ -11,10 +12,32 @@ const Menu = () => {
   const handleClick = (to) => {
     props.setActive(to.id);
     navigation.navigate(to.name);
+  };
+  const logout = () => {
+    Alert.alert(
+      "Logout",
+      "Are you sure you want to logout?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        {
+          text: "Confirm",
+          onPress: () => {
+            props.setActive(1);
+            AsyncStorage.clear();
+            navigation.navigate('LoginScreen');
+          }
+        }
+      ],
+      { cancelable: false }
+    );
   }
   useEffect(() => {
     props.setPre({ id: 5, name: 'MenuScreen' });
-  }, [])
+  }, []);
   return (
     <ScrollView style={styles.container}>
       <View style={{ ...styles.card, marginBottom: 20, paddingVertical: 7 }}>
@@ -37,16 +60,16 @@ const Menu = () => {
       <TouchableOpacity style={styles.card} onPress={() => handleClick({ id: 6, name: 'Profile' })}>
         <Text style={styles.title}>My Profile</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.card}>
+      <TouchableOpacity style={styles.card} onPress={() => handleClick({ id: 7, name: 'PrivacyPolicy' })}>
         <Text style={styles.title}>Privacy Policy</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.card}>
+      <TouchableOpacity style={styles.card} onPress={() => handleClick({ id: 8, name: 'ContactUs' })}>
         <Text style={styles.title}>Contact Us</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.card}>
+      <TouchableOpacity style={styles.card} onPress={() => handleClick({ id: 9, name: 'Feedback' })}>
         <Text style={styles.title}>Feedback</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.card}>
+      <TouchableOpacity style={styles.card} onPress={logout}>
         <Text style={styles.title}>Logout</Text>
       </TouchableOpacity>
     </ScrollView>

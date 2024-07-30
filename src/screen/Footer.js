@@ -1,9 +1,14 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Icon } from 'react-native-paper';
+import { context } from '../navigation/Appnav';
 
-const Footer = ({active, setActive}) => {
+const Footer = () => {
+    const props= useContext(context);
+    const active= props.active;
+    const setActive= props.setActive;
+    
     const navigation = useNavigation();
     const menu = [
         {
@@ -38,7 +43,7 @@ const Footer = ({active, setActive}) => {
         },
     ];
     const color=(id)=>{
-        return active === id ? "#fff" : "#1586b3";
+        return active === id || (id === 5 && active > id) ? "#fff" : "#1586b3";
     };
 
     const handleClick = (id) => {

@@ -160,3 +160,23 @@ export const getVisitorList = async () => {
   }
 };
 
+// Dashboard APIs
+export const getDashboardData = async () => {
+  try {
+    const response = await axiosInstance.get(`/dashboardEndUser/dashboardenduserservice`);
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const updateBookingRequest = (id, status) => {
+  try {
+    const response = axiosInstance.put(`/booking/allowbookingbyenduser?id=${id}&status=${status}`);
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+}

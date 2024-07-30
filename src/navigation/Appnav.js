@@ -10,18 +10,25 @@ import Footer from '../screen/Footer';
 import { StyleSheet, View } from 'react-native';
 import AddBooking from '../screen/dashboard/AddBooking';
 import Profile from '../screen/dashboard/Profile';
+import PrivacyPolicy from '../screen/dashboard/PrivacyPolicy';
+import ContactUs from '../screen/dashboard/ContactUs';
+import Feedback from '../screen/dashboard/Feedback';
+import LoadingIndicator from '../screen/LoadingIndicator';
 
 const Stack = createNativeStackNavigator();
 export const context = createContext();
 // create a component
 const Appnav = () => {
   const [active, setActive] = useState(1);
-  const [pre, setPre]= useState({id: 1, name: 'Dashboard'});
+  const [pre, setPre] = useState({ id: 1, name: 'Dashboard' });
+  const [headerProps, setHeaderProps] = useState();
+  const [loading, setLoading] = useState(false);
   return (
     <View style={styles.container}>
-      <HeadBar index={active} setActive={setActive} preState={pre} />
-      <View style={styles.content}>
-        <context.Provider value={{ active, setActive, pre, setPre }}>
+      {loading && <LoadingIndicator />}
+      <context.Provider value={{ active, setActive, pre, setPre, headerProps, setHeaderProps, setLoading }}>
+        <HeadBar />
+        <View style={styles.content}>
           <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName='DashboardScreen' >
             <Stack.Screen name="DashboardScreen" component={Dashboard} />
             <Stack.Screen name="CalendarScreen" component={CalendarView} />
@@ -30,10 +37,13 @@ const Appnav = () => {
             <Stack.Screen name="MenuScreen" component={Menu} />
             <Stack.Screen name="AddBooking" component={AddBooking} />
             <Stack.Screen name="Profile" component={Profile} />
+            <Stack.Screen name='PrivacyPolicy' component={PrivacyPolicy} />
+            <Stack.Screen name="ContactUs" component={ContactUs} />
+            <Stack.Screen name="Feedback" component={Feedback} />
           </Stack.Navigator>
-        </context.Provider>
-      </View>
-      <Footer active={active} setActive={setActive} />
+        </View>
+        <Footer />
+      </context.Provider>
     </View>
 
   );
