@@ -1,21 +1,32 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, View, LayoutAnimation, TouchableOpacity, ScrollView, Platform ,TextInput} from 'react-native';
+import { SafeAreaView, StyleSheet, Text, View, LayoutAnimation, TouchableOpacity, ScrollView, Platform ,TextInput,Switch} from 'react-native';
+import { Button, useTheme } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Checkbox } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { findBuildingListBasedonLocationId, findEquipmentsListBasedonCustomerLocationId, getLocationlist, loginHomeAccess } from '../../apiservices/Apiservices';
+import { addBookingApi, findBuildingListBasedonLocationId, findCapacityBuildingBased, findCapacityLocationBased, findCateringListBasedonBuildingId, findCateringListBasedonCustomerLocationId, findCateringStatusBasedonBasedonBuildingId, findCateringStatusBasedonCustomerLocationId, findCustomerCleaningSattusBasedonBuildingId, findCustomerCleaningStatusBasedonCustomerLocationId, findCustomeritsupportsettingListBasedonBuildingId, findCustomeritsupportsettingListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonBuildingId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerMobileEquipmentStatusBasedonBuildingId, findCustomerMobileEquipmentStatusBasedonCustomerLocationId, findCustomerSpecialSettingBasedonBuildingId, findCustomerSpecialSettingBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonBuildingId, findCustomerSpecialSettingListBasedonCustomerLocationId, findEquipmentsListBasedonBuildingId, findEquipmentsListBasedonCustomerLocationId, findFloorsListBasedonBuildingId, findITSupporttBasedonBuildingId, findITSupporttBasedonCustomerLocationId, findMobileEquipmentsBasedonCustomerLocationId, getDeskList, getEndUserList, getLocationlist, getMeetingRoomList, getMeetingRoomListForEquipmentAndCapacity, getParkingSeatList, getVisitorList, loginHomeAccess, visitorCreateAndUpdate } from '../../apiservices/Apiservices';
+import { useNavigation } from '@react-navigation/native';
 
 const AddBooking = () => {
 
-   
+   const navigation = useNavigation();
+   const { colors } = useTheme();
 
     const [itemsLocations, setItemsLocations] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState(null);
 
     const [itemsBuildings, setItemsBuildings] = useState([]);
     const [selectedBuilding, setSelectedBuilding] = useState(null);
+
+    const [itemsFloors, setItemsFloors] = useState([]);
+    const [checkedFloors, setCheckedFloors] = useState({});
+    const [isOpenFloor, setIsOpenFloor] = useState(false);
+
+    
+    const [itemsCapacity, setItemsCapacity] = useState([]);
+    const [selectedCapacity, setSelectedCapacity] = useState(null);
 
     const [itemsResources, setItemsResources] = useState([]);
     const [selectedResource, setSelectedResource] = useState(null);
@@ -37,13 +48,71 @@ const AddBooking = () => {
     const [requesterEmail,setRequesterEmail]=useState('');
     const [subject,setSubject]=useState('');
     const [description,setDescription]=useState('');
-    const [visitor,setVisitor]=useState();
+   
+//  Add visitor
+const [visitorCompany,setVisitorCompany]=useState('');
+const [vistorName,setVistorName]=useState('');
+const [vistorEmail,setVistorEmail]=useState('');
+
+    const [visitor,setVisitor]=useState([]);
+    const [checkVisitor,setCheckVisitor]=useState({});
+    const [visitorisOpen,setVisitorisOpen]=useState(false);
+
+    //Add Visitor form enable status
+    const [visitorFormEnable,setVisitorFormEnable]=useState(false);
+    const [viewMoreenable,setViewMoreenable]=useState(false);
+
+//    Catering
+    const [catering,setCatering]=useState([]);
+    const [checkCatering,setCheckCatering]=useState({});
+    const [cateringisOpen,setCateringisOpen]=useState(false);
+
+    //Add Catering form enable status
+    const [cateringFormEnable,setCateringFormEnable]=useState(false);
+
+
+ //cleaning 
+    const [cleaningFormEnable,setCleaningFormEnable]=useState(false);  
+
+    const [isCleaning,setIsCleaning]=useState(false);
+    const [cleaning,setCleaning]=useState();
+// mobile equipment
+const [mobileEquipmentFormEnable,setMobileEquipmentFormEnable]=useState(false);
+const [mobileEquipment,setMobileEquipment]=useState([]);
+const [checkedMobileEquipment,setCheckedMobileEquipment]=useState({});
+const [mobileEquipmentDescription,setMobileEquipmentDescription]=useState('');
+const [mobileEquipmentisOpen,setMobileEquipmentisOpen]=useState(false);
+
+//IT support
+const [itSupportFormEnable,setItSupportFormEnable]=useState(false);
+const [itSupport,setItSupport]=useState([]);
+const [checkedItSupport,setCheckedItSupport]=useState({});
+const [itSupportDescription,setItSupportDescription]=useState('');
+const [itSupportisOpen,setItSupportisOpen]=useState(false);
+
+
+// Special Service
+const [specialServiceFormEnable,setSpecialServiceFormEnable]=useState(false);
+const [specialService,setSpecialService]=useState([]);
+const [checkedSpecialService,setCheckedSpecialService]=useState({});
+const [specialServiceDescription,setSpecialServiceDescription]=useState('');
+const [specialServiceisOpen,setSpecialServiceisOpen]=useState(false);
+
+
+
+
 
     const [user, setUser] = useState([]);
     const [checkUser, setCheckUser] = useState({});
     const [userisOpen, setUserisOpen] = useState(false);
+    const [loginUser, setLoginUser] = useState({});
 
-   
+//    startDate && endDate Response Keys
+    const [startDate, setStartDate] = useState(new Date());
+    const [startTime, setStartTime] = useState(new Date());
+    const [endTime, setEndTime] = useState(new Date());
+    const [endDate1, setEndDate1] = useState(new Date());
+
 
     // Start Date and Time
     const [date, setDate] = useState(new Date());
@@ -70,6 +139,15 @@ const AddBooking = () => {
         { label: '120 min', value: '120' },
         { label: 'All Day', value: '1440' }
     ]);
+
+    const addVisitorFormStatus = () => {
+        if(visitorFormEnable){
+            setVisitorFormEnable(false);
+        }else{
+            setVisitorFormEnable(true);
+        }
+        
+    }
 
     const onChange = (event, selectedDate) => {
         const currentDate = selectedDate || date;
@@ -115,6 +193,24 @@ const AddBooking = () => {
     },[selectedResource])
 
     useEffect(() => {
+        // console.log("Start Date ",date);
+        // console.log("End Date ",endDate);
+    
+        const startDate = formatDate(date);
+        const startTime = formatTime(date);
+        const endDate1 = formatDate(endDate);
+        const endTime = formatTime(endDate);
+
+        setStartDate(startDate);
+        setStartTime(startTime);
+        setEndDate1(endDate1);
+        setEndTime(endTime);
+    
+       
+
+    }, [date, endDate]);
+
+    useEffect(() => {
         if (durationValue !== null) {
             const endDateTime = new Date(date.getTime() + durationValue * 60000);
             setEndDate(endDateTime);
@@ -148,69 +244,293 @@ const AddBooking = () => {
     };
 
     useEffect(() => {
-       
-        getlocationApi();
+        getLoginUser();
+        getEndUsers();
+        getVisitors();
     }, []);
 
-    const getlocationApi =async () => {
-        const userId =await AsyncStorage.getItem('userId');
-    // console.log("Retrieved userId: ", userId);
-     const userDetails=null; 
-     if(userId){
-         
-        loginHomeAccess(userId).then((res) => {
-            // console.log("User Details ", res);
-            userDetails = res.customerDetails.location.id
-        })
-     } 
+    useEffect(() => {
+        Object.keys(loginUser).length > 0 && getlocationApi();
+    },[loginUser])
 
+    const getLoginUser = async () => {
+        const userId =await AsyncStorage.getItem('userId');
+         if(userId){
+            loginHomeAccess(userId).then((res) => {
+                if(res.status){
+                setLoginUser(res.user);
+                setRequesterName(res.user.firstName);
+                setRequesterEmail(res.user.email);
+                }
+                // console.log("locationId ",userDetails);
+                // console.log("location ",res.customerDetails.location.location);
+            })
+         } 
+    }
+
+    // console.log("loginUser ",loginUser.id);
+    const getlocationApi = () => {
         getLocationlist().then((res) => {
             // console.log("location ", res);
+            if(res.status){
             const locationOptions = res.customerLocations.map(item => ({
                 label: item.location,
                 value: item.id
-            }))
+            }));
             setItemsLocations(locationOptions);
+            const itemsLocationsId=loginUser?.location?.id;
+            // console.log("itemsLocationsId ",itemsLocationsId);
+            locationOptions.map((item)=>{
+                if(item.value === itemsLocationsId){
+                    setSelectedLocation(item.value);
+                }
+            })
+        }
         })
 
-      if(userDetails === null){
-          itemsLocations.map((item)=>{
-              if(item.value===userDetails){
-                  setSelectedLocation(item.value);
-              }
-          })
-      }
     }
+
+
+    const getEndUsers = () => {
+   
+        getEndUserList().then((res) => {
+            if(res.status){
+            setUser([]);
+            setUser(res.users);
+
+   const initialCheckedState = res.users.reduce((acc, user) => {
+            acc[user.id] = false;
+            return acc;
+        }, {});
+        setCheckUser(initialCheckedState);
+    }
+        })
+        
+    }
+
+ 
+    const handleuserToggle = () => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setUserisOpen(!userisOpen);
+    };
+
+    const userCheckboxChange = (id) => {
+        const newSelectedItems = { ...checkUser, [id]: !checkUser[id] };
+        setCheckUser(newSelectedItems);
+    };
+
+    const selectedUerNames = Object.entries(checkUser)
+        .filter(([id, isChecked]) => isChecked)
+        .map(([id]) => user.find(item => item.id === Number(id))?.username || '');
+
+   const getVisitors =() =>{
+     getVisitorList().then((res) => {
+        if(res.status){
+        setVisitor([]);
+        // console.log("visitor ", res.visitors);
+        setVisitor(res.visitors);
+        }
+
+       
+    })
+   }    
+
+   const handleVisitorToggle = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setVisitorisOpen(!visitorisOpen);
+};
+
+const visitorCheckboxChange = (id) => {
+    const newSelectedItems = { ...checkVisitor, [id]: !checkVisitor[id] };
+    // setCheckUser(newSelectedItems);
+    setCheckVisitor(newSelectedItems);
+};
+
+const selectedVisitorNames = Object.entries(checkVisitor)
+    .filter(([id, isChecked]) => isChecked)
+    .map(([id]) => visitor.find(item => item.id === Number(id))?.name || '');
 
     useEffect(() => {
         // console.log("selectedLocation ",selectedLocation);
         if(selectedLocation){
             getBulidingListApi(selectedLocation);
             getEqupmentListApi(selectedLocation);
+            getCustomerITSupporting(selectedLocation);
+            cateringApi(selectedLocation);
+            cleaningApi(selectedLocation);
+            MobileEquipmentApi(selectedLocation);
+            specialServiceApi(selectedLocation);
+            capcityAp(selectedLocation);
         }
         
     },[selectedLocation])
 
+    useEffect(() => {
+        if(selectedBuilding){
+            getFloorListApi(selectedBuilding);
+            getEquipmentListBuilding(selectedBuilding);
+            capacityBuildingBased(selectedBuilding);
+            cateringApiwithBuilding(selectedBuilding);
+            cleaningApiwithBuilding(selectedBuilding);
+            MobileEquipmentApiwithBuilding(selectedBuilding);
+            specialServiceApiwithBuilding(selectedBuilding);
+            getCustomerITSupportingwithBuildingId(selectedBuilding);
+        }
+        
+    },[selectedBuilding])
+
     const getBulidingListApi =(id) =>{
         findBuildingListBasedonLocationId(id).then((res) => {
             // console.log("building ", res.buildings);
+            if(res.status){
+            setItemsBuildings([]);
             const buildingOptions = res.buildings.map(item => ({
                 label: item.name,
                 value: item.id
             }))
             setItemsBuildings(buildingOptions);
+        }
         })
     }
+
+    const getFloorListApi =(id) =>{
+        // console.log("id ",id);
+        findFloorsListBasedonBuildingId(id).then((res) => {
+            // console.log("floor ", res.floors);
+            // console.log("floor List Building Baesd ",res.floors);
+            setItemsFloors([]);
+            if(res.status){
+            setItemsFloors(res.floors);
+        }
+        })
+    }
+
+    // console.log(" cateringFormEnable ", cateringFormEnable );
+ const handleFloorToggle = () => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        // setIsOpen(!isOpen);
+        setIsOpenFloor(!isOpenFloor);
+    };
+
+    const handleFloorCheckboxChange = (id) => {
+        const newSelectedItems = { ...checkedFloors, [id]: !checkedFloors[id] };
+        setCheckedFloors(newSelectedItems);
+    };
+
+    const selectedFloorNames = Object.entries(checkedFloors)
+        .filter(([id, isChecked]) => isChecked)
+        .map(([id]) => itemsFloors.find(item => item.id === Number(id))?.name || '');
+
+
 
     const getEqupmentListApi =(id) =>{
         findEquipmentsListBasedonCustomerLocationId(id).then((res) => {
             // console.log("equipment ", res.customerEquipments);
+            setEquipmentData([]);
+            if(res.status){
+           
+
             setEquipmentData(res.customerEquipments);
-            const initialCheckedState = backendResponse.reduce((acc, equipment) => {
-                acc[equipment.id] = false;
-                return acc;
-            }, {});
-            setCheckedEquipments(initialCheckedState);
+            // const initialCheckedState = res.customerEquipments.reduce((acc, equipment) => {
+            //     acc[equipment.id] = false;
+            //     return acc;
+            // }, {});
+            // setCheckedEquipments(initialCheckedState);
+        }
+        })
+    }
+
+    const getEquipmentListBuilding =(id) =>{
+        findEquipmentsListBasedonBuildingId(id).then((res) => {
+            // console.log("equipment List Building Baesd ");
+            // console.log("equipment ", res.customerEquipments);
+            setEquipmentData([]);
+            if(res.status){
+            
+            setEquipmentData(res.customerEquipments);
+            // const initialCheckedState = res.customerEquipments.reduce((acc, equipment) => {
+            //     acc[equipment.id] = false;
+            //     return acc;
+            // }, {});
+            // setCheckedEquipments(initialCheckedState);
+        }
+        })
+    }
+
+   
+
+
+    const capcityAp =(id) =>{
+        findCapacityLocationBased(id).then((res) => {
+            // console.log("capacity ", res);
+            if(res.status){
+                setItemsCapacity([]);
+            // Transform the data
+            if(res?.meetingRoomCapacityDTO?.listcapacity.length > 0){
+                // console.log("capacity ", res?.meetingRoomCapacityDTO?.listcapacity);
+                // const transformedData = res?.meetingRoomCapacityDTO?.listcapacity.map(capacity => ({
+                //     label: capacity.toString(),
+                //     value: capacity
+                //   }));
+              
+                //   // Update the state
+                //   setItemsCapacity(transformedData);
+
+                let updatedCapacityList = res.meetingRoomCapacityDTO.listcapacity;
+                const newCapacity = 0;
+          
+                if (!updatedCapacityList.includes(newCapacity)) {
+                  updatedCapacityList = [newCapacity, ...updatedCapacityList];
+                }
+          
+                const transformedData = updatedCapacityList.map(capacity => ({
+                  label: capacity.toString(),
+                  value: capacity
+                }));
+          
+                setItemsCapacity(transformedData);
+                
+            }
+ 
+            }
+        })
+    }
+
+    const capacityBuildingBased =(id) =>{
+        findCapacityBuildingBased(id).then((res) => {
+            // console.log("capacity List Building Baesd ");
+            // console.log("capacity ", res);
+            setItemsCapacity([]);
+            if(res.status){
+               
+            // Transform the data
+            if(res?.meetingRoomCapacityDTO?.listcapacity.length > 0){
+                // console.log("capacity ", res?.meetingRoomCapacityDTO?.listcapacity);
+                // const transformedData = res?.meetingRoomCapacityDTO?.listcapacity.map(capacity => ({
+                //     label: capacity.toString(),
+                //     value: capacity
+                //   }));
+              
+                //   // Update the state
+                //   setItemsCapacity(transformedData);
+
+                let updatedCapacityList = res.meetingRoomCapacityDTO.listcapacity;
+                const newCapacity = 0;
+          
+                if (!updatedCapacityList.includes(newCapacity)) {
+                  updatedCapacityList = [newCapacity, ...updatedCapacityList];
+                }
+          
+                const transformedData = updatedCapacityList.map(capacity => ({
+                  label: capacity.toString(),
+                  value: capacity
+                }));
+          
+                setItemsCapacity(transformedData);
+                
+            }
+
+            }
         })
     }
     const handleToggle = () => {
@@ -225,8 +545,442 @@ const AddBooking = () => {
 
     const selectedNames = Object.entries(checkedEquipments)
         .filter(([id, isChecked]) => isChecked)
-        .map(([id]) => equipmentData.find(item => item.id === Number(id)).name);
+        .map(([id]) => equipmentData.find(item => item.id === Number(id))?.name || '');
 
+
+   
+    const cateringApi =(selectedLocation) =>  {
+        // console.log("selectedLocation  Addbooking ",selectedLocation);
+        findCateringStatusBasedonCustomerLocationId(selectedLocation).then((res) => {
+            setCateringFormEnable(false);
+            if(res.status){
+            // console.log("catering status ", res.customerCateringSetting.isAllowedCateringWithinHours);
+            setCateringFormEnable(res.customerCateringSetting.isAllowedCateringWithinHours);
+            }
+        })
+        findCateringListBasedonCustomerLocationId(selectedLocation).then((res) => {
+           
+            if(res.status){
+                setCatering([]);
+                setCatering(res.customerCaterings);
+                // const initialCheckedState = res.customerCaterings.reduce((acc, equipment) => {
+                //     acc[equipment.id] = false;
+                //     return acc;
+                // }, {});
+                // setCheckCatering(initialCheckedState);
+            }
+           
+        })
+    }
+
+    const cateringApiwithBuilding =(selectedBuilding) =>  {
+        // console.log("selectedLocation  Addbooking ",selectedLocation);
+
+        findCateringStatusBasedonBasedonBuildingId(selectedBuilding).then((res) => {
+            // console.log("catering status Building Baesd ");
+            setCateringFormEnable(false);
+            if(res.status){
+            // console.log("catering status ", res.customerCateringSetting.isAllowedCateringWithinHours);
+            setCateringFormEnable(res.customerCateringSetting.isAllowedCateringWithinHours);
+            }
+        })
+
+        findCateringListBasedonBuildingId(selectedBuilding).then((res) => {
+            // console.log("catering List Building Baesd ");
+            if(res.status){
+                setCatering([]);
+                setCatering(res.customerCaterings);
+                // const initialCheckedState = res.customerCaterings.reduce((acc, equipment) => {
+                //     acc[equipment.id] = false;
+                //     return acc;
+                // }, {});
+                // setCheckCatering(initialCheckedState);
+            }
+        })
+
+
+    }
+
+    // console.log(" cateringFormEnable ", cateringFormEnable );
+
+    const handleCateringToggle = () => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        // setIsOpen(!isOpen);
+        setCateringisOpen(!cateringisOpen);
+    };
+
+    const handleCateringCheckboxChange = (id) => {
+        const newSelectedItems = { ...checkCatering, [id]: !checkCatering[id] };
+        setCheckCatering(newSelectedItems);
+    };
+
+    const selectedCateringNames = Object.entries(checkCatering)
+        .filter(([id, isChecked]) => isChecked)
+        .map(([id]) => catering.find(item => item.id === Number(id))?.name || '');
+
+
+  //Cleaning Api
+  const cleaningApi =(selectedLocation) =>  {
+    findCustomerCleaningStatusBasedonCustomerLocationId(selectedLocation).then((res) => {
+        setCateringFormEnable(false);
+        if(res.status){
+
+            // console.log("cleaning status ", res.customerCleaning.cleaningTimeStatus);
+            setCleaningFormEnable(res.customerCleaning.cleaningTimeStatus);
+            // setCleaningFormEnable(res.customerCleaningSetting.isAllowedCleaningWithinHours);
+        }
+    })
+  } 
+  
+  const cleaningApiwithBuilding =(selectedBuilding) =>  {
+    findCustomerCleaningSattusBasedonBuildingId(selectedBuilding).then((res) => {
+        // console.log("cleaning status Building Baesd ");
+        setCateringFormEnable(false);
+        if(res.status){
+            setCateringFormEnable(res.customerCleaning.cleaningTimeStatus);
+        }
+    })
+  }
+  
+  //Mobile Equpment Api
+
+  const MobileEquipmentApi =(selectedLocation) =>  {
+    // console.log("selectedLocation  Addbooking ",selectedLocation);
+    findCustomerMobileEquipmentStatusBasedonCustomerLocationId(selectedLocation).then((res) => {
+        setMobileEquipmentFormEnable(false);
+        if(res.status){
+            // console.log("mobile equipment status ", res.customerMobileEquipmentSetting.isAllowedWithinHours);
+            setMobileEquipmentFormEnable(res.customerMobileEquipmentSetting.isAllowedWithinHours);
+        }
+    })
+
+    findCustomerMobileEquipmentListBasedonCustomerLocationId(selectedLocation).then((res) => {
+        setMobileEquipment([]);
+        if(res.status){
+           
+            setMobileEquipment(res.customerMobileEquipments);
+            // const initialCheckedState = res.customerMobileEquipments.reduce((acc, equipment) => {
+            //     acc[equipment.id] = false;
+            //     return acc;
+            // }, {});
+            // setCheckedMobileEquipment(initialCheckedState);
+        }
+    })
+  }
+
+
+  const MobileEquipmentApiwithBuilding =(selectedBuilding) =>  {
+    findCustomerMobileEquipmentStatusBasedonBuildingId(selectedBuilding).then((res) => {
+        // console.log("mobile equipment status Building Baesd ");
+        setMobileEquipmentFormEnable(false);
+        if(res.status){
+            // console.log("mobile equipment status ", res.customerMobileEquipmentSetting.isAllowedWithinHours);
+            setMobileEquipmentFormEnable(res.customerMobileEquipmentSetting.isAllowedWithinHours);
+        }
+    })
+
+    findCustomerMobileEquipmentListBasedonBuildingId(selectedBuilding).then((res) => {
+        // console.log("mobile equipment List Building Baesd ");
+        setMobileEquipment([]);
+        if(res.status){
+          
+            setMobileEquipment(res.customerMobileEquipments);
+            // const initialCheckedState = res.customerMobileEquipments.reduce((acc, equipment) => {
+            //     acc[equipment.id] = false;
+            //     return acc;
+            // }, {});
+            // setCheckedMobileEquipment(initialCheckedState);
+        }
+    })
+  }
+
+
+  const handleMobileEquipmentToggle = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setMobileEquipmentisOpen(!mobileEquipmentisOpen);
+};
+
+const handleMobileEquipmentCheckboxChange = (id) => {
+    const newSelectedItems = { ...checkedMobileEquipment, [id]: !checkedMobileEquipment[id] };
+    setCheckedMobileEquipment(newSelectedItems);
+};
+
+const selectedMobileEquipmentNames = Object.entries(checkedMobileEquipment)
+    .filter(([id, isChecked]) => isChecked)
+    .map(([id]) => mobileEquipment.find(item => item.id === Number(id))?.name || '');
+
+
+
+
+   const getCustomerITSupporting =(selectedLocation) =>  {
+    findCustomeritsupportsettingListBasedonCustomerLocationId(selectedLocation).then((res) => {
+        // console.log("it support Setting ", res);
+        setItSupportFormEnable(false);
+        if(res.status){
+            // console.log("it support Setting ", res);
+            setItSupportFormEnable(res.customerITSupportSetting.isAllowedWithinHours);
+        }
+    })
+
+    findITSupporttBasedonCustomerLocationId(selectedLocation).then((res) => {
+        // console.log("it support ", res);
+        setItSupport([]);
+        if(res.status){
+           
+            setItSupport(res.customerITSupports);
+            // const initialCheckedState = res.customerITSupports.reduce((acc, equipment) => {
+            //     acc[equipment.id] = false;
+            //     return acc;
+            // }, {});
+            // setCheckedItSupport(initialCheckedState);
+        }
+    })
+   }
+
+  const getCustomerITSupportingwithBuildingId =(selectedBuilding)=>  {
+    findCustomeritsupportsettingListBasedonBuildingId(selectedBuilding).then((res) => {
+        // console.log("it support Setting status  ", res);
+        setItSupportFormEnable(false);
+        if(res.status){
+            // console.log("it support Setting ", res);
+            setItSupportFormEnable(res.customerITSupportSetting.isAllowedWithinHours);
+        }
+    })
+
+    findITSupporttBasedonBuildingId(selectedBuilding).then((res) => {
+        // console.log("it support Setting List ");
+        setItSupport([]);
+        if(res.status){
+           
+            setItSupport(res.customerITSupports);
+            // const initialCheckedState = res.customerITSupports.reduce((acc, equipment) => {
+            //     acc[equipment.id] = false;
+            //     return acc;
+            // }, {});
+            // setCheckedItSupport(initialCheckedState);
+        }
+    })
+
+  }
+
+
+   const handleItSupportToggle = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setItSupportisOpen(!itSupportisOpen);
+};  
+
+const handleItSupportCheckboxChange = (id) => {
+    const newSelectedItems = { ...checkedItSupport, [id]: !checkedItSupport[id] };
+    setCheckedItSupport(newSelectedItems);
+};
+
+const selectedItSupportNames = Object.entries(checkedItSupport)
+    .filter(([id, isChecked]) => isChecked)
+    .map(([id]) => itSupport.find(item => item.id === Number(id))?.name || '');
+
+
+ //Special Service Api
+ 
+ const specialServiceApi =(selectedLocation) =>  {
+    // console.log("selectedLocation  Addbooking ",selectedLocation);
+    findCustomerSpecialSettingBasedonCustomerLocationId(selectedLocation).then((res) => {
+        // console.log("special service status ", res);
+        setSpecialServiceFormEnable(false);
+        if(res.status){
+            // console.log("special service status ", res.customerSpecialServiceSetting.isAllowedSpecialServiceWithinHours);
+
+            setSpecialServiceFormEnable(res.customerSpecialServiceSetting.isAllowedSpecialServiceWithinHours);
+        }
+    })
+
+    findCustomerSpecialSettingListBasedonCustomerLocationId(selectedLocation).then((res) => {
+        // console.log("special service ", res);
+        setSpecialService([]);
+        if(res.status){
+          
+            setSpecialService(res.customerSpecialServices);
+            // const initialCheckedState = res.customerSpecialServices.reduce((acc, equipment) => {
+            //     acc[equipment.id] = false;
+            //     return acc;
+            // }, {});
+            // setCheckedSpecialService(initialCheckedState);
+        }
+    })
+ }
+
+ const specialServiceApiwithBuilding =(selectedBuilding) =>  {
+    findCustomerSpecialSettingBasedonBuildingId(selectedBuilding).then((res) => {
+        setSpecialServiceFormEnable(false);
+        // console.log("building special service status ", res);
+        if(res.status){
+            // console.log("special service status ", res.customerSpecialServiceSetting.isAllowedSpecialServiceWithinHours);
+
+            setSpecialServiceFormEnable(res.customerSpecialServiceSetting.isAllowedSpecialServiceWithinHours);
+        }
+    })
+
+    findCustomerSpecialSettingListBasedonBuildingId(selectedBuilding).then((res) => {
+        // console.log("building special service List ", res);
+        setSpecialService([]);
+        if(res.status){
+            setSpecialService(res.customerSpecialServices);
+            // const initialCheckedState = res.customerSpecialServices.reduce((acc, equipment) => {
+            //     acc[equipment.id] = false;
+            //     return acc;      
+            // }, {});
+            // setCheckedSpecialService(initialCheckedState);
+        }
+           
+    })
+ }
+
+ const handleSpecialServiceToggle = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    setSpecialServiceisOpen(!specialServiceisOpen);
+};  
+
+const handleItSpecialServiceCheckboxChange = (id) => {
+    const newSelectedItems = { ...checkedSpecialService, [id]: !checkedSpecialService[id] };
+    setCheckedSpecialService(newSelectedItems);
+};
+
+const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
+    .filter(([id, isChecked]) => isChecked)
+    .map(([id]) => specialService.find(item => item.id === Number(id))?.name || '');
+
+
+   useEffect(() => {
+
+    // console.log("selectedLocation ",selectedLocation);
+    // console.log("selectedBuilding ",selectedBuilding);
+    // console.log("checkedEquipments ",checkedEquipments);
+    // console.log("selectedCapacity ",selectedCapacity);
+
+
+    if(Object.keys(checkedEquipments).length > 0  && selectedCapacity !== null){
+        // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding);
+        getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity).then((res) => {
+            // console.log("Equipment And Capacity ",res);
+            
+            if(res.status){
+                // console.log("Equipment And Capacity ",res.meetingRoomDTOs);
+                setMeetingRoom([]);
+        const mappedItems = res.meetingRoomDTOs.map(resource => ({
+            label: resource.name,
+            value: resource.id,
+        }));
+
+        setMeetingRoom(mappedItems);
+            }
+        })
+        
+    }else if(Object.keys(checkedEquipments).length > 0 ){
+        getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity).then((res) => {
+            // console.log("Equipment",res);
+            if(res.status){
+                setMeetingRoom([]);
+        const mappedItems = res.meetingRoomDTOs.map(resource => ({
+            label: resource.name,
+            value: resource.id,
+        }));
+
+        setMeetingRoom(mappedItems);
+            }
+        })
+        
+    }else if(selectedCapacity !== null ){
+        getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity).then((res) => {
+            // console.log("Capacity ",res);
+            if(res.status){
+                setMeetingRoom([]);
+        const mappedItems = res.meetingRoomDTOs.map(resource => ({
+            label: resource.name,
+            value: resource.id,
+        }));
+
+        setMeetingRoom(mappedItems);
+                
+            }
+        })
+    }else if(selectedLocation && selectedBuilding){
+        // console.log("Both ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
+        getMettingRooms(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
+        getDesk(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
+        getParkingSeats(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
+
+       }else if(selectedLocation){
+        // console.log("Location ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
+        getMettingRooms(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime);
+        getDesk(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime);
+        getParkingSeats(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime);
+           
+       }
+       
+   },[selectedLocation,selectedBuilding,startDate,endDate1,startTime,endTime,checkedEquipments,selectedCapacity])
+
+   const formatDate = (date1) => {
+    const day = date1.getDate().toString().padStart(2, '0');
+    const month = (date1.getMonth() + 1).toString().padStart(2, '0');
+    const year = date1.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
+
+  const formatTime = (date1) => {
+    const hours = date1.getHours().toString().padStart(2, '0');
+    const minutes = date1.getMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
+  const getMettingRooms = (selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime) => {
+    // console.log("getMettingRooms ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
+    getMeetingRoomList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime).then((res) => {
+        // console.log("meeting Room ", res.meetingRoomDTOs);
+        if(res.status){
+        setMeetingRoom([]);
+        const mappedItems = res.meetingRoomDTOs.map(resource => ({
+            label: resource.name,
+            value: resource.id,
+        }));
+
+        setMeetingRoom(mappedItems);
+    }
+    })
+  }
+
+  const getDesk =(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime) => {
+    getDeskList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime).then((res) => {
+        // console.log("desk ", res.deskDTOs);
+          // Map backend response to dropdown items
+          if(res.status){
+        setDesk([]);
+          const mappedItems = res.deskDTOs.map(resource => ({
+            label: resource.name,
+            value: resource.id,
+        }));
+
+        setDesk(mappedItems);
+    }
+    })
+  }
+
+const getParkingSeats = (selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime) => {
+    // console.log("parking seat ", res.parkingSeatDTOs);
+    getParkingSeatList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime).then((res) => {
+        // console.log("parking seat ", res.parkingSeatDTOs);
+        // console.log("parking seat ", res.parkingSeatDTOs);
+           // Map backend response to dropdown items
+           if(res.status){
+        setParkingseat([]);
+           const mappedItems = res.parkingSeatDTOs.map(resource => ({
+            label: resource.name,
+            value: resource.id,
+        }));
+
+        setParkingseat(mappedItems);
+    }
+
+    })
+}
     useEffect(() => {
         const backendResponse = [
             { id: "meetingRoom", resource: "Meeting Room" },
@@ -242,100 +996,15 @@ const AddBooking = () => {
         setItemsResources(resourceOptions);
         if(selectedResource === null){
             setSelectedResource(resourceOptions[0].value);
+
         }
        
     }, []);
-    useEffect(() => {
-        // Example backend response
-        const response = [
-            {
-                id: 2850,
-                name: "Meeting Room 4",
-                capacity: 23,
-                status: true,
-                type: "Premium"
-            },
-            {
-                id: 2851,
-                name: "Meeting Room 5",
-                capacity: 15,
-                status: false,
-                type: "Standard"
-            },
-           
-        ];
-
-        // Map backend response to dropdown items
-        const mappedItems = response.map(resource => ({
-            label: resource.name,
-            value: resource.id,
-        }));
-
-        setMeetingRoom(mappedItems);
-    }, []);
-
-    useEffect(() => {
-        // Example backend response
-        const response = [
-            {
-                id: 1,
-                name: "Parking Seat 1",
-                capacity: 23,
-                status: true,
-                type: "Premium"
-            },
-            {
-                id: 2851,
-                name: "Parking Seat 2",
-                capacity: 15,
-                status: false,
-                type: "Standard"
-            },
-           
-        ];
-
-        // Map backend response to dropdown items
-        const mappedItems = response.map(resource => ({
-            label: resource.name,
-            value: resource.id,
-        }));
-
-        setParkingseat(mappedItems);
-    }, []);
-
-    useEffect(() => {
-        // Example backend response
-        const response = [
-            {
-                id: 1,
-                name: "Desk 1",
-                capacity: 23,
-                status: true,
-                type: "Premium"
-            },
-            {
-                id: 2851,
-                name: "Desk 2",
-                capacity: 15,
-                status: false,
-                type: "Standard"
-            },
-           
-        ];
-
-        // Map backend response to dropdown items
-        const mappedItems = response.map(resource => ({
-            label: resource.name,
-            value: resource.id,
-        }));
-
-        setDesk(mappedItems);
-    }, []);
-
-
+   
    
 
-        // console.log("selectedResource ",selectedResource);
+
+        // console.log("mobileEquipment ",mobileEquipment);
 
         const meetingroomChange =(item) =>{
             // console.log("item ",item);
@@ -354,40 +1023,156 @@ const AddBooking = () => {
             setSelectedParkingSeat(item.value)
         }
 
-        useEffect(() => {
-            const users = [
-                { id: 4011, username: "ajith@gmail.com", email: "ajith@gmail.com" },
-                { id: 4312, username: "ajith@dbcyelagiri.edu.in", email: "ajith@dbcyelagiri.edu.in" },
-                { id: 5241, username: "b@gmail.com", email: "b@gmail.com" },
-                { id: 5140, username: "jeni@gmail.com", email: "jeni@gmail.com" }
-            ];
-            setUser(users);
-            const initialCheckedState = users.reduce((acc, user) => {
-                acc[user.id] = false;
-                return acc;
-            }, {});
-            setCheckUser(initialCheckedState);
-        }, []);
+       const addVisitor = () => {
+        if(vistorEmail && vistorName){
+            datas={
+                name:vistorName,
+                email:vistorEmail,
+                company:visitorCompany,
+
+            }
+
+            visitorCreateAndUpdate(datas).then((res) => {
+                if(res.status){
+                    // console.log("create Visitor ", res);
+                    setVistorName('');
+                    setVistorEmail('');
+                    setVisitorCompany('');
+                    getVisitors();
+                    setVisitorFormEnable(false);
+                }
+            })
+            
+            
+            
+        }
+           
+       }
+
+       const resourceSelected =(item) =>{
+        setSelectedResource(item.value);
+           //caltering
+           setCheckCatering({});
+           setCateringisOpen(!cateringisOpen);
+           
+
+           //cleaning 
+           setIsCleaning(!isCleaning);
+           setCleaning();
+ 
+          
+            setCheckedMobileEquipment({});
+            setMobileEquipmentDescription('');
+            setMobileEquipmentisOpen(!mobileEquipmentisOpen);
+          
+            setCheckedItSupport({});
+            setItSupportDescription('');
+            setItSupportisOpen(!itSupportisOpen);
+           
+  
+            
+           setCheckedSpecialService({});
+           setSpecialServiceDescription('');
+           setSpecialServiceisOpen(!specialServiceisOpen);
+
+        setViewMoreenable(!viewMoreenable);
+
+       }
+
+    const handleClickViewMore = () => {
+
+        if(viewMoreenable){
+            setViewMoreenable(false);
+        }else{
+            setViewMoreenable(true);
+        }
+        
+    }   
+    const toggleCleaningSwitch = () => {
+        if(isCleaning){
+            setIsCleaning(false);
+        }else{
+            setIsCleaning(true);
+        }
+        
+    }  
     
-
-
-
-
-
-        const handleuserToggle = () => {
-            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            setUserisOpen(!userisOpen);
-        };
     
-        const userCheckboxChange = (id) => {
-            const newSelectedItems = { ...checkUser, [id]: !checkUser[id] };
-            setCheckUser(newSelectedItems);
-        };
-    
-        const selectedUerNames = Object.entries(checkUser)
-            .filter(([id, isChecked]) => isChecked)
-            .map(([id]) => user.find(item => item.id === Number(id))?.username || '');
+   const handleClickCancel = () => {
+    // navigation.navigate('Dashboard');    
+   }
 
+   const handleClickSubmit = () => {
+ // Get an array of equipment IDs where the value is true
+const equipmentIds = Object.keys(checkedEquipments).filter(key => checkedEquipments[key] === true);
+const mobileEquipmentIds = Object.keys(checkedMobileEquipment).filter(key => checkedMobileEquipment[key] === true);
+const itSupportIds = Object.keys(checkedItSupport).filter(key => checkedItSupport[key] === true);
+const specialServiceIds = Object.keys(checkedSpecialService).filter(key => checkedSpecialService[key] === true);
+// const parkingSeatIds = Object.keys(checkedParkingSeat).filter(key => checkedParkingSeat[key] === true);
+// const chargingCarIds = Object.keys(checkedChargingCar).filter(key => checkedChargingCar[key] === true);
+
+const floorIds = Object.keys(checkedFloors).filter(key => checkedFloors[key] === true).join(',');
+
+const users=Object.keys(checkUser).filter(key => checkUser[key] === true);
+
+    // if(selectedResource ==='meetingRoom'){
+      datas={ 
+       attendeeIds :users,
+       bookingCateringDTOs:{
+            bookingDescription:description,
+            bookingFrom: "MOBILE",
+            bookingType: selectedResource,
+            buildingId: selectedBuilding,
+            capacity: null,
+            capacity1: selectedCapacity,
+            chargingCarIds: [],
+            cleaningRequired: isCleaning,
+            company: null,
+            customerCleaningDescription: cleaning,
+            // customerEquipmentsIds: [176028, 176029],
+            customerEquipmentsIds:equipmentIds,
+            customerITSupportDescription:itSupportDescription,
+            customerITSupportsIds:itSupportIds,
+            customerMobileEquipmentDescription: mobileEquipmentDescription,
+            customerMobileEquipmentsIds:mobileEquipmentIds,
+            customerSpecialServiceDescription: specialServiceDescription,
+            customerSpecialServicesIds: specialServiceIds,
+            deskId: null,
+            driver: null,
+            endDate: endDate1,
+            endTime: endTime,
+            floorId: null,
+            floorIds: floorIds,
+            licensePlate: null,
+            locationId: selectedLocation,
+            meetingRoomId: selectedMeetingRoom,
+            parkingSeatDetails: [],
+            parkingSeatId: null,
+            parkingSeatsIds: [],
+            requesterEmail: requesterEmail,
+            requesterId: loginUser.id,
+            requesterName: requesterName,
+            startDate: startDate,
+            startTime: startTime,
+            subject: subject,
+        
+         }
+       }
+
+       console.log("add booking  Payload datas ", datas);
+      
+    //    addBookingApi(datas).then((res) => {
+    //     console.log("add booking  outer", res);
+    //        if(res.status){
+    //            console.log("add booking  success", res);
+    //        }
+    //    })
+       
+//    } 
+} 
+
+
+// console.log(selectedLocation, itemsLocations);
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>Add Booking</Text>
@@ -409,6 +1194,49 @@ const AddBooking = () => {
                 </View>
 
                 <View style={styles.pickerContainer}>
+                    <Text>Building</Text>
+                    <Dropdown
+                        style={styles.dropdown}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        inputSearchStyle={styles.inputSearchStyle}
+                        data={itemsBuildings}
+                        labelField="label"
+                        valueField="value"
+                        placeholder="Select Building"
+                        value={selectedBuilding}
+                        onChange={item => setSelectedBuilding(item.value)}
+                    />
+                </View>
+
+                <View style={styles.pickerContainer}>
+                    <Text> Floor </Text>
+                    <View style={styles.dropdownContainer}>      
+                <TouchableOpacity onPress={handleFloorToggle} style={styles.dropdownHeader}>
+                    {selectedFloorNames.length > 0 ? (
+                        <Text>{selectedFloorNames.join(', ')}</Text>
+                    ) : (
+                        <Text  style={styles.dropdownHeaderText}>Select Floor</Text> 
+                    )}
+                </TouchableOpacity>
+                {isOpenFloor && (
+                    <View style={styles.dropdownContent}>
+                        {itemsFloors.map((item) => (
+                            <View key={item.id} style={styles.dropdownItem}>
+                                <Checkbox
+                                    status={checkedFloors[item.id] ? 'checked' : 'unchecked'}
+                                    onPress={() => handleFloorCheckboxChange(item.id)}
+                                />
+                                <Text>{item.name}</Text>
+                            </View>
+                        ))}
+                    </View>
+                )}
+
+                    </View>
+                </View>
+
+                <View style={styles.pickerContainer}>
                     <Text>Resource</Text>
                     <Dropdown
                         style={styles.dropdown}
@@ -420,11 +1248,12 @@ const AddBooking = () => {
                         valueField="value"
                         placeholder="Select Resource"
                         value={selectedResource}
-                        onChange={item => setSelectedResource(item.value)}
+                        onChange={item => resourceSelected(item)}
                     />
                 </View>
-
-                <View style={styles.pickerContainer}>
+                {
+                    (selectedResource === 'meetingRoom' && equipmentData.length > 0) &&
+                    <View style={styles.pickerContainer}>
                     <Text>Equipments</Text>
                     <View style={styles.dropdownContainer}>
                         <TouchableOpacity onPress={handleToggle} style={styles.dropdownHeader}>
@@ -451,6 +1280,33 @@ const AddBooking = () => {
                         )}
                     </View>
                 </View>
+                }
+
+               
+
+                {
+                    (selectedResource === 'meetingRoom' && itemsCapacity.length > 0) &&
+                    <View style={styles.pickerContainer}>
+                    <Text>Capacity</Text>
+
+<Dropdown
+        style={styles.dropdown}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        data={itemsCapacity}
+        labelField="label"
+        valueField="value"
+        placeholder="Select capacity"
+        value={selectedCapacity}
+        onChange={item => setSelectedCapacity(item.value)}
+      />
+
+                </View>
+
+                }
+
+              
 
               <View style={styles.pickerContainer}>
             <View style={styles.dateLabeles} >
@@ -617,7 +1473,7 @@ const AddBooking = () => {
 
             </View>
             <View style={styles.pickerContainer}>
-                <Text>Subject</Text>
+                <Text>Subject *</Text>
                 <TextInput style={styles.textInput} placeholder="Requester Email" className="input" value={subject} onChangeText={text => setSubject(text)} />
 
             </View>
@@ -661,11 +1517,295 @@ const AddBooking = () => {
                     </View>
                 </View>
 
-                <View style={styles.pickerContainer}>
-                <Text>Add Visitor</Text>
-                <TextInput style={styles.textInput} placeholder="" className="input" value={visitor} onChangeText={text => setVisitor(text)} />
+                <View style={styles.dateTimeContainer}>
+             
+                {/* <TextInput style={styles.textInput} placeholder="" className="input" value={visitor} onChangeText={text => setVisitor(text)} /> */}
+                <View  style={styles.visitorContainer}>
+                    <Text>Add VisitorS </Text>
+                    <View style={styles.dropdownContainer}>      
+                <TouchableOpacity onPress={handleVisitorToggle} style={styles.dropdownHeader}>
+                    {selectedVisitorNames.length > 0 ? (
+                        <Text>{selectedVisitorNames.join(', ')}</Text>
+                    ) : (
+                        <Text  style={styles.dropdownHeaderText}>Select Visitor</Text>
+                    )}
+                </TouchableOpacity>
+                {visitorisOpen && (
+                    <View style={styles.dropdownContent}>
+                        {visitor.map((item) => (
+                            <View key={item.id} style={styles.dropdownItem}>
+                                <Checkbox
+                                    status={checkVisitor[item.id] ? 'checked' : 'unchecked'}
+                                    onPress={() => visitorCheckboxChange(item.id)}
+                                />
+                                <Text>{item.name}</Text>
+                            </View>
+                        ))}
+                    </View>
+                )}
+
+                    </View>
+                </View>
+           <View style={styles.vistorbuttonContainer}>
+           <Button mode="contained" onPress={() => addVisitorFormStatus()} style={styles.button}>Add Visitor</Button>
+           </View>
+             
+            
+            </View>
+            {
+                visitorFormEnable && 
+                <View >
+                <View style={styles.pickerContainer}> 
+                <Text>Visitor Name *</Text>
+                <TextInput  style={styles.textInput}  placeholder="Visitor Name" className="input" value={vistorName} onChangeText={text => setVistorName(text)} />
+                </View>
+                <View style={styles.pickerContainer}> 
+                <Text> Email *</Text>
+                <TextInput  style={styles.textInput}  placeholder=" Email" className="input" value={vistorEmail} onChangeText={text => setVistorEmail(text)} />
+                </View>
+
+                <View style={styles.pickerContainer}> 
+                <Text> Company *</Text>
+                <TextInput  style={styles.textInput}  placeholder=" Email" className="input" value={visitorCompany} onChangeText={text => setVisitorCompany(text)} />
+                </View>
+                
+
+                <Button mode="contained-tonal" onPress={() => addVisitor()} style={styles.button}>Add Visitor</Button>
+             </View>
+            }
+    {
+                (viewMoreenable && (selectedResource === 'meetingRoom' || selectedResource === 'desk')) &&
+                
+                <View>
+                 {
+                    cateringFormEnable &&
+                    <View style={styles.pickerContainer}>
+                    <Text> Catering  </Text>
+                    <View style={styles.dropdownContainer}>      
+                <TouchableOpacity onPress={handleCateringToggle} style={styles.dropdownHeader}>
+                    {selectedCateringNames.length > 0 ? (
+                        <Text>{selectedCateringNames.join(', ')}</Text>
+                    ) : (
+                        <Text  style={styles.dropdownHeaderText}>Select Catering</Text>
+                    )}
+                </TouchableOpacity>
+               
+                {cateringisOpen && (
+                    <View style={styles.dropdownContent}>
+                        {catering.map((item) => (
+                            <View key={item.id} style={styles.dropdownItem}>
+                                <Checkbox
+                                    status={checkCatering[item.id] ? 'checked' : 'unchecked'}
+                                    onPress={() => handleCateringCheckboxChange(item.id)}
+                                />
+                                <Text>{item.name}</Text>
+                            </View>
+                        ))}
+                    </View>
+                )}
+
+                    </View>
+                </View>
+                 }
+                    {
+                        cleaningFormEnable &&
+                        <View style={styles.pickerContainer}>
+                             <View style={styles.pickerContainer}>
+                        <Text>Cleaning</Text>
+                        <Switch 
+                         onValueChange={toggleCleaningSwitch}
+                         value={isCleaning}
+                         />
+
+                    </View>
+                   
+
+                 <View style={styles.pickerContainer}>
+                <Text>Cleaning Description</Text>
+                <TextInput
+                    style={styles.textInputPragraph}
+                    placeholder="Enter description here..."
+                    multiline={true} // Allows multiple lines of text
+                    numberOfLines={4} // Specifies the number of lines visible at once
+                    value={cleaning}
+                    onChangeText={text => setCleaning(text)}
+                />
 
             </View>
+                        </View>
+                    }
+                   {
+                    mobileEquipmentFormEnable &&
+                    <View >
+                         <View style={styles.pickerContainer}>
+                    <Text> Mobile Equipments </Text>
+                    <View style={styles.dropdownContainer}>      
+                <TouchableOpacity onPress={handleMobileEquipmentToggle} style={styles.dropdownHeader}>
+                    {selectedMobileEquipmentNames.length > 0 ? (
+                        <Text>{selectedMobileEquipmentNames.join(', ')}</Text>
+                    ) : (
+                        <Text  style={styles.dropdownHeaderText}>Select Mobile Equipments</Text>
+                    )}
+                </TouchableOpacity>
+                {mobileEquipmentisOpen && (
+                    <View style={styles.dropdownContent}>
+                        {mobileEquipment.map((item) => (
+                            <View key={item.id} style={styles.dropdownItem}>
+                                <Checkbox
+                                    status={checkedMobileEquipment[item.id] ? 'checked' : 'unchecked'}
+                                    onPress={() => handleMobileEquipmentCheckboxChange(item.id)}
+                                />
+                                <Text>{item.name}</Text>
+                            </View>
+                        ))}
+                    </View>
+                )}
+
+                    </View>
+                </View>
+                    <View style={styles.pickerContainer}>
+                        <Text>Mobile Equipments Description</Text>
+                        
+                        <TextInput
+                    style={styles.textInputPragraph}
+                    placeholder="Enter description here..."
+                    multiline={true} // Allows multiple lines of text
+                    numberOfLines={4} // Specifies the number of lines visible at once
+                    value={mobileEquipmentDescription}
+                    onChangeText={text => setMobileEquipmentDescription(text)}
+                />
+
+                    </View>
+                        </View>
+                   }
+
+                   {
+                    itSupportFormEnable &&
+                    <View>
+                       <View style={styles.pickerContainer}>
+                    <Text> Mobile Equipments </Text>
+                    <View style={styles.dropdownContainer}>      
+                <TouchableOpacity onPress={handleItSupportToggle} style={styles.dropdownHeader}>
+                    {selectedItSupportNames.length > 0 ? (
+                        <Text>{selectedItSupportNames.join(', ')}</Text>
+                    ) : (
+                        <Text  style={styles.dropdownHeaderText}>Select IT Support</Text>
+                    )}
+                </TouchableOpacity>
+                {itSupportisOpen && (
+                    <View style={styles.dropdownContent}>
+                        {itSupport.map((item) => (
+                            <View key={item.id} style={styles.dropdownItem}>
+                                <Checkbox
+                                    status={checkedItSupport[item.id] ? 'checked' : 'unchecked'}
+                                    onPress={() => handleItSupportCheckboxChange(item.id)}
+                                />
+                                <Text>{item.name}</Text>
+                            </View>
+                        ))}
+                    </View>
+                )}
+
+                    </View>
+                </View>
+                    <View style={styles.pickerContainer}>
+                        <Text>IT Support Description</Text>
+                        <TextInput
+                    style={styles.textInputPragraph}
+                    placeholder="Enter description here..."
+                    multiline={true} // Allows multiple lines of text
+                    numberOfLines={4} // Specifies the number of lines visible at once
+                    value={itSupportDescription}
+                    onChangeText={text => setItSupportDescription(text)}
+                />
+                    </View>                        
+                   </View>
+                   }
+                   
+                    {
+                        specialServiceFormEnable &&
+                        <View> 
+
+<View style={styles.pickerContainer}>
+                    <Text> Special Service </Text>
+                    <View style={styles.dropdownContainer}>      
+                <TouchableOpacity onPress={handleSpecialServiceToggle} style={styles.dropdownHeader}>
+                    {selectedSpecialServiceNames.length > 0 ? (
+                        <Text>{selectedSpecialServiceNames.join(', ')}</Text>
+                    ) : (
+                        <Text  style={styles.dropdownHeaderText}>Select Special Service</Text>
+                    )}
+                </TouchableOpacity>
+                {specialServiceisOpen && (
+                    <View style={styles.dropdownContent}>
+                        {specialService.map((item) => (
+                            <View key={item.id} style={styles.dropdownItem}>
+                                <Checkbox
+                                    status={checkedSpecialService[item.id] ? 'checked' : 'unchecked'}
+                                    onPress={() => handleItSpecialServiceCheckboxChange(item.id)}
+                                />
+                                <Text>{item.name}</Text>
+                            </View>
+                        ))}
+                    </View>
+                )}
+
+                    </View>
+                </View>
+
+                <View style={styles.pickerContainer}>
+                        <Text>Special Service Description</Text>
+                        <TextInput
+                    style={styles.textInputPragraph}
+                    placeholder="Enter description here..."
+                    multiline={true} // Allows multiple lines of text
+                    numberOfLines={4} // Specifies the number of lines visible at once
+                    value={specialServiceDescription}
+                    onChangeText={text => setSpecialServiceDescription(text)}
+                />
+                    </View>   
+
+                        </View>
+                    }
+                </View>
+            }
+
+<View style={styles.viewMoreContainer}>
+      {!viewMoreenable ? (
+        <TouchableOpacity onPress={handleClickViewMore} style={styles.iconRowview}>
+            <Icon name="chevron-down" size={20} style={styles.iconview} />
+          <Text style={styles.iconTextview}>View More</Text>
+          
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity onPress={handleClickViewMore} style={styles.iconRowview}>
+             <Icon name="chevron-up" size={20} style={styles.iconview} />
+          <Text style={styles.iconTextview}>View Less</Text>
+         
+        </TouchableOpacity>
+      )}
+    </View>
+
+    <View style={styles.submitbuttonContainer}>
+
+    <Button
+        mode="elevated"
+        onPress={handleClickCancel}
+        style={[styles.button, styles.cancelButton]}
+        buttonColor="red"
+      >
+        Cancel
+      </Button>
+      <Button
+        mode="contained"
+        onPress={handleClickSubmit}
+        style={styles.button}
+        buttonColor={colors.primary}
+      >
+        Submit
+      </Button>
+
+     </View>   
 
                
             </ScrollView>
@@ -808,6 +1948,60 @@ const styles = StyleSheet.create({
         padding: 10,
         textAlignVertical: 'top', // Ensures text starts at the top of the input
     },
+
+    //visitor
+    visitorContainer: {
+        width: '55%',
+        marginBottom: 20,
+    },
+    vistorbuttonContainer: {
+        width: '45%',
+        // marginBottom: 20,
+        marginTop: 25,
+    },
+    iconRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        margin: 10,
+      },
+      iconText: {
+        marginLeft: 10,
+        fontSize: 18,
+      },
+
+      viewMoreContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginVertical: 20,
+      },
+      iconRowview: {
+        flexDirection: 'column', // Stack items vertically
+        alignItems: 'center', // Center items horizontally
+        marginVertical: 10,
+      },
+      iconview: {
+        marginTop: 10, // Space between text and icon
+      },
+      iconTextview: {
+        fontSize: 16,
+      },
+
+      submitbuttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        marginTop: 10,
+      },
+      button: {
+        // flex: 1,
+        textDecorationColor: '#fff',
+        margin: 8,
+      },
+      cancelButton: {
+        backgroundColor: 'red',
+      },
+    
+
 });
 
 export default AddBooking;
