@@ -1,12 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
-import { updateBookingRequest } from '../apiservices/Apiservices';
-import Toast from 'react-native-toast-message';
-import { ToastColor } from './utils/ToastColors';
 
-const Table = ({ cols, rows, onClick }) => {
-  const [menuIndex, setMenuIndex] = useState();
+const Table = ({ cols, rows, onClick, menuIndex, setMenuIndex, loading }) => {
 
   return (
     <>
@@ -55,7 +51,7 @@ const Table = ({ cols, rows, onClick }) => {
               }
             </View>)
           :
-          <Text style={styles.nodata}>Data Not Found!</Text>
+          <Text style={styles.nodata}>{loading ? '':'Data Not Found!'}</Text>
       }
     </>
   );

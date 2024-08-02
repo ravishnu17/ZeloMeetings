@@ -19,10 +19,11 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   async (config) => {
     const token =   await AsyncStorage.getItem('user_token');
-    // console.log("auth token",token);
+    const language= await AsyncStorage.getItem('language');
+    
     if (token) {
       config.headers.Authorization = `${token}`;
-      config.headers['Accept-Language'] = await AsyncStorage.getItem('language');
+      config.headers['Accept-Language'] =  language || 'en';
     }
     return config;
   },

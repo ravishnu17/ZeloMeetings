@@ -6,8 +6,8 @@ import { context } from '../navigation/Appnav';
 
 const Footer = () => {
     const props= useContext(context);
-    const active= props.active;
-    const setActive= props.setActive;
+    const active= props?.active;
+    const setActive= props?.setActive;
     
     const navigation = useNavigation();
     const menu = [

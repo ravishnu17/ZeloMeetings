@@ -9,9 +9,9 @@ import { context } from '../navigation/Appnav';
 
 const HeadBar = () => {
   const props = useContext(context);
-  const index = props.active;
-  const setActive = props.setActive;
-  const preState = props.pre;
+  const index = props?.active;
+  const setActive = props?.setActive;
+  const preState = props?.pre;
 
   const navigation = useNavigation();
   const [showModel, setShowModel] = useState(false);
@@ -78,7 +78,7 @@ const HeadBar = () => {
             }
             {
               index === 3 &&
-              <TouchableOpacity onPress={() => props?.setHeaderProps({ showFilter: true })}>
+              <TouchableOpacity onPress={() => props?.setHeaderProps(pre=>({...pre, showFilter: true }))}>
                 <Icon
                   source="filter"
                   size={30}

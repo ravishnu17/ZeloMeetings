@@ -4,12 +4,18 @@ import Table from '../Table';
 import { getDashboardData, updateBookingRequest } from '../../apiservices/Apiservices';
 import { Alert } from 'react-native';
 import { context } from '../../navigation/Appnav';
+import Toast from 'react-native-simple-toast';
+import { ToastColor } from '../utils/ToastColors';
+import { useIsFocused } from '@react-navigation/native';
 
 const Dashboard = () => {
     const [dashboard, setDashboard] = useState();
-    const props= useContext(context);
-    const setLoading = props.setLoading;
+    const [menuIndex, setMenuIndex] = useState(-1);
+
+    const props = useContext(context);
+    const setLoading = props?.setLoading;
     const cols = ['Type', 'Room / Desk', 'Requester', 'Start Time', 'End Time'];
+    const isFocus = useIsFocused();
 
     const dashBoardDetails = async () => {
         setLoading(true);
@@ -21,10 +27,12 @@ const Dashboard = () => {
     }
 
     const getDetails = (item) => {
-        let data = { id: item?.id, type: null, name: null, requester: null, startTime: null, endTime: null };
+        const curr_date = new Date();
+        let data = { id: item?.id, type: null, name: null, requester: null, startTime: null, endTime: null, isEnded: null };
         let from = new Date(item?.fromTime);
         let to = new Date(item?.toTime);
 
+        data.isEnded = curr_date > to;
         data.requester = item?.requesterName;
         data.startTime = from.getFullYear() + '-' + ('0' + (from.getMonth() + 1)).slice(-2) + '-' + ('0' + from.getDate()).slice(-2) + ' ' + ('0' + from.getHours()).slice(-2) + ':' + ('0' + from.getMinutes()).slice(-2);
         data.endTime = to.getFullYear() + '-' + ('0' + (to.getMonth() + 1)).slice(-2) + '-' + ('0' + to.getDate()).slice(-2) + ' ' + ('0' + to.getHours()).slice(-2) + ':' + ('0' + to.getMinutes()).slice(-2);
@@ -36,6 +44,7 @@ const Dashboard = () => {
             data.type = 'Desk';
             data.name = item?.desk?.name;
         }
+
         return data
     }
 
@@ -46,24 +55,34 @@ const Dashboard = () => {
             [
                 {
                     text: "Cancel",
-                    onPress: () => console.log("Cancel Pressed"),
+                    onPress: () => console.log("Cancel Pressed in update request"),
                     style: "cancel"
                 },
                 {
                     text: "Confirm",
-                    onPress: async () => {
+                    onPress: () => {
                         setLoading(true);
-                        const res = await updateBookingRequest(id, status);
-                        console.log(res);
-                        setLoading(false);
-                        if (res.status) {
-                            Toast.showWithGravity(
-                                'Coming Soon!',
-                                Toast.SHORT,
-                                Toast.BOTTOM,
-                                ToastColor.SUCCESS
-                            );
-                        }
+                        updateBookingRequest(id, status).then((res) => {
+                            if (res.status) {
+                                Toast.showWithGravity(
+                                    res?.information?.description,
+                                    Toast.SHORT,
+                                    Toast.BOTTOM,
+                                    ToastColor.SUCCESS
+                                );
+                            } else {
+                                Toast.showWithGravity(
+                                    res?.information?.description,
+                                    Toast.SHORT,
+                                    Toast.BOTTOM,
+                                    ToastColor.ERROR
+                                );
+                            }
+                        }).catch((error) => console.log('error while updating request', error)
+                        ).finally(() => {
+                            setLoading(false);
+                            dashBoardDetails();
+                        });
                     }
                 }
             ],
@@ -72,8 +91,11 @@ const Dashboard = () => {
     }
 
     useEffect(() => {
-        dashBoardDetails();
-    }, []);
+        if (isFocus) {
+            props?.setActive(1);
+            dashBoardDetails();
+        }
+    }, [isFocus]);
 
     return (
         <ScrollView style={styles.container}>
@@ -127,11 +149,13 @@ const Dashboard = () => {
                 <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Room / Desk booking requests</Text>
                 <Table
                     cols={cols}
-                    rows={dashboard?.bookingList ? dashboard?.bookingList?.map((item) => getDetails(item)) : []}
+                    rows={dashboard?.bookingList ? dashboard?.bookingList?.map((item) => getDetails(item)).filter((item) => item.isEnded === false) : []}
                     onClick={updateRequest}
+                    menuIndex={menuIndex}
+                    setMenuIndex={setMenuIndex}
+                    loading={props?.loading}
                 />
             </View>
-
         </ScrollView>
     )
 }

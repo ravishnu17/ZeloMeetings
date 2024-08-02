@@ -26,10 +26,10 @@ const Appnav = () => {
   return (
     <View style={styles.container}>
       {loading && <LoadingIndicator />}
-      <context.Provider value={{ active, setActive, pre, setPre, headerProps, setHeaderProps, setLoading }}>
+      <context.Provider value={{ active, setActive, pre, setPre, headerProps, setHeaderProps, loading, setLoading }}>
         <HeadBar />
         <View style={styles.content}>
-          <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName='DashboardScreen' >
+          <Stack.Navigator screenOptions={{ headerShown: false }} >
             <Stack.Screen name="DashboardScreen" component={Dashboard} />
             <Stack.Screen name="CalendarScreen" component={CalendarView} />
             <Stack.Screen name="RoomScreen" component={Rooms} />

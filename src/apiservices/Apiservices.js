@@ -473,15 +473,17 @@ export const getDashboardData = async () => {
   }
 }
 
-export const updateBookingRequest = (id, status) => {
-  try {
-    const response = axiosInstance.put(`/booking/allowbookingbyenduser?id=${id}&status=${status}`);
+// Update Booking Request
+export const updateBookingRequest =async (id, status) => {
+  try {                                       
+    const response =await axiosInstance.get(`/booking/allowbookingbyenduser?id=${id}&status=${status}`);
     return response.data;
   } catch (error) {
     console.error('API Error:', error);
     throw error;
   }
 }
+
 
 // Add Booking APIs
 
@@ -547,5 +549,37 @@ export const locationBasedCalenderMeetingRoom = async (id) => {
   } catch (error) {
     console.error('API Error:', error);
     throw error;
+  }
+}
+
+// Rooms APIs
+
+// get meeting rooms
+export const getMeetingRoomsByLocationId= async (customerLocationId)=>{
+  try{
+    const response = await axiosInstance.get(`/meetingRoom/listmeetingroomsbylocation?customerLocationId=${customerLocationId}`);
+    return response.data;
+  }catch(error){
+    console.error('API Error:', error);
+  }
+}
+
+// get desks
+export const getDesksByLocationId= async (customerLocationId)=>{
+  try{
+    const response = await axiosInstance.get(`/desk/listdesksbylocation?customerLocationId=${customerLocationId}`);
+    return response.data;
+  }catch(error){
+    console.error('API Error:', error);
+  }
+}
+
+// get desks
+export const getParkingSeatByLocationId= async (customerLocationId)=>{
+  try{
+    const response = await axiosInstance.get(`/parkingSeat/listparkingseats/bycustomerlocation?customerLocationId=${customerLocationId}`);
+    return response.data;
+  }catch(error){
+    console.error('API Error:', error);
   }
 }

@@ -10,7 +10,7 @@ const Menu = () => {
   const props = useContext(context);
 
   const handleClick = (to) => {
-    props.setActive(to.id);
+    props?.setActive(to.id);
     navigation.navigate(to.name);
   };
   const logout = () => {
@@ -26,7 +26,8 @@ const Menu = () => {
         {
           text: "Confirm",
           onPress: () => {
-            props.setActive(1);
+            props?.setActive(1);
+            props?.setHeaderProps({'login':true});
             AsyncStorage.clear();
             navigation.navigate('LoginScreen');
           }
@@ -36,7 +37,7 @@ const Menu = () => {
     );
   }
   useEffect(() => {
-    props.setPre({ id: 5, name: 'MenuScreen' });
+    props?.setPre({ id: 5, name: 'MenuScreen' });
   }, []);
   return (
     <ScrollView style={styles.container}>
