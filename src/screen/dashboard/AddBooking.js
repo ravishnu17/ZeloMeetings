@@ -272,6 +272,7 @@ const [specialServiceisOpen,setSpecialServiceisOpen]=useState(false);
     const getlocationApi = () => {
         getLocationlist().then((res) => {
             // console.log("location ", res);
+            setItemsLocations([]);
             if(res.status){
             const locationOptions = res.customerLocations.map(item => ({
                 label: item.location,
@@ -294,8 +295,10 @@ const [specialServiceisOpen,setSpecialServiceisOpen]=useState(false);
     const getEndUsers = () => {
    
         getEndUserList().then((res) => {
-            if(res.status){
             setUser([]);
+            setCheckUser({});
+            if(res.status){
+          
             setUser(res.users);
 
    const initialCheckedState = res.users.reduce((acc, user) => {
@@ -325,8 +328,10 @@ const [specialServiceisOpen,setSpecialServiceisOpen]=useState(false);
 
    const getVisitors =() =>{
      getVisitorList().then((res) => {
-        if(res.status){
         setVisitor([]);
+        setCheckVisitor({});
+        if(res.status){
+       
         // console.log("visitor ", res.visitors);
         setVisitor(res.visitors);
         }
@@ -382,8 +387,10 @@ const selectedVisitorNames = Object.entries(checkVisitor)
     const getBulidingListApi =(id) =>{
         findBuildingListBasedonLocationId(id).then((res) => {
             // console.log("building ", res.buildings);
-            if(res.status){
             setItemsBuildings([]);
+            setSelectedBuilding(null);
+            if(res.status){
+          
             const buildingOptions = res.buildings.map(item => ({
                 label: item.name,
                 value: item.id
@@ -399,6 +406,8 @@ const selectedVisitorNames = Object.entries(checkVisitor)
             // console.log("floor ", res.floors);
             // console.log("floor List Building Baesd ",res.floors);
             setItemsFloors([]);
+            setCheckedFloors({});
+
             if(res.status){
             setItemsFloors(res.floors);
         }
@@ -427,6 +436,7 @@ const selectedVisitorNames = Object.entries(checkVisitor)
         findEquipmentsListBasedonCustomerLocationId(id).then((res) => {
             // console.log("equipment ", res.customerEquipments);
             setEquipmentData([]);
+            setCheckedEquipments({});
             if(res.status){
            
 
@@ -445,6 +455,7 @@ const selectedVisitorNames = Object.entries(checkVisitor)
             // console.log("equipment List Building Baesd ");
             // console.log("equipment ", res.customerEquipments);
             setEquipmentData([]);
+            setCheckedEquipments({});
             if(res.status){
             
             setEquipmentData(res.customerEquipments);
@@ -463,8 +474,10 @@ const selectedVisitorNames = Object.entries(checkVisitor)
     const capcityAp =(id) =>{
         findCapacityLocationBased(id).then((res) => {
             // console.log("capacity ", res);
+            setItemsCapacity([]);
+            setSelectedCapacity(null);
             if(res.status){
-                setItemsCapacity([]);
+               
             // Transform the data
             if(res?.meetingRoomCapacityDTO?.listcapacity.length > 0){
                 // console.log("capacity ", res?.meetingRoomCapacityDTO?.listcapacity);
@@ -501,6 +514,7 @@ const selectedVisitorNames = Object.entries(checkVisitor)
             // console.log("capacity List Building Baesd ");
             // console.log("capacity ", res);
             setItemsCapacity([]);
+            setSelectedCapacity(null);
             if(res.status){
                
             // Transform the data
@@ -559,9 +573,10 @@ const selectedVisitorNames = Object.entries(checkVisitor)
             }
         })
         findCateringListBasedonCustomerLocationId(selectedLocation).then((res) => {
-           
+            setCatering([]);
+            setCheckCatering({});
             if(res.status){
-                setCatering([]);
+              
                 setCatering(res.customerCaterings);
                 // const initialCheckedState = res.customerCaterings.reduce((acc, equipment) => {
                 //     acc[equipment.id] = false;
@@ -587,8 +602,10 @@ const selectedVisitorNames = Object.entries(checkVisitor)
 
         findCateringListBasedonBuildingId(selectedBuilding).then((res) => {
             // console.log("catering List Building Baesd ");
+            setCatering([]);
+            setCheckCatering({});
             if(res.status){
-                setCatering([]);
+              
                 setCatering(res.customerCaterings);
                 // const initialCheckedState = res.customerCaterings.reduce((acc, equipment) => {
                 //     acc[equipment.id] = false;
@@ -656,6 +673,7 @@ const selectedVisitorNames = Object.entries(checkVisitor)
 
     findCustomerMobileEquipmentListBasedonCustomerLocationId(selectedLocation).then((res) => {
         setMobileEquipment([]);
+        setCheckedMobileEquipment({});
         if(res.status){
            
             setMobileEquipment(res.customerMobileEquipments);
@@ -682,6 +700,7 @@ const selectedVisitorNames = Object.entries(checkVisitor)
     findCustomerMobileEquipmentListBasedonBuildingId(selectedBuilding).then((res) => {
         // console.log("mobile equipment List Building Baesd ");
         setMobileEquipment([]);
+        setCheckedMobileEquipment({});
         if(res.status){
           
             setMobileEquipment(res.customerMobileEquipments);
@@ -725,6 +744,7 @@ const selectedMobileEquipmentNames = Object.entries(checkedMobileEquipment)
     findITSupporttBasedonCustomerLocationId(selectedLocation).then((res) => {
         // console.log("it support ", res);
         setItSupport([]);
+        setCheckedItSupport({});
         if(res.status){
            
             setItSupport(res.customerITSupports);
@@ -750,6 +770,7 @@ const selectedMobileEquipmentNames = Object.entries(checkedMobileEquipment)
     findITSupporttBasedonBuildingId(selectedBuilding).then((res) => {
         // console.log("it support Setting List ");
         setItSupport([]);
+        setCheckedItSupport({});
         if(res.status){
            
             setItSupport(res.customerITSupports);
@@ -796,6 +817,7 @@ const selectedItSupportNames = Object.entries(checkedItSupport)
     findCustomerSpecialSettingListBasedonCustomerLocationId(selectedLocation).then((res) => {
         // console.log("special service ", res);
         setSpecialService([]);
+        setCheckedSpecialService({});
         if(res.status){
           
             setSpecialService(res.customerSpecialServices);
@@ -822,6 +844,7 @@ const selectedItSupportNames = Object.entries(checkedItSupport)
     findCustomerSpecialSettingListBasedonBuildingId(selectedBuilding).then((res) => {
         // console.log("building special service List ", res);
         setSpecialService([]);
+        setCheckedSpecialService({});
         if(res.status){
             setSpecialService(res.customerSpecialServices);
             // const initialCheckedState = res.customerSpecialServices.reduce((acc, equipment) => {
@@ -861,10 +884,11 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding);
         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity).then((res) => {
             // console.log("Equipment And Capacity ",res);
-            
+            setMeetingRoom([]);
+            setSelectedMeetingRoom(null);
             if(res.status){
                 // console.log("Equipment And Capacity ",res.meetingRoomDTOs);
-                setMeetingRoom([]);
+               
         const mappedItems = res.meetingRoomDTOs.map(resource => ({
             label: resource.name,
             value: resource.id,
@@ -877,8 +901,10 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
     }else if(Object.keys(checkedEquipments).length > 0 ){
         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity).then((res) => {
             // console.log("Equipment",res);
+            setMeetingRoom([]);
+            setSelectedMeetingRoom(null);
             if(res.status){
-                setMeetingRoom([]);
+               
         const mappedItems = res.meetingRoomDTOs.map(resource => ({
             label: resource.name,
             value: resource.id,
@@ -891,8 +917,10 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
     }else if(selectedCapacity !== null ){
         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity).then((res) => {
             // console.log("Capacity ",res);
+            setMeetingRoom([]);
+            setSelectedMeetingRoom(null);
             if(res.status){
-                setMeetingRoom([]);
+                
         const mappedItems = res.meetingRoomDTOs.map(resource => ({
             label: resource.name,
             value: resource.id,
@@ -935,8 +963,10 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
     // console.log("getMettingRooms ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
     getMeetingRoomList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime).then((res) => {
         // console.log("meeting Room ", res.meetingRoomDTOs);
-        if(res.status){
         setMeetingRoom([]);
+        setSelectedMeetingRoom(null);
+        if(res.status){
+       
         const mappedItems = res.meetingRoomDTOs.map(resource => ({
             label: resource.name,
             value: resource.id,
@@ -951,8 +981,10 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
     getDeskList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime).then((res) => {
         // console.log("desk ", res.deskDTOs);
           // Map backend response to dropdown items
+          setDesk([]);
+          setSelectedDesk(null);
           if(res.status){
-        setDesk([]);
+        
           const mappedItems = res.deskDTOs.map(resource => ({
             label: resource.name,
             value: resource.id,
@@ -969,8 +1001,10 @@ const getParkingSeats = (selectedLocation,selectedBuilding,startDate,startTime,e
         // console.log("parking seat ", res.parkingSeatDTOs);
         // console.log("parking seat ", res.parkingSeatDTOs);
            // Map backend response to dropdown items
+           setParkingseat([]);
+           setSelectedParkingSeat(null);
            if(res.status){
-        setParkingseat([]);
+      
            const mappedItems = res.parkingSeatDTOs.map(resource => ({
             label: resource.name,
             value: resource.id,
