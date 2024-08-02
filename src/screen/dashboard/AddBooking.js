@@ -1114,59 +1114,133 @@ const specialServiceIds = Object.keys(checkedSpecialService).filter(key => check
 const floorIds = Object.keys(checkedFloors).filter(key => checkedFloors[key] === true).join(',');
 
 const users=Object.keys(checkUser).filter(key => checkUser[key] === true);
+const visitorId=Object.keys(checkVisitor).filter(key => checkVisitor[key] === true);
+
+const catringdataId=Object.keys(checkCatering).filter(key => checkCatering[key] === true);
 
     // if(selectedResource ==='meetingRoom'){
-      datas={ 
-       attendeeIds :users,
-       bookingCateringDTOs:{
-            bookingDescription:description,
-            bookingFrom: "MOBILE",
-            bookingType: selectedResource,
-            buildingId: selectedBuilding,
-            capacity: null,
-            capacity1: selectedCapacity,
-            chargingCarIds: [],
-            cleaningRequired: isCleaning,
-            company: null,
-            customerCleaningDescription: cleaning,
-            // customerEquipmentsIds: [176028, 176029],
-            customerEquipmentsIds:equipmentIds,
-            customerITSupportDescription:itSupportDescription,
-            customerITSupportsIds:itSupportIds,
-            customerMobileEquipmentDescription: mobileEquipmentDescription,
-            customerMobileEquipmentsIds:mobileEquipmentIds,
-            customerSpecialServiceDescription: specialServiceDescription,
-            customerSpecialServicesIds: specialServiceIds,
-            deskId: null,
-            driver: null,
-            endDate: endDate1,
-            endTime: endTime,
-            floorId: null,
-            floorIds: floorIds,
-            licensePlate: null,
-            locationId: selectedLocation,
-            meetingRoomId: selectedMeetingRoom,
-            parkingSeatDetails: [],
-            parkingSeatId: null,
-            parkingSeatsIds: [],
-            requesterEmail: requesterEmail,
-            requesterId: loginUser.id,
-            requesterName: requesterName,
-            startDate: startDate,
-            startTime: startTime,
-            subject: subject,
-        
-         }
-       }
+        const bookingCatringdtoresponse =[];
+
+        if(catringdataId.length > 0){
+            catringdataId.forEach((item) => {
+                bookingCatringdtoresponse.push({
+                    customerCateringId: item, 
+                    debit:null,
+                    description:null,
+                    endTime: null,
+                    quantity: null,
+                    startTime: null,
+                })
+            })
+        }
+
+        console.log("bookingCatringdtoresponse ",bookingCatringdtoresponse);
+   
+
+
+    //   datas={ 
+    //    attendeeIds :users,
+    //     bookingCatringDTOs:bookingCatringdtoresponse,
+    //         bookingDescription:description,
+    //         bookingFrom: "MOBILE",
+    //         bookingType: selectedResource,
+    //         buildingId: selectedBuilding,
+    //         capacity: null,
+    //         capacity1: selectedCapacity,
+    //         chargingCarIds: [],
+    //         cleaningRequired: isCleaning,
+    //         company: null,
+    //         customerCleaningDescription: cleaning,
+    //         // customerEquipmentsIds: [176028, 176029],
+    //         customerEquipmentsIds:equipmentIds,
+    //         customerITSupportDescription:itSupportDescription,
+    //         customerITSupportsIds:itSupportIds,
+    //         customerMobileEquipmentDescription: mobileEquipmentDescription,
+    //         customerMobileEquipmentsIds:mobileEquipmentIds,
+    //         customerSpecialServiceDescription: specialServiceDescription,
+    //         customerSpecialServicesIds: specialServiceIds,
+    //         deskId: null,
+    //         driver: null,
+    //         endDate: endDate1,
+    //         endTime: endTime,
+    //         floorId: null,
+    //         floorIds: floorIds,
+    //         licensePlate: null,
+    //         locationId: selectedLocation,
+    //         meetingRoomId: selectedMeetingRoom,
+    //         parkingSeatDetails: [],
+    //         parkingSeatId: null,
+    //         parkingSeatsIds: [],
+    //         requesterEmail: requesterEmail,
+    //         requesterId: loginUser.id,
+    //         requesterName: requesterName,
+    //         startDate: startDate,
+    //         startTime: startTime,
+    //         subject: subject,
+    //         test: null,
+    //         timeDuration:durationValue,
+    //         usageType: null,
+    //         visitorEmails: [],
+    //         visitorIds:visitorId,
+    //         visitorname:null  ,      
+         
+    //    }
+
+
+  datas=  {
+        locationId:selectedLocation,
+        buildingId:selectedBuilding,
+        floorId:null,
+        bookingType:selectedResource,
+        startDate:startDate,
+        startTime:startTime,
+        endDate:endDate1,
+        endTime:endTime,
+        timeDuration:durationValue,
+        meetingRoomId:selectedMeetingRoom,
+        deskId:selectedDesk,
+        requesterName: requesterName,
+        requesterEmail: requesterEmail,
+        bookingDescription: description,
+        attendeeIds: users,
+        visitorEmails: [],
+        parkingSeatsIds: [],
+        chargingCarIds: [],
+        cleaningRequired: true,
+        customerCleaningDescription:cleaning,
+        customerMobileEquipmentsIds: mobileEquipmentIds,
+        customerMobileEquipmentDescription: mobileEquipmentDescription,
+        customerITSupportsIds: itSupportIds,
+        customerITSupportDescription: itSupportDescription,
+        customerSpecialServicesIds: specialServiceIds,
+        customerSpecialServiceDescription: specialServiceDescription, 
+        requesterId: loginUser.id,
+        subject: subject,
+        test: null,
+        capacity1: selectedCapacity,
+        customerEquipmentsIds: equipmentIds,
+        bookingFrom: "MOBILE",
+        bookingCateringDTOs: bookingCatringdtoresponse,
+        visitorname: null,
+        company: null,
+        capacity: null,
+        driver: null,
+        licensePlate: null,
+        usageType: null,
+        parkingSeatId: selectedParkingSeat,
+        parkingSeatDetails: [],
+        visitorIds: visitorId,
+        floorIds: floorIds
+    }
 
        console.log("add booking  Payload datas ", datas);
       
-    //    addBookingApi(datas).then((res) => {
-    //     console.log("add booking  outer", res);
-    //        if(res.status){
-    //            console.log("add booking  success", res);
-    //        }
-    //    })
+       addBookingApi(datas).then((res) => {
+        // console.log("add booking  outer", res);
+           if(res.status){
+               console.log("add booking  success", res);
+           }
+       })
        
 //    } 
 } 

@@ -486,11 +486,66 @@ export const updateBookingRequest = (id, status) => {
 // Add Booking APIs
 
  export const addBookingApi = async (data) => {
+  console.log("data Api");
   try {
-    const response = await axiosInstance.post('/mrroom/booking/create', data);
+    const response = await axiosInstance.post('/booking/create', data);
     return response.data;
   } catch (error) {
     console.error('API Error:', error);
     throw error;
   }
 };
+
+//calender fiter Api
+
+// /booking/listbyfilters?bookingType=meetingRoom&customerLocationId=6984&startDate=2024-08-01&endDate=2024-08-01&buildingList=0&floorList=0
+
+export const getCalenderData = async (bookingType, customerLocationId, startDate, endDate, buildingList, floorList) => {
+  try {
+    const response= await axiosInstance.get(`/booking/listbyfilters?bookingType=${bookingType}&customerLocationId=${customerLocationId}&startDate=${startDate}&endDate=${endDate}&buildingList=${buildingList}&floorList=${floorList}`);
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+// filter calender for resource based
+
+export const getCalenderResourceData = async (resource) => {
+
+  ///booking/listbyfilterswithresource
+
+// payLoad:{
+//   carId:null,
+// chargingCarId:null,
+// customerLocationId:"6984",
+// deskId: null,
+// endDate: "2024-08-01",
+// meetingRoomId: "1009",
+// parkingSeatId:null,
+// sourceType: "meetingRoom",
+// startDate: "2024-08-01"
+// }
+
+  try {
+    const response= await axiosInstance.post(`/booking/listbyfilterswithresource`, resource);
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+
+//list of meeting room  based on location /meetingRoom/listmeetingroomsbylocation?customerLocationId=4540
+export const locationBasedCalenderMeetingRoom = async (id) => {
+  const num = Number(id);
+  try {
+    const response = await axiosInstance.get(`/meetingRoom/listmeetingroomsbylocation?customerLocationId=${num}`);
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+}
