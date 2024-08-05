@@ -58,9 +58,18 @@ const CalendarView = () => {
     // Start date of the current month
     const startDate = `${year}-${padZero(month)}-01`;
     
-    // End date of the current month
-    const endDate = new Date(year, month, 0).toISOString().split('T')[0]; // Setting day to 0 gives the last day of the previous month
-    
+    console.log("month ",month);
+    // End date of the selected month
+  const nextMonthFirstDay = new Date(year, month, 1);
+  // console.log("nextMonthFirstDay  intial ",nextMonthFirstDay);
+
+  nextMonthFirstDay.setDate(nextMonthFirstDay.getDate());
+
+  // console.log("nextMonthFirstDay  asas",nextMonthFirstDay.getDate());
+
+
+
+  const endDate = nextMonthFirstDay.toISOString().split('T')[0];
     // console.log('Start Date:', startDate);
     // console.log('End Date:', endDate);
 
@@ -68,6 +77,49 @@ const CalendarView = () => {
     setMonthEndDate(endDate);
 
   }, []);
+
+
+  const onMonthChange = (month) => {
+    // console.log("month ", month);
+    // // Update the start and end dates for the new month
+    // const newMonthDate = new Date(month.year, month.month - 1, 1);
+    // const year = newMonthDate.getFullYear();
+    // const newMonth = newMonthDate.getMonth() + 1;
+
+    // const padZero = (num) => (num < 10 ? `0${num}` : num);
+
+    // const startDate = `${year}-${padZero(newMonth)}-01`;
+    // const endDate = new Date(year, newMonth, 0).toISOString().split('T')[0];
+
+    console.log("month ", month);
+    // Update the start and end dates for the new month
+  const year = month.year;
+  const newMonth = month.month; // month.month is already 1-based (1 for January, 2 for February, etc.)
+
+  const padZero = (num) => (num < 10 ? `0${num}` : num);
+
+  // Start date of the selected month
+  const startDate = `${year}-${padZero(newMonth)}-01`;
+
+  // End date of the selected month
+  const nextMonthFirstDay = new Date(year, newMonth, 1);
+  // console.log("nextMonthFirstDay  intial ",nextMonthFirstDay);
+
+  nextMonthFirstDay.setDate(nextMonthFirstDay.getDate());
+
+  // console.log("nextMonthFirstDay  asas",nextMonthFirstDay.getDate());
+
+
+
+  const endDate = nextMonthFirstDay.toISOString().split('T')[0];
+
+  // console.log(' month Start Date:', startDate);
+  // console.log(' month End Date:', endDate);
+
+    setMonthStartDate(startDate);
+    setMonthEndDate(endDate);
+
+  };
 
   useEffect(() => {
     if (Object.keys(loginUser).length > 0) {
@@ -167,7 +219,7 @@ const CalendarView = () => {
       getCalenderResourceData(datas).then((res) => {
       setEvents({});
       setLoading(true);
-      if (res.status) {
+      if (res?.status) {
 
     const eventMarks = res?.bookings?.reduce((acc, event) => { 
       const date = event.startDate;
@@ -412,6 +464,7 @@ const CalendarView = () => {
         onDayPress={(day) => {
           setSelectedDate(day.dateString);
         }}
+        onMonthChange={onMonthChange}
         markedDates={events}
       />
       <View style={styles.pickerContainer}>
