@@ -528,7 +528,7 @@ export const updateBookingRequest =async (id, status) => {
 // Add Booking APIs
 
  export const addBookingApi = async (data) => {
-  console.log("data Api");
+  // console.log("data Api");
   try {
     const response = await axiosInstance.post('/booking/create', data);
     return response.data;

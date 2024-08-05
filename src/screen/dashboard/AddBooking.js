@@ -1183,6 +1183,9 @@ const catringdataId=Object.keys(checkCatering).filter(key => checkCatering[key] 
             })
         }
 
+        const parkingSeatIds=[selectedParkingSeat];
+        console.log("parkingSeatIds ",parkingSeatIds);
+
        datas= {
             locationId:selectedLocation,
             buildingId:selectedBuilding,
@@ -1200,7 +1203,7 @@ const catringdataId=Object.keys(checkCatering).filter(key => checkCatering[key] 
             bookingDescription: description,
             attendeeIds: users,
             visitorEmails: [],
-            parkingSeatsIds: [],
+            parkingSeatsIds:parkingSeatIds,
             chargingCarIds: [],
             cleaningRequired: isCleaning,
             customerCleaningDescription: cleaning,
@@ -1223,58 +1226,11 @@ const catringdataId=Object.keys(checkCatering).filter(key => checkCatering[key] 
             driver: null,
             licensePlate: null,
             usageType: null,
-            parkingSeatId: selectedParkingSeat,
+            parkingSeatId: null,
             parkingSeatDetails:[],
             visitorIds: visitorId,
             floorIds: floorIds
           }
-
-
-//   datas=  {
-//         locationId:selectedLocation,
-//         buildingId:selectedBuilding,
-//         floorId:null,
-//         bookingType:selectedResource,
-//         startDate:startDate,
-//         startTime:startTime,
-//         endDate:endDate1,
-//         endTime:endTime,
-//         timeDuration:durationValue,
-//         meetingRoomId:selectedMeetingRoom,
-//         deskId:selectedDesk,
-//         requesterName: requesterName,
-//         requesterEmail: requesterEmail,
-//         bookingDescription: description,
-//         attendeeIds: users,
-//         visitorEmails: [],
-//         parkingSeatsIds: [],
-//         chargingCarIds: [],
-//         cleaningRequired: true,
-//         customerCleaningDescription:cleaning,
-//         customerMobileEquipmentsIds: mobileEquipmentIds,
-//         customerMobileEquipmentDescription: mobileEquipmentDescription,
-//         customerITSupportsIds: itSupportIds,
-//         customerITSupportDescription: itSupportDescription,
-//         customerSpecialServicesIds: specialServiceIds,
-//         customerSpecialServiceDescription: specialServiceDescription, 
-//         requesterId: loginUser.id,
-//         subject: subject,
-//         test: null,
-//         capacity1: selectedCapacity,
-//         customerEquipmentsIds: equipmentIds,
-//         bookingFrom: "MOBILE",
-//         bookingCateringDTOs: bookingCatringdtoresponse,
-//         visitorname: null,
-//         company: null,
-//         capacity: null,
-//         driver: null,
-//         licensePlate: null,
-//         usageType: null,
-//         parkingSeatId: selectedParkingSeat,
-//         parkingSeatDetails: [],
-//         visitorIds: visitorId,
-//         floorIds: floorIds
-//     }
 
     //    console.log("add booking  Payload datas ", datas);
       
@@ -1634,8 +1590,12 @@ const catringdataId=Object.keys(checkCatering).filter(key => checkCatering[key] 
 
                     </View>
                 </View>
+                {
+                    (selectedResource === 'meetingRoom'  ||  selectedResource === 'desk')   &&
 
-                <View style={styles.dateTimeContainer}>
+                    <View>
+
+                        <View style={styles.dateTimeContainer}>
              
                 {/* <TextInput style={styles.textInput} placeholder="" className="input" value={visitor} onChangeText={text => setVisitor(text)} /> */}
                 <View  style={styles.visitorContainer}>
@@ -1691,6 +1651,10 @@ const catringdataId=Object.keys(checkCatering).filter(key => checkCatering[key] 
                 <Button mode="contained-tonal" onPress={() => addVisitor()} style={styles.button}>Add Visitor</Button>
              </View>
             }
+        </View>
+     }
+
+            
     {
                 (viewMoreenable && (selectedResource === 'meetingRoom' || selectedResource === 'desk')) &&
                 
