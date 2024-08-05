@@ -880,9 +880,9 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
     // console.log("selectedCapacity ",selectedCapacity);
 
 
-    if(Object.keys(checkedEquipments).length > 0  && selectedCapacity !== null){
+    if(Object.keys(checkedEquipments).length > 0  && selectedCapacity !== null ){
         // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding);
-        getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity).then((res) => {
+        getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
             // console.log("Equipment And Capacity ",res);
             setMeetingRoom([]);
             setSelectedMeetingRoom(null);
@@ -899,7 +899,7 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         })
         
     }else if(Object.keys(checkedEquipments).length > 0 ){
-        getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity).then((res) => {
+        getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
             // console.log("Equipment",res);
             setMeetingRoom([]);
             setSelectedMeetingRoom(null);
@@ -915,7 +915,7 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         })
         
     }else if(selectedCapacity !== null ){
-        getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity).then((res) => {
+        getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
             // console.log("Capacity ",res);
             setMeetingRoom([]);
             setSelectedMeetingRoom(null);
@@ -930,21 +930,43 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
                 
             }
         })
+    }else if(Object.keys(checkedFloors).length > 0 ){
+        // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding," checkedFloors ",checkedFloors);
+        getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
+            // console.log("mroom ",res);
+            setMeetingRoom([]);
+            setSelectedMeetingRoom(null);
+            if(res?.status){
+                
+        const mappedItems = res.meetingRoomDTOs.map(resource => ({
+            label: resource.name,
+            value: resource.id,
+        }));
+
+        setMeetingRoom(mappedItems);
+                
+            }
+        })
+
+        getDesk(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors);
+        getParkingSeats(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors);
+
+        
     }else if(selectedLocation && selectedBuilding){
         // console.log("Both ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
         getMettingRooms(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
-        getDesk(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
-        getParkingSeats(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
+        getDesk(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors);
+        getParkingSeats(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors);
 
        }else if(selectedLocation){
         // console.log("Location ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
         getMettingRooms(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime);
-        getDesk(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime);
-        getParkingSeats(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime);
+        getDesk(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedFloors);
+        getParkingSeats(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedFloors);
            
        }
        
-   },[selectedLocation,selectedBuilding,startDate,endDate1,startTime,endTime,checkedEquipments,selectedCapacity])
+   },[selectedLocation,selectedBuilding,startDate,endDate1,startTime,endTime,checkedEquipments,selectedCapacity,checkedFloors])
 
    const formatDate = (date1) => {
     const day = date1.getDate().toString().padStart(2, '0');
@@ -965,7 +987,7 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         // console.log("meeting Room ", res.meetingRoomDTOs);
         setMeetingRoom([]);
         setSelectedMeetingRoom(null);
-        if(res.status){
+        if(res?.status){
        
         const mappedItems = res.meetingRoomDTOs.map(resource => ({
             label: resource.name,
@@ -977,15 +999,15 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
     })
   }
 
-  const getDesk =(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime) => {
-    getDeskList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime).then((res) => {
-        // console.log("desk ", res.deskDTOs);
+  const getDesk =(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors) => {
+    getDeskList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors).then((res) => {
+        // console.log("desk ", res);
           // Map backend response to dropdown items
           setDesk([]);
           setSelectedDesk(null);
-          if(res.status){
+          if(res?.status){
         
-          const mappedItems = res.deskDTOs.map(resource => ({
+          const mappedItems = res?.deskDTOs?.map(resource => ({
             label: resource.name,
             value: resource.id,
         }));
@@ -995,17 +1017,17 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
     })
   }
 
-const getParkingSeats = (selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime) => {
+const getParkingSeats = (selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors) => {
     // console.log("parking seat ", res.parkingSeatDTOs);
-    getParkingSeatList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime).then((res) => {
-        // console.log("parking seat ", res.parkingSeatDTOs);
+    getParkingSeatList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors).then((res) => {
+        // console.log("parking seat ", res);
         // console.log("parking seat ", res.parkingSeatDTOs);
            // Map backend response to dropdown items
            setParkingseat([]);
            setSelectedParkingSeat(null);
-           if(res.status){
+           if(res?.status){
       
-           const mappedItems = res.parkingSeatDTOs.map(resource => ({
+           const mappedItems = res?.parkingSeatDTOs?.map(resource => ({
             label: resource.name,
             value: resource.id,
         }));
@@ -1142,17 +1164,10 @@ const equipmentIds = Object.keys(checkedEquipments).filter(key => checkedEquipme
 const mobileEquipmentIds = Object.keys(checkedMobileEquipment).filter(key => checkedMobileEquipment[key] === true);
 const itSupportIds = Object.keys(checkedItSupport).filter(key => checkedItSupport[key] === true);
 const specialServiceIds = Object.keys(checkedSpecialService).filter(key => checkedSpecialService[key] === true);
-// const parkingSeatIds = Object.keys(checkedParkingSeat).filter(key => checkedParkingSeat[key] === true);
-// const chargingCarIds = Object.keys(checkedChargingCar).filter(key => checkedChargingCar[key] === true);
-
 const floorIds = Object.keys(checkedFloors).filter(key => checkedFloors[key] === true).join(',');
-
 const users=Object.keys(checkUser).filter(key => checkUser[key] === true);
 const visitorId=Object.keys(checkVisitor).filter(key => checkVisitor[key] === true);
-
 const catringdataId=Object.keys(checkCatering).filter(key => checkCatering[key] === true);
-
-    // if(selectedResource ==='meetingRoom'){
         const bookingCatringdtoresponse =[];
 
         if(catringdataId.length > 0){
@@ -1168,111 +1183,106 @@ const catringdataId=Object.keys(checkCatering).filter(key => checkCatering[key] 
             })
         }
 
-        console.log("bookingCatringdtoresponse ",bookingCatringdtoresponse);
-   
+       datas= {
+            locationId:selectedLocation,
+            buildingId:selectedBuilding,
+            floorId: null,
+            bookingType:selectedResource,
+            startDate: startDate,
+            startTime: startTime,
+            endDate: endDate1,
+            endTime: endTime,
+           timeDuration: durationValue,
+            meetingRoomId: selectedMeetingRoom,
+            deskId: selectedDesk,
+            requesterName: requesterName,
+            requesterEmail:requesterEmail,
+            bookingDescription: description,
+            attendeeIds: users,
+            visitorEmails: [],
+            parkingSeatsIds: [],
+            chargingCarIds: [],
+            cleaningRequired: isCleaning,
+            customerCleaningDescription: cleaning,
+            customerMobileEquipmentsIds: mobileEquipmentIds,
+            customerMobileEquipmentDescription: mobileEquipmentDescription,
+            customerITSupportsIds:itSupportIds,
+            customerITSupportDescription:itSupportDescription,
+            customerSpecialServicesIds:specialServiceIds,
+            customerSpecialServiceDescription: specialServiceDescription,
+            requesterId: loginUser.id,
+            subject:subject,
+            test: null,
+            capacity1: selectedCapacity,
+            customerEquipmentsIds: equipmentIds,
+            bookingFrom:"MOBILE",
+            bookingCateringDTOs: bookingCatringdtoresponse,
+            visitorname: null,
+            company: null,
+            capacity: null,
+            driver: null,
+            licensePlate: null,
+            usageType: null,
+            parkingSeatId: selectedParkingSeat,
+            parkingSeatDetails:[],
+            visitorIds: visitorId,
+            floorIds: floorIds
+          }
 
 
-    //   datas={ 
-    //    attendeeIds :users,
-    //     bookingCatringDTOs:bookingCatringdtoresponse,
-    //         bookingDescription:description,
-    //         bookingFrom: "MOBILE",
-    //         bookingType: selectedResource,
-    //         buildingId: selectedBuilding,
-    //         capacity: null,
-    //         capacity1: selectedCapacity,
-    //         chargingCarIds: [],
-    //         cleaningRequired: isCleaning,
-    //         company: null,
-    //         customerCleaningDescription: cleaning,
-    //         // customerEquipmentsIds: [176028, 176029],
-    //         customerEquipmentsIds:equipmentIds,
-    //         customerITSupportDescription:itSupportDescription,
-    //         customerITSupportsIds:itSupportIds,
-    //         customerMobileEquipmentDescription: mobileEquipmentDescription,
-    //         customerMobileEquipmentsIds:mobileEquipmentIds,
-    //         customerSpecialServiceDescription: specialServiceDescription,
-    //         customerSpecialServicesIds: specialServiceIds,
-    //         deskId: null,
-    //         driver: null,
-    //         endDate: endDate1,
-    //         endTime: endTime,
-    //         floorId: null,
-    //         floorIds: floorIds,
-    //         licensePlate: null,
-    //         locationId: selectedLocation,
-    //         meetingRoomId: selectedMeetingRoom,
-    //         parkingSeatDetails: [],
-    //         parkingSeatId: null,
-    //         parkingSeatsIds: [],
-    //         requesterEmail: requesterEmail,
-    //         requesterId: loginUser.id,
-    //         requesterName: requesterName,
-    //         startDate: startDate,
-    //         startTime: startTime,
-    //         subject: subject,
-    //         test: null,
-    //         timeDuration:durationValue,
-    //         usageType: null,
-    //         visitorEmails: [],
-    //         visitorIds:visitorId,
-    //         visitorname:null  ,      
-         
-    //    }
+//   datas=  {
+//         locationId:selectedLocation,
+//         buildingId:selectedBuilding,
+//         floorId:null,
+//         bookingType:selectedResource,
+//         startDate:startDate,
+//         startTime:startTime,
+//         endDate:endDate1,
+//         endTime:endTime,
+//         timeDuration:durationValue,
+//         meetingRoomId:selectedMeetingRoom,
+//         deskId:selectedDesk,
+//         requesterName: requesterName,
+//         requesterEmail: requesterEmail,
+//         bookingDescription: description,
+//         attendeeIds: users,
+//         visitorEmails: [],
+//         parkingSeatsIds: [],
+//         chargingCarIds: [],
+//         cleaningRequired: true,
+//         customerCleaningDescription:cleaning,
+//         customerMobileEquipmentsIds: mobileEquipmentIds,
+//         customerMobileEquipmentDescription: mobileEquipmentDescription,
+//         customerITSupportsIds: itSupportIds,
+//         customerITSupportDescription: itSupportDescription,
+//         customerSpecialServicesIds: specialServiceIds,
+//         customerSpecialServiceDescription: specialServiceDescription, 
+//         requesterId: loginUser.id,
+//         subject: subject,
+//         test: null,
+//         capacity1: selectedCapacity,
+//         customerEquipmentsIds: equipmentIds,
+//         bookingFrom: "MOBILE",
+//         bookingCateringDTOs: bookingCatringdtoresponse,
+//         visitorname: null,
+//         company: null,
+//         capacity: null,
+//         driver: null,
+//         licensePlate: null,
+//         usageType: null,
+//         parkingSeatId: selectedParkingSeat,
+//         parkingSeatDetails: [],
+//         visitorIds: visitorId,
+//         floorIds: floorIds
+//     }
 
-
-  datas=  {
-        locationId:selectedLocation,
-        buildingId:selectedBuilding,
-        floorId:null,
-        bookingType:selectedResource,
-        startDate:startDate,
-        startTime:startTime,
-        endDate:endDate1,
-        endTime:endTime,
-        timeDuration:durationValue,
-        meetingRoomId:selectedMeetingRoom,
-        deskId:selectedDesk,
-        requesterName: requesterName,
-        requesterEmail: requesterEmail,
-        bookingDescription: description,
-        attendeeIds: users,
-        visitorEmails: [],
-        parkingSeatsIds: [],
-        chargingCarIds: [],
-        cleaningRequired: true,
-        customerCleaningDescription:cleaning,
-        customerMobileEquipmentsIds: mobileEquipmentIds,
-        customerMobileEquipmentDescription: mobileEquipmentDescription,
-        customerITSupportsIds: itSupportIds,
-        customerITSupportDescription: itSupportDescription,
-        customerSpecialServicesIds: specialServiceIds,
-        customerSpecialServiceDescription: specialServiceDescription, 
-        requesterId: loginUser.id,
-        subject: subject,
-        test: null,
-        capacity1: selectedCapacity,
-        customerEquipmentsIds: equipmentIds,
-        bookingFrom: "MOBILE",
-        bookingCateringDTOs: bookingCatringdtoresponse,
-        visitorname: null,
-        company: null,
-        capacity: null,
-        driver: null,
-        licensePlate: null,
-        usageType: null,
-        parkingSeatId: selectedParkingSeat,
-        parkingSeatDetails: [],
-        visitorIds: visitorId,
-        floorIds: floorIds
-    }
-
-       console.log("add booking  Payload datas ", datas);
+    //    console.log("add booking  Payload datas ", datas);
       
        addBookingApi(datas).then((res) => {
         // console.log("add booking  outer", res);
            if(res.status){
-               console.log("add booking  success", res);
+            //    console.log("add booking  success", res);
+               navigation.navigate('CalendarScreen')
            }
        })
        

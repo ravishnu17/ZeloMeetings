@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { SafeAreaView, StyleSheet, Text, View, ScrollView } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -7,12 +7,17 @@ import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { findBuildingListBasedonLocationId, findFloorsListBasedonBuildingId, getCalenderData, getCalenderResourceData, getDeskListBuildingAndFloor, getDesksByLocationId, getLocationlist, getMeetingRoomListBuildingAndFloor, getParkingSeatByLocationId, getParkingSeatListBuildingAndFloor, locationBasedCalenderMeetingRoom, loginHomeAccess } from '../../apiservices/Apiservices';
+import { context } from '../../navigation/Appnav';
 
 const CalendarView = () => {
+  const props = useContext(context);
+  const setLoading = props?.setLoading;
   const navigation = useNavigation();
   const [events, setEvents] = useState({});
 
   const [selectedDate, setSelectedDate] = useState(); // Default selected date
+  const [monthStartDate, setMonthStartDate] = useState();
+  const [monthEndDate, setMonthEndDate] = useState();
 
   const [itemsLocations, setItemsLocations] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
@@ -40,6 +45,28 @@ const CalendarView = () => {
     getLoginUser();
     const today = new Date().toISOString().split('T')[0];
     setSelectedDate(today);
+
+
+
+    const today1 = new Date();
+        const year = today1.getFullYear();
+    const month = today1.getMonth() + 1; // Months are zero-based in JavaScript
+    
+    // Function to pad single digit month and day with leading zero
+    const padZero = (num) => (num < 10 ? `0${num}` : num);
+    
+    // Start date of the current month
+    const startDate = `${year}-${padZero(month)}-01`;
+    
+    // End date of the current month
+    const endDate = new Date(year, month, 0).toISOString().split('T')[0]; // Setting day to 0 gives the last day of the previous month
+    
+    // console.log('Start Date:', startDate);
+    // console.log('End Date:', endDate);
+
+    setMonthStartDate(startDate);
+    setMonthEndDate(endDate);
+
   }, []);
 
   useEffect(() => {
@@ -78,27 +105,31 @@ const CalendarView = () => {
   useEffect(() => {
     // console.log("selectedDate",selectedDate);
 
-    console.log("selectedMeetingRoom",selectedMeetingRoom);
-    console.log("selectedDesk",selectedDesk);
-    console.log("selectedParkingSeat",selectedParkingSeat);
+    // console.log("selectedMeetingRoom",selectedMeetingRoom);
+    // console.log("selectedDesk",selectedDesk);
+    // console.log("selectedParkingSeat",selectedParkingSeat);
+
+   
+
 
     if(selectedMeetingRoom !==null || selectedDesk !==null || selectedParkingSeat !==null){
 
-    resourcedateBasedBooking(selectedLocation,selectResource,selectedMeetingRoom,selectedDesk,selectedParkingSeat,selectedDate);
-    console.log("resource based");
+    resourcedateBasedBooking(selectedLocation,selectResource,selectedMeetingRoom,selectedDesk,selectedParkingSeat,monthStartDate,monthEndDate);
+    // console.log("resource based");
       
     }else{
-      calenderApi(selectedLocation, selectedBuilding, selectFloors, selectResource,selectedDate);
+      calenderApi(selectedLocation, selectedBuilding, selectFloors, selectResource,monthStartDate,monthEndDate);
     }
     
 
-  }, [selectedLocation, selectedBuilding, selectFloors,selectResource,selectedDate,selectedMeetingRoom,selectedDesk,selectedParkingSeat]);
+  }, [selectedLocation, selectedBuilding, selectFloors,selectResource,monthStartDate,monthEndDate,selectedMeetingRoom,selectedDesk,selectedParkingSeat]);
 
-  const calenderApi = (locationId, buildingId, floorId, resource,selectedDate) => {
+  const calenderApi = (locationId, buildingId, floorId, resource,startDate,endDate) => {
     
-    getCalenderData(resource, locationId, selectedDate, selectedDate, buildingId, floorId).then((res) => {
+    getCalenderData(resource, locationId, startDate, endDate, buildingId, floorId).then((res) => {
       setEvents({});
-      if (res.status) {
+      setLoading(true);
+      if (res?.status) {
     const eventMarks = res?.bookings?.reduce((acc, event) => { 
       const date = event.startDate;
       if (date && date.match(/^\d{4}-\d{2}-\d{2}$/)) {
@@ -111,33 +142,31 @@ const CalendarView = () => {
     }, {});
 
     setEvents(eventMarks);
-  
 
-        // setDesk(res.desks);
-      } else {
-        // setDesk([]);
-      }
+    setLoading(false);
+      } 
     })
   };
 
-  const resourcedateBasedBooking = (locationId,resource,meetingRoom,desk,parkingSeat,selectedDate) => {
+  const resourcedateBasedBooking = (locationId,resource,meetingRoom,desk,parkingSeat,monthStartDate,monthEndDate) => {
 
     datas={
       carId:null,
       chargingCarId:null,
       customerLocationId:locationId,
       deskId:desk,
-      endDate:selectedDate,
+      endDate:monthEndDate,
       meetingRoomId:meetingRoom,
       parkingSeatId:parkingSeat,
       sourceType:resource,
-      startDate:selectedDate,
+      startDate:monthStartDate,
 }
 
-console.log("data dfghfghfghs",datas);
+
     
       getCalenderResourceData(datas).then((res) => {
       setEvents({});
+      setLoading(true);
       if (res.status) {
 
     const eventMarks = res?.bookings?.reduce((acc, event) => { 
@@ -152,11 +181,8 @@ console.log("data dfghfghfghs",datas);
     }, {});
 
     setEvents(eventMarks);
-
-        // setDesk(res.desks);
-      } else {
-        // setDesk([]);
-      }
+    setLoading(false);
+      } 
     })
   };
 

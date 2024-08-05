@@ -348,7 +348,7 @@ export const  getMeetingRoomList = async (location,building,startDate,startTime,
 };
 
 //Equiments and capacity and other 
-export const getMeetingRoomListForEquipmentAndCapacity = async (location,building,startDate,startTime,endDate,endTime,equipment,capacity) => {
+export const getMeetingRoomListForEquipmentAndCapacity = async (location,building,startDate,startTime,endDate,endTime,equipment,capacity,floorList) => {
   const locationId = Number(location);
   const buildingId = Number(building);
   // const equipmentId = Object.keys(equipment).filter(key=> equipment[key] === true).join(',');
@@ -358,25 +358,48 @@ const equipmentId = Object.keys(equipment).filter(key => equipment[key] === true
 
   // console.log("capacity ",capacity);
 
+  const floorIds = Object.keys(floorList).filter(key => floorList[key] === true).join(',');
+  // console.log("floor ",floorIds);
+
   const capacityId = Number(capacity);
   // console.log("Api inside" , "location ",locationId," building ",buildingId," start ",startDate," start time ",startTime," end ",endDate," end time ",endTime," equipment ",equipmentId," capacity ",capacityId);
 
   // console.log(" Object.Keys(equipmentId).length > 0",Object.Keys(equipmentId).length > 0);
   try {
-    if(capacityId > 0 && equipmentId){
+    if(capacityId >0 && equipmentId && floorIds){
+      // console.log("capacity",capacityId ,"equipment",equipmentId ,"floor",floorIds);
+      const response=await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId :0}&floorId=${floorIds}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId}`);
+      return response.data;
+    }
+   else if(capacityId > 0 && equipmentId){
       // console.log("equipment",equipmentId ,"capacity",capacityId);
-      const response=await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId :0}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId}`);
+      const response=await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId :0}&floorId=${floorIds}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId}`);
+      return response.data;
+    }else if(equipmentId && floorIds){
+      const response=await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId :0}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
       return response.data;
     }else if(equipmentId){
       // console.log("equipment",equipmentId );
       const response=await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId :0}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
       return response.data;
-    }else if(capacityId > 0|| capacity === 0){
+    }else if(capacityId > 0 || capacity === 0 && floorIds){
+      // console.log("floor and capacity" ,"capacity 0",capacityId ,"floor",floorIds);
+      const response=await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId :0}&floorId=${floorIds}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId ? capacityId : capacity}`);
+      return response.data;
+      
+
+    }else if(capacityId > 0 || capacity === 0){
       // console.log("capacity",capacityId);
 
       const response=await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId :0}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId ? capacityId : capacity}`);
       return response.data;
       
+    }else if(floorIds){
+      // console.log(" only  floor ",floorIds);
+
+      ///meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=6984&buildingId=176019&floorId=176050&startDate=2024-08-05&startTime=12:52&endDate=2024-08-05&endTime=13:22&editBookingId=0&capacityNumber=0
+      const response=await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId :0}&floorId=${floorIds}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=0`);
+      return response.data;
     }
   } catch (error) {
     console.error('API Error:', error);
@@ -384,23 +407,40 @@ const equipmentId = Object.keys(equipment).filter(key => equipment[key] === true
   }
 }
 
-export const getDeskList = async (location,building,startDate,startTime,endDate,endTime) => {
+export const getDeskList = async (location,building,startDate,startTime,endDate,endTime,checkedFloors) => {
   const locationId = Number(location);
   const buildingId = Number(building);
+  const floorIds = Object.keys(checkedFloors).filter(key => checkedFloors[key] === true).join(',');
+
   try {
-    const response = await axiosInstance.get(`/desk/listdesks/bylocationandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
-    return response.data;
+    if(floorIds){
+      // console.log("Desk floor ",floorIds);
+      const response = await axiosInstance.get(`/desk/listdesks/bylocationandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds} &startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
+      return response.data; 
+    }else{
+      const response = await axiosInstance.get(`/desk/listdesks/bylocationandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
+      return response.data;
+    }
+   
   } catch (error) {
     console.error('API Error:', error);
     throw error;
   }
 };
- export const getParkingSeatList = async (location,building,startDate,startTime,endDate,endTime) => {
+ export const getParkingSeatList = async (location,building,startDate,startTime,endDate,endTime,checkedFloors) => {
   const locationId = Number(location);
   const buildingId = Number(building);
+  const floorIds = Object.keys(checkedFloors).filter(key => checkedFloors[key] === true).join(',');
   try {
-    const response = await axiosInstance.get(`/parkingSeat/listparkingseats/bycustomerlocationandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
-    return response.data;
+    if(floorIds){
+      // console.log("parking seat floor ",floorIds);
+      const response = await axiosInstance.get(`/parkingSeat/listparkingseats/bycustomerlocationandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
+      return response.data;
+    }else{
+      const response = await axiosInstance.get(`/parkingSeat/listparkingseats/bycustomerlocationandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
+      return response.data;
+    }
+   
   } catch (error) {
     console.error('API Error:', error);
     throw error;
