@@ -5,13 +5,14 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { findBuildingListBasedonLocationId, findFloorsListBasedonBuildingId, getCalenderData, getCalenderResourceData, getDeskListBuildingAndFloor, getDesksByLocationId, getLocationlist, getMeetingRoomListBuildingAndFloor, getParkingSeatByLocationId, getParkingSeatListBuildingAndFloor, locationBasedCalenderMeetingRoom, loginHomeAccess } from '../../apiservices/Apiservices';
 import { context } from '../../navigation/Appnav';
 
 const CalendarView = () => {
   const props = useContext(context);
   const setLoading = props?.setLoading;
+  const isFocus= useIsFocused();
   const navigation = useNavigation();
   const [events, setEvents] = useState({});
 
@@ -42,41 +43,43 @@ const CalendarView = () => {
 
 
   useEffect(() => {
-    getLoginUser();
-    const today = new Date().toISOString().split('T')[0];
-    setSelectedDate(today);
+    if (isFocus){
+      props?.setPre();
+      getLoginUser();
+      const today = new Date().toISOString().split('T')[0];
+      setSelectedDate(today);
 
 
 
-    const today1 = new Date();
-        const year = today1.getFullYear();
-    const month = today1.getMonth() + 1; // Months are zero-based in JavaScript
-    
-    // Function to pad single digit month and day with leading zero
-    const padZero = (num) => (num < 10 ? `0${num}` : num);
-    
-    // Start date of the current month
-    const startDate = `${year}-${padZero(month)}-01`;
-    
-    console.log("month ",month);
-    // End date of the selected month
-  const nextMonthFirstDay = new Date(year, month, 1);
-  // console.log("nextMonthFirstDay  intial ",nextMonthFirstDay);
+      const today1 = new Date();
+          const year = today1.getFullYear();
+      const month = today1.getMonth() + 1; // Months are zero-based in JavaScript
+      
+      // Function to pad single digit month and day with leading zero
+      const padZero = (num) => (num < 10 ? `0${num}` : num);
+      
+      // Start date of the current month
+      const startDate = `${year}-${padZero(month)}-01`;
+      
+      console.log("month ",month);
+      // End date of the selected month
+      const nextMonthFirstDay = new Date(year, month, 1);
+      // console.log("nextMonthFirstDay  intial ",nextMonthFirstDay);
 
-  nextMonthFirstDay.setDate(nextMonthFirstDay.getDate());
+      nextMonthFirstDay.setDate(nextMonthFirstDay.getDate());
 
-  // console.log("nextMonthFirstDay  asas",nextMonthFirstDay.getDate());
+      // console.log("nextMonthFirstDay  asas",nextMonthFirstDay.getDate());
 
 
 
-  const endDate = nextMonthFirstDay.toISOString().split('T')[0];
-    // console.log('Start Date:', startDate);
-    // console.log('End Date:', endDate);
+      const endDate = nextMonthFirstDay.toISOString().split('T')[0];
+      // console.log('Start Date:', startDate);
+      // console.log('End Date:', endDate);
 
-    setMonthStartDate(startDate);
-    setMonthEndDate(endDate);
-
-  }, []);
+      setMonthStartDate(startDate);
+      setMonthEndDate(endDate);
+    }
+  }, [ isFocus ]);
 
 
   const onMonthChange = (month) => {

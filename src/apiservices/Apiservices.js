@@ -20,8 +20,8 @@ export const loginUser = async (userData) => {
 
 export const loginHomeAccess = async (id) => {
 
-  const num= Number(id);
- 
+  const num = Number(id);
+
   try {
     const response = await axiosInstance.get(`/user/find?id=${num}`);
     return response.data;
@@ -36,7 +36,7 @@ export const loginHomeAccess = async (id) => {
 export const getLocationlist = async (type) => {
   try {
     const response = await axiosInstance.get(`/customerlocation/listactive`);
-  
+
     return response.data;
   } catch (error) {
     console.error('API Error:', error);
@@ -60,7 +60,7 @@ export const findBuildingListBasedonLocationId = async (id) => {
 //find By floors List based on building
 
 export const findFloorsListBasedonBuildingId = async (id) => {
-  const num = Number(id); 
+  const num = Number(id);
   // /floor/listbybuilding?id=5214&status=true
   try {
     const response = await axiosInstance.get(`/floor/listbybuilding?id=${num}&status=${true}`);
@@ -96,7 +96,7 @@ export const findEquipmentsListBasedonBuildingId = async (id) => {
 }
 
 
-  // find customer It support Status  based on location
+// find customer It support Status  based on location
 export const findCustomeritsupportsettingListBasedonCustomerLocationId = async (id) => {
   const num = Number(id);
   try {
@@ -108,8 +108,8 @@ export const findCustomeritsupportsettingListBasedonCustomerLocationId = async (
   }
 }
 
- // find customer It support List  based on location
- export const findITSupporttBasedonCustomerLocationId = async (id) => {
+// find customer It support List  based on location
+export const findITSupporttBasedonCustomerLocationId = async (id) => {
   const num = Number(id);
   try {
     const response = await axiosInstance.get(`/customeritsupport/listactive/bycustomerlocation?customerLocationId=${num}`);
@@ -205,7 +205,7 @@ export const findCateringListBasedonBuildingId = async (id) => {
 // find customer cleaning Status  based on location
 export const findCustomerCleaningStatusBasedonCustomerLocationId = async (id) => {
   const num = Number(id);
-  
+
   try {
     const response = await axiosInstance.get(`/customercleaning/find/bycustomerlocation?id=${num}`);
     return response.data;
@@ -333,7 +333,7 @@ export const findCustomerSpecialSettingListBasedonBuildingId = async (id) => {
 
 //location and Building based
 
-export const  getMeetingRoomList = async (location,building,startDate,startTime,endDate,endTime) => {
+export const getMeetingRoomList = async (location, building, startDate, startTime, endDate, endTime) => {
   const locationId = Number(location);
   const buildingId = Number(building);
   // console.log("location ",locationId," building ",buildingId," start ",startDate," start time ",startTime," end ",endDate," end time ",endTime);
@@ -348,12 +348,12 @@ export const  getMeetingRoomList = async (location,building,startDate,startTime,
 };
 
 //Equiments and capacity and other 
-export const getMeetingRoomListForEquipmentAndCapacity = async (location,building,startDate,startTime,endDate,endTime,equipment,capacity,floorList) => {
+export const getMeetingRoomListForEquipmentAndCapacity = async (location, building, startDate, startTime, endDate, endTime, equipment, capacity, floorList) => {
   const locationId = Number(location);
   const buildingId = Number(building);
   // const equipmentId = Object.keys(equipment).filter(key=> equipment[key] === true).join(',');
   // Extract keys where value is true
-const equipmentId = Object.keys(equipment).filter(key => equipment[key] === true).join(',');
+  const equipmentId = Object.keys(equipment).filter(key => equipment[key] === true).join(',');
   // console.log('equipment123456 ', equipmentId);
 
   // console.log("capacity ",capacity);
@@ -366,39 +366,39 @@ const equipmentId = Object.keys(equipment).filter(key => equipment[key] === true
 
   // console.log(" Object.Keys(equipmentId).length > 0",Object.Keys(equipmentId).length > 0);
   try {
-    if(capacityId >0 && equipmentId && floorIds){
+    if (capacityId > 0 && equipmentId && floorIds) {
       // console.log("capacity",capacityId ,"equipment",equipmentId ,"floor",floorIds);
-      const response=await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId :0}&floorId=${floorIds}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId}`);
+      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId}`);
       return response.data;
     }
-   else if(capacityId > 0 && equipmentId){
+    else if (capacityId > 0 && equipmentId) {
       // console.log("equipment",equipmentId ,"capacity",capacityId);
-      const response=await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId :0}&floorId=${floorIds}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId}`);
+      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId}`);
       return response.data;
-    }else if(equipmentId && floorIds){
-      const response=await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId :0}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
+    } else if (equipmentId && floorIds) {
+      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
       return response.data;
-    }else if(equipmentId){
+    } else if (equipmentId) {
       // console.log("equipment",equipmentId );
-      const response=await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId :0}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
+      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
       return response.data;
-    }else if(capacityId > 0 || capacity === 0 && floorIds){
+    } else if (capacityId > 0 || capacity === 0 && floorIds) {
       // console.log("floor and capacity" ,"capacity 0",capacityId ,"floor",floorIds);
-      const response=await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId :0}&floorId=${floorIds}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId ? capacityId : capacity}`);
+      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId ? capacityId : capacity}`);
       return response.data;
-      
 
-    }else if(capacityId > 0 || capacity === 0){
+
+    } else if (capacityId > 0 || capacity === 0) {
       // console.log("capacity",capacityId);
 
-      const response=await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId :0}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId ? capacityId : capacity}`);
+      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId ? capacityId : capacity}`);
       return response.data;
-      
-    }else if(floorIds){
+
+    } else if (floorIds) {
       // console.log(" only  floor ",floorIds);
 
       ///meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=6984&buildingId=176019&floorId=176050&startDate=2024-08-05&startTime=12:52&endDate=2024-08-05&endTime=13:22&editBookingId=0&capacityNumber=0
-      const response=await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId :0}&floorId=${floorIds}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=0`);
+      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=0`);
       return response.data;
     }
   } catch (error) {
@@ -407,47 +407,47 @@ const equipmentId = Object.keys(equipment).filter(key => equipment[key] === true
   }
 }
 
-export const getDeskList = async (location,building,startDate,startTime,endDate,endTime,checkedFloors) => {
+export const getDeskList = async (location, building, startDate, startTime, endDate, endTime, checkedFloors) => {
   const locationId = Number(location);
   const buildingId = Number(building);
   const floorIds = Object.keys(checkedFloors).filter(key => checkedFloors[key] === true).join(',');
 
   try {
-    if(floorIds){
+    if (floorIds) {
       // console.log("Desk floor ",floorIds);
       const response = await axiosInstance.get(`/desk/listdesks/bylocationandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds} &startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
-      return response.data; 
-    }else{
+      return response.data;
+    } else {
       const response = await axiosInstance.get(`/desk/listdesks/bylocationandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
       return response.data;
     }
-   
+
   } catch (error) {
     console.error('API Error:', error);
     throw error;
   }
 };
- export const getParkingSeatList = async (location,building,startDate,startTime,endDate,endTime,checkedFloors) => {
+export const getParkingSeatList = async (location, building, startDate, startTime, endDate, endTime, checkedFloors) => {
   const locationId = Number(location);
   const buildingId = Number(building);
   const floorIds = Object.keys(checkedFloors).filter(key => checkedFloors[key] === true).join(',');
   try {
-    if(floorIds){
+    if (floorIds) {
       // console.log("parking seat floor ",floorIds);
       const response = await axiosInstance.get(`/parkingSeat/listparkingseats/bycustomerlocationandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
       return response.data;
-    }else{
+    } else {
       const response = await axiosInstance.get(`/parkingSeat/listparkingseats/bycustomerlocationandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
       return response.data;
     }
-   
+
   } catch (error) {
     console.error('API Error:', error);
     throw error;
   }
 };
 
- export const getEndUserList = async () => {
+export const getEndUserList = async () => {
   try {
     const response = await axiosInstance.get(`/user/listactiveendusersforbooking`);
     return response.data;
@@ -469,7 +469,7 @@ export const getVisitorList = async () => {
 export const visitorCreateAndUpdate = async (data) => {
   // const num = Number(id);
   try {
-    const response = await axiosInstance.post('/visitor/createorupdate',data);
+    const response = await axiosInstance.post('/visitor/createorupdate', data);
     return response.data;
   } catch (error) {
     console.error('API Error:', error);
@@ -514,9 +514,9 @@ export const getDashboardData = async () => {
 }
 
 // Update Booking Request
-export const updateBookingRequest =async (id, status) => {
-  try {                                       
-    const response =await axiosInstance.get(`/booking/allowbookingbyenduser?id=${id}&status=${status}`);
+export const updateBookingRequest = async (id, status) => {
+  try {
+    const response = await axiosInstance.get(`/booking/allowbookingbyenduser?id=${id}&status=${status}`);
     return response.data;
   } catch (error) {
     console.error('API Error:', error);
@@ -527,8 +527,8 @@ export const updateBookingRequest =async (id, status) => {
 
 // Add Booking APIs
 
- export const addBookingApi = async (data) => {
-  // console.log("data Api");
+export const addBookingApi = async (data) => {
+  console.log("data Api");
   try {
     const response = await axiosInstance.post('/booking/create', data);
     return response.data;
@@ -544,17 +544,17 @@ export const updateBookingRequest =async (id, status) => {
 
 export const getCalenderData = async (bookingType, customerLocationId, startDate, endDate, buildingList, floorList) => {
   // console.log("calenderApi Filter",    "bookingType ",bookingType," customerLocationId ",customerLocationId," startDate ",startDate," endDate ",endDate," buildingList ",buildingList," floorList ",floorList);
- if(bookingType && customerLocationId && startDate && endDate ){
-  try {
-    const response= await axiosInstance.get(`/booking/listbyfilters?bookingType=${bookingType}&customerLocationId=${customerLocationId}&startDate=${startDate}&endDate=${endDate}&buildingList=${buildingList ? buildingList : 0}&floorList=${floorList ? floorList : 0}`);
-    return response.data;
-  } catch (error) {
-    console.error('API Error:', error);
-    throw error;
+  if (bookingType && customerLocationId && startDate && endDate) {
+    try {
+      const response = await axiosInstance.get(`/booking/listbyfilters?bookingType=${bookingType}&customerLocationId=${customerLocationId}&startDate=${startDate}&endDate=${endDate}&buildingList=${buildingList ? buildingList : 0}&floorList=${floorList ? floorList : 0}`);
+      return response.data;
+    } catch (error) {
+      console.error('API Error:', error);
+      throw error;
+    }
+
   }
-   
- }
- 
+
 }
 
 // filter calender for resource based
@@ -562,7 +562,7 @@ export const getCalenderData = async (bookingType, customerLocationId, startDate
 export const getCalenderResourceData = async (resource) => {
 
   try {
-    const response= await axiosInstance.post(`/booking/listbyfilterswithresource`, resource);
+    const response = await axiosInstance.post(`/booking/listbyfilterswithresource`, resource);
     return response.data;
   } catch (error) {
     console.error('API Error:', error);
@@ -586,38 +586,34 @@ export const locationBasedCalenderMeetingRoom = async (id) => {
 // Rooms APIs
 
 // get meeting rooms
-export const getMeetingRoomsByLocationId= async (customerLocationId)=>{
-  try{
+export const getMeetingRoomsByLocationId = async (customerLocationId) => {
+  try {
     const response = await axiosInstance.get(`/meetingRoom/listmeetingroomsbylocation?customerLocationId=${customerLocationId}`);
     return response.data;
-  }catch(error){
+  } catch (error) {
     console.error('API Error:', error);
   }
 }
-
-
 
 // get desks
-export const getDesksByLocationId= async (customerLocationId)=>{
-  try{
+export const getDesksByLocationId = async (customerLocationId) => {
+  try {
     const response = await axiosInstance.get(`/desk/listdesksbylocation?customerLocationId=${customerLocationId}`);
     return response.data;
-  }catch(error){
+  } catch (error) {
     console.error('API Error:', error);
   }
 }
-
 
 // get Parling Seat
-export const getParkingSeatByLocationId= async (customerLocationId)=>{
-  try{
+export const getParkingSeatByLocationId = async (customerLocationId) => {
+  try {
     const response = await axiosInstance.get(`/parkingSeat/listparkingseats/bycustomerlocation?customerLocationId=${customerLocationId}`);
     return response.data;
-  }catch(error){
+  } catch (error) {
     console.error('API Error:', error);
   }
 }
-
 
 //new api
 // /meetingRoom/listMeetingRoom?buildingId=5104&floorId=0
@@ -626,7 +622,7 @@ export const getMeetingRoomListBuildingAndFloor = async (buildingId, floorId) =>
 
   try {
     const response = await axiosInstance.get(`/meetingRoom/listMeetingRoom?buildingId=${buildingId}&floorId=${floorId ? floorId : 0}`);
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error('API Error:', error);
     throw error;
@@ -638,7 +634,7 @@ export const getDeskListBuildingAndFloor = async (buildingId, floorId) => {
 
   try {
     const response = await axiosInstance.get(`/desk/desklistbyBuildingFloor?buildingId=${buildingId}&floorId=${floorId ? floorId : 0}`);
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error('API Error:', error);
     throw error;
@@ -646,13 +642,11 @@ export const getDeskListBuildingAndFloor = async (buildingId, floorId) => {
 
 }
 
-
-
-export const getParkingSeatListBuildingAndFloor = async (buildingId, floorId) => {  
+export const getParkingSeatListBuildingAndFloor = async (buildingId, floorId) => {
 
   try {
     const response = await axiosInstance.get(`/parkingSeat/parkingSeatbyBuildingFloor?buildingId=${buildingId}&floorId=${floorId ? floorId : 0}`);
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error('API Error:', error);
     throw error;
@@ -660,3 +654,74 @@ export const getParkingSeatListBuildingAndFloor = async (buildingId, floorId) =>
 
 }
 
+// Room filters API
+
+export const findMeetingRoomsbyFilters = async (locationId, equipmentIds, startDate, startTime, endDate, endTime, buildingId, floorId) => {
+  try {
+    const res = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime?customerLocationId=${locationId}&customerEquipmentIds=${equipmentIds}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0${buildingId ? `&buildingId=${buildingId}` : ''}${floorId ? `&floorId=${floorId}` : ''}`);
+    return res.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const findDesksbyFilters = async (locationId, startDate, startTime, endDate, endTime, buildingId, floorId) => {
+  try {
+    const res = await axiosInstance.get(`/desk/listdesks/bylocationandtime?customerLocationId=${locationId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0${buildingId ? `&buildingId=${buildingId}` : ''}${floorId ? `&floorId=${floorId}` : ''}`);
+    return res.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const findParkingSeatbyFilters = async (locationId, startDate, startTime, endDate, endTime, buildingId, floorId) => {
+  try {
+    const res = await axiosInstance.get(`/parkingSeat/listparkingseats/bycustomerlocationandtime?customerLocationId=${locationId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0${buildingId ? `&buildingId=${buildingId}` : ''}${floorId ? `&floorId=${floorId}` : ''}`);
+    return res.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const findAllResourceByBuildingId= async (buildingId)=>{
+  try{
+    const res= await axiosInstance.get(`/building/filterallresourcebybuilding?id=${buildingId}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const findEquipmentByBuildingId= async (buildingId)=>{
+  try{
+    const res= await axiosInstance.get(`/customerequipment/listactivecustomerequipmentsbybuilding?id=${buildingId}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const floorListbyBuildingId =async (buildingId)=>{
+  try{
+    const res=await axiosInstance.get(`/floor/listactive?id=${buildingId}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const FloorBasedFilter=async (floorID)=>{
+  try{
+    const res=await axiosInstance.get(`/floor/floorBasedFilter?id=${floorID}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}

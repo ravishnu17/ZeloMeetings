@@ -9,8 +9,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { addBookingApi, findBuildingListBasedonLocationId, findCapacityBuildingBased, findCapacityLocationBased, findCateringListBasedonBuildingId, findCateringListBasedonCustomerLocationId, findCateringStatusBasedonBasedonBuildingId, findCateringStatusBasedonCustomerLocationId, findCustomerCleaningSattusBasedonBuildingId, findCustomerCleaningStatusBasedonCustomerLocationId, findCustomeritsupportsettingListBasedonBuildingId, findCustomeritsupportsettingListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonBuildingId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerMobileEquipmentStatusBasedonBuildingId, findCustomerMobileEquipmentStatusBasedonCustomerLocationId, findCustomerSpecialSettingBasedonBuildingId, findCustomerSpecialSettingBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonBuildingId, findCustomerSpecialSettingListBasedonCustomerLocationId, findEquipmentsListBasedonBuildingId, findEquipmentsListBasedonCustomerLocationId, findFloorsListBasedonBuildingId, findITSupporttBasedonBuildingId, findITSupporttBasedonCustomerLocationId, findMobileEquipmentsBasedonCustomerLocationId, getDeskList, getEndUserList, getLocationlist, getMeetingRoomList, getMeetingRoomListForEquipmentAndCapacity, getParkingSeatList, getVisitorList, loginHomeAccess, visitorCreateAndUpdate } from '../../apiservices/Apiservices';
 import { useNavigation } from '@react-navigation/native';
 
-const AddBooking = () => {
-
+const AddBooking = ({route}) => {
+    const params = route.params;
    const navigation = useNavigation();
    const { colors } = useTheme();
 
@@ -193,9 +193,6 @@ const [specialServiceisOpen,setSpecialServiceisOpen]=useState(false);
     },[selectedResource])
 
     useEffect(() => {
-        // console.log("Start Date ",date);
-        // console.log("End Date ",endDate);
-    
         const startDate = formatDate(date);
         const startTime = formatTime(date);
         const endDate1 = formatDate(endDate);
@@ -247,6 +244,21 @@ const [specialServiceisOpen,setSpecialServiceisOpen]=useState(false);
         getLoginUser();
         getEndUsers();
         getVisitors();
+
+        console.log("prams", params);
+        if (params){
+            setSelectedLocation(params.locationID);
+            params.buildingID && setSelectedBuilding(params.buildingID);
+            params.floorID && setCheckedFloors(params.floorID);
+            setSelectedResource(params.resource);
+            if (params?.resource === 'meetingRoom'){
+                setSelectedMeetingRoom(params?.[params?.resource]);
+            }else if(params?.resource === 'desk'){
+                setSelectedDesk(params?.[params?.resource]);
+            }else if(params?.resource === 'parkingSeat'){
+                setSelectedParkingSeat(params?.[params?.resource]);
+            }
+        }
     }, []);
 
     useEffect(() => {
@@ -885,7 +897,6 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
             // console.log("Equipment And Capacity ",res);
             setMeetingRoom([]);
-            setSelectedMeetingRoom(null);
             if(res.status){
                 // console.log("Equipment And Capacity ",res.meetingRoomDTOs);
                
@@ -895,6 +906,8 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         }));
 
         setMeetingRoom(mappedItems);
+        setSelectedMeetingRoom(null || params?.[params?.resource]);
+
             }
         })
         
@@ -902,7 +915,6 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
             // console.log("Equipment",res);
             setMeetingRoom([]);
-            setSelectedMeetingRoom(null);
             if(res.status){
                
         const mappedItems = res.meetingRoomDTOs.map(resource => ({
@@ -911,6 +923,7 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         }));
 
         setMeetingRoom(mappedItems);
+        setSelectedMeetingRoom(null || params?.[params?.resource]);
             }
         })
         
@@ -918,7 +931,6 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
             // console.log("Capacity ",res);
             setMeetingRoom([]);
-            setSelectedMeetingRoom(null);
             if(res.status){
                 
         const mappedItems = res.meetingRoomDTOs.map(resource => ({
@@ -927,6 +939,7 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         }));
 
         setMeetingRoom(mappedItems);
+        setSelectedMeetingRoom(null || params?.[params?.resource]);
                 
             }
         })
@@ -935,7 +948,6 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
             // console.log("mroom ",res);
             setMeetingRoom([]);
-            setSelectedMeetingRoom(null);
             if(res?.status){
                 
         const mappedItems = res.meetingRoomDTOs.map(resource => ({
@@ -944,6 +956,7 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         }));
 
         setMeetingRoom(mappedItems);
+        setSelectedMeetingRoom(null || params?.[params?.resource]);
                 
             }
         })
@@ -1004,7 +1017,6 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         // console.log("desk ", res);
           // Map backend response to dropdown items
           setDesk([]);
-          setSelectedDesk(null);
           if(res?.status){
         
           const mappedItems = res?.deskDTOs?.map(resource => ({
@@ -1013,6 +1025,7 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         }));
 
         setDesk(mappedItems);
+        setSelectedDesk(null || params?.[params?.resource]);
     }
     })
   }
@@ -1050,7 +1063,7 @@ const getParkingSeats = (selectedLocation,selectedBuilding,startDate,startTime,e
         }));
 
         setItemsResources(resourceOptions);
-        if(selectedResource === null){
+        if(selectedResource === null && !params?.resource){
             setSelectedResource(resourceOptions[0].value);
 
         }
@@ -1245,7 +1258,7 @@ const catringdataId=Object.keys(checkCatering).filter(key => checkCatering[key] 
 //    } 
 } 
 
-
+    console.log("room value", selectedLocation, selectedBuilding, checkedFloors, selectedResource, selectedMeetingRoom, selectedDesk, selectedParkingSeat);
 // console.log(selectedLocation, itemsLocations);
     return (
         <SafeAreaView style={styles.container}>

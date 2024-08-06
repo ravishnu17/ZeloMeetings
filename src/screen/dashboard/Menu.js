@@ -1,4 +1,4 @@
-import { useNavigation } from '@react-navigation/native'
+import { useIsFocused, useNavigation } from '@react-navigation/native'
 import React, { useContext, useEffect } from 'react'
 import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Icon } from 'react-native-paper'
@@ -8,8 +8,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 const Menu = () => {
   const navigation = useNavigation();
   const props = useContext(context);
+  const isFocus = useIsFocused();
 
   const handleClick = (to) => {
+    props?.setPre({ id: 5, name: 'MenuScreen' });
     props?.setActive(to.id);
     navigation.navigate(to.name);
   };
@@ -27,7 +29,7 @@ const Menu = () => {
           text: "Confirm",
           onPress: () => {
             props?.setActive(1);
-            props?.setHeaderProps({'login':true});
+            props?.setHeaderProps({});
             AsyncStorage.clear();
             navigation.navigate('LoginScreen');
           }
@@ -37,8 +39,10 @@ const Menu = () => {
     );
   }
   useEffect(() => {
-    props?.setPre({ id: 5, name: 'MenuScreen' });
-  }, []);
+    if (isFocus) {
+      props?.setPre();
+    }
+  }, [isFocus]);
   return (
     <ScrollView style={styles.container}>
       <View style={{ ...styles.card, marginBottom: 20, paddingVertical: 7 }}>

@@ -20,7 +20,7 @@ export const context = createContext();
 // create a component
 const Appnav = () => {
   const [active, setActive] = useState(1);
-  const [pre, setPre] = useState({ id: 1, name: 'Dashboard' });
+  const [pre, setPre] = useState();
   const [headerProps, setHeaderProps] = useState();
   const [loading, setLoading] = useState(false);
   return (

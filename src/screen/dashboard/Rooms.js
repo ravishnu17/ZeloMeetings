@@ -8,8 +8,8 @@ import { ToastColor } from '../utils/ToastColors';
 
 import { context } from '../../navigation/Appnav';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useIsFocused } from '@react-navigation/native';
-import { findCateringListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonCustomerLocationId, findEquipmentsListBasedonCustomerLocationId, findITSupporttBasedonCustomerLocationId, getDesksByLocationId, getLocationlist, getMeetingRoomsByLocationId, getParkingSeatByLocationId, loginHomeAccess } from '../../apiservices/Apiservices';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { FloorBasedFilter, findAllResourceByBuildingId, findBuildingListBasedonLocationId, findCateringListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonCustomerLocationId, findDesksbyFilters, findEquipmentByBuildingId, findEquipmentsListBasedonCustomerLocationId, findITSupporttBasedonCustomerLocationId, findMeetingRoomsbyFilters, findParkingSeatbyFilters, floorListbyBuildingId, getDesksByLocationId, getLocationlist,getMeetingRoomsByLocationId, getParkingSeatByLocationId, loginHomeAccess } from '../../apiservices/Apiservices';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import meetingRoomImg from '../../assets/meetingRoom.jpg';
@@ -18,15 +18,21 @@ import parkingSeatImg from '../../assets/parking-seats.jpg';
 import LoadingIndicator from '../LoadingIndicator';
 
 const Rooms = () => {
+  const navigate= useNavigation();
   // useStates
   const [showModel, setShowModel] = useState(false);
+  // const [userLocation, setUserLocation] = useState();
   const [locations, setLocations] = useState();
   const [selectedLocation, setSelectedLocation] = useState();
   const [selectedResource, setSelectedResource] = useState('All');
+  const [selectedDuration, setSelectedDuration] = useState();
   const [meetingRooms, setMeetingRooms] = useState([]);
+  const [building, setBuilding] = useState([]);
+  const [selectedBuilding, setSelectedBuilding] = useState();
+  const [floor, setFloor] = useState([]);
+  const [selectedFloor, setSelectedFloor] = useState();
   const [desks, setDesks] = useState([]);
   const [parkingSeats, setParkingSeats] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   // services
   const serviceItems = { equipment: [], catering: [], IT_support: [], mobileEquip: [], Special: [] };
@@ -44,15 +50,18 @@ const Rooms = () => {
   // EndDate
   const [showEndTime, setShowEndTime] = useState(false);
   const [showEndDate, setShowEndDate] = useState(false);
-  const [endDateTime, setEndDateTime] = useState(new Date());
+  const [endDateTime, setEndDateTime] = useState();
 
   const props = useContext(context);
+  const loading = props?.loading;
+  const setLoading = props?.setLoading;
+
   const isFocus = useIsFocused();
   const resources = [
     { label: 'All', value: 'All' },
-    { label: 'Meeting Room', value: 'Meeting Room' },
-    { label: 'Desk', value: 'Desk' },
-    { label: 'Parking Seat', value: 'Parking Seat' }
+    { label: 'Meeting Room', value: 'meetingRoom' },
+    { label: 'Desk', value: 'desk' },
+    { label: 'Parking Seat', value: 'parkingSeat' }
   ]
 
   const viewPlant = () => {
@@ -63,39 +72,89 @@ const Rooms = () => {
       ToastColor.ERROR
     );
   }
-  const data = [
-    { label: 'Item 1', value: '1' },
-    { label: 'Item 2', value: '2' },
-    { label: 'Item 3', value: '3' },
-    { label: 'Item 4', value: '4' },
-    { label: 'Item 5', value: '5' },
-    { label: 'Item 6', value: '6' },
-    { label: 'Item 7', value: '7' },
-    { label: 'Item 8', value: '8' },
+
+  const timeDuration = [
+    { label: '00 min', value: 0 },
+    { label: '15 min', value: 15 },
+    { label: '30 min', value: 30 },
+    { label: '45 min', value: 45 },
+    { label: '60 min', value: 60 },
+    { label: '75 min', value: 75 },
+    { label: '100 min', value: 100 },
+    { label: '115 min', value: 115 },
   ];
 
   // get user location
   const getUserLocation = async () => {
+    setLoading(true);
     let userId = await AsyncStorage.getItem('userId');
     let userData = await loginHomeAccess(userId);
-    setSelectedLocation(userData?.customerDetails?.location?.id || userData?.user?.location?.id);
+    // setUserLocation(userData?.customerDetails?.location?.id || userData?.user?.location?.id);
+    // get Location List
+    locationList(userData?.customerDetails?.location?.id || userData?.user?.location?.id);
   }
+
   // Get all locations
-  const locationList = async () => {
+  const locationList = async (locationData) => {
     let location = await getLocationlist();
     let locationOptions = location.customerLocations.map(item => ({
       label: item.location,
       value: item.id
     }));
-    !selectedLocation && setSelectedLocation(locationOptions[0].value);
+    let selectedLoc = locationData || locationOptions[0].value;
+
+    getRoomsDeskSeat(selectedLoc, selectedResource);
+    // set values
+    setSelectedLocation(selectedLoc);
     setLocations(locationOptions);
+
+    // get Equipment List
+    getEquipmentList(selectedLoc);
+    getBuildingList(selectedLoc);
   }
 
-  const getEquipmentList = async () => {
-    let equipment = await findEquipmentsListBasedonCustomerLocationId(selectedLocation);
+  const getEquipmentList = async (location) => {
+    let equipment = await findEquipmentsListBasedonCustomerLocationId(location);
     if (equipment.status) {
       setEquipmentList(equipment.customerEquipments?.map(item => ({ label: item.name, value: item.id })));
     }
+  }
+
+  const getBuildingList = (location) => {
+    setLoading(true);
+    findBuildingListBasedonLocationId(location).then((res) => {
+      if (res.status) {
+        setBuilding(res.buildings?.map(item => ({ label: item.name, value: item.id })));
+      } else {
+        setBuilding([]);
+      }
+    }).catch((error) => {
+      console.log("getBuildingList", error);
+    }).finally(() => {
+      setLoading(false);
+    })
+  }
+
+  const getFloorEquipmentbyBuilding = (buildingId) => {
+    setLoading(true);
+    floorListbyBuildingId(buildingId).then((res) => {
+      if (res.status) {
+        setFloor(res?.floors?.map(item => ({ label: item.name, value: item.id })));
+      } else {
+        setFloor([]);
+      }
+    }).catch((error) => {
+      console.log("floor list", error);
+    });
+
+    findEquipmentByBuildingId(buildingId).then((res) =>
+      setEquipmentList(res?.customerEquipments?.map(item => ({ label: item.name, value: item.id })))
+    ).catch((error) =>
+      console.log("equipment by building",error)
+    ).finally(() => {
+      setLoading(false);
+    });
+
   }
 
   // Get Service data
@@ -126,42 +185,71 @@ const Rooms = () => {
   }
 
   // Get all resources
-  const getRoomsDeskSeat = async () => {
+  const getRoomsDeskSeat = async (location, resource) => {
     setLoading(true);
-
-    if (selectedResource === 'All' || selectedResource === 'Meeting Room') {
-      let rooms = await getMeetingRoomsByLocationId(selectedLocation);
-      setMeetingRooms(rooms?.meetingRoomDTOs);
+    if (resource === 'All' || resource === 'meetingRoom') {
+      getMeetingRoomsByLocationId(location).then((res) => {
+        if (res.status) {
+          setMeetingRooms(res.meetingRoomDTOs);
+        } else {
+          setMeetingRooms([]);
+        }
+      }).catch((err) => {
+        console.log("meetingsroom-location", err);
+        setMeetingRooms([]);
+      }).finally(() => resource !== 'all' && setLoading(false));
     }
 
-    if (selectedResource === 'All' || selectedResource === 'Desk') {
-      let desk = await getDesksByLocationId(selectedLocation);
-      setDesks(desk?.deskDTOs);
+    if (resource === 'All' || resource === 'desk') {
+      getDesksByLocationId(location).then((res) => {
+        if (res.status) {
+          setDesks(res.deskDTOs);
+        } else {
+          setDesks([]);
+        }
+      }).catch((err) => {
+        console.log("desk list location", err);
+        setDesks([]);
+      }).finally(() => resource !== 'all' && setLoading(false));
     }
 
-    if (selectedResource === 'All' || selectedResource === 'Parking Seat') {
-      let seat = await getParkingSeatByLocationId(selectedLocation);
-      setParkingSeats(seat?.parkingSeatDTOs);
+    if (resource === 'All' || resource === 'parkingSeat') {
+      getParkingSeatByLocationId(location).then((res) => {
+        if (res.status) {
+          setParkingSeats(res.parkingSeatDTOs);
+        } else {
+          setParkingSeats([]);
+        }
+      }).catch((err) => {
+        console.log("parking seat location", err);
+        setParkingSeats([]);
+      }).finally(() => setLoading(false));
     }
-
-    setLoading(false);
   }
-  // Handle Filter click
-  const handleFilterClick = () => {
-    props?.setHeaderProps();
-    // getRoomsDeskSeat();
+
+  // Book resource
+  const BookResource =(resourceType, resourceId) =>{
+    props?.setPre({ id: 3, name: 'RoomScreen' });
+    navigate.navigate('AddBooking', { 
+      locationID: selectedLocation, 
+      buildingID: selectedBuilding, 
+      floorID: selectedFloor, 
+      resource: resourceType,
+      [resourceType]: resourceId ,
+    });
   }
+
   // List resource view
   const listResourceView = (index, item, type) => {
     let resourceImg = null;
 
     if (item?.imagePath) {
       resourceImg = item?.imagePath
-    } else if (type === 'Meeting Room') {
+    } else if (type === 'meetingRoom') {
       resourceImg = meetingRoomImg
-    } else if (type === 'Desk') {
+    } else if (type === 'desk') {
       resourceImg = deskImg
-    } else if (type === 'Parking Seat') {
+    } else if (type === 'parkingSeat') {
       resourceImg = parkingSeatImg
     }
 
@@ -186,7 +274,7 @@ const Rooms = () => {
           </View>
         </View>
         <View style={styles.menu}>
-          {type === 'Meeting Room' &&
+          {type === 'meetingRoom' &&
             <TouchableOpacity style={styles.menuItem} onPress={() => {
 
               getServiceData(item?.equipments?.map(ele => (
@@ -202,12 +290,26 @@ const Rooms = () => {
             <Text style={styles.menuText}>View Plant</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} >
+          <TouchableOpacity style={styles.menuItem} onPress={()=>BookResource(type, item?.id)} >
             <Text style={styles.menuText}>Book</Text>
           </TouchableOpacity>
         </View>
       </View>
     )
+  }
+
+  // change location
+  const changeLocation = ({ value }) => {
+    setSelectedLocation(value);
+    setSelectedResource('All');
+    setCheckedEquipment([]);
+    getEquipmentList(value);
+    setSelectedBuilding();
+    getBuildingList(value);
+    setSelectedFloor();
+    setStartDateTime(new Date());
+    setEndDateTime();
+    setSelectedDuration();
   }
 
   // Set false for all datetime view state
@@ -251,7 +353,7 @@ const Rooms = () => {
     setTimeout(() => {
       setShowStartDate(false);
       setShowStartTime(false);
-    }, 10);
+    }, 10); r
 
   };
 
@@ -275,12 +377,20 @@ const Rooms = () => {
 
   const dateFormat = (date) => {
     // Format YYYY-MM-DD
-    return date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+    if (date) {
+      return date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
+    } else {
+      return null
+    }
   }
 
   const timeFormat = (date) => {
-    // Format HH:MM
-    return ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
+    if (date) {
+      // Format HH:MM
+      return ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2);
+    } else {
+      return null
+    }
   }
 
   // display dropdown of equipment
@@ -300,56 +410,162 @@ const Rooms = () => {
     );
   };
 
+  //  change duration
+  const changeDuration = ({ value }) => {
+    setSelectedDuration(value);
+    let tempstartDate = new Date(startDateTime);
+    let enddatetime = new Date(tempstartDate.setMilliseconds(tempstartDate.getMilliseconds() + (value * 60 * 1000)));
+    setEndDateTime(enddatetime);
+  }
+
+  // Handle Filter click
+  const handleFilterClick = () => {
+    setLoading(true);
+    props?.setHeaderProps();
+    // For location resource change
+    if (!selectedDuration && !endDateTime) {
+      if (!selectedBuilding) {
+        getRoomsDeskSeat(selectedLocation, selectedResource);
+      }else{
+        if(!selectedFloor){
+          findAllResourceByBuildingId(selectedBuilding).then((res) => {
+            if (res.status) {
+              setMeetingRooms(res?.resourceDTO?.meetingRooms);
+              setDesks(res?.resourceDTO?.desks);
+              setParkingSeats(res?.resourceDTO?.parkingSeats);
+            }
+          }).catch((error) => {
+            console.log("filter-room", error);
+          }).finally(() => {
+            setLoading(false);
+          });
+        }else{
+          FloorBasedFilter(selectedFloor).then((res) => {
+            if (res.status) {
+              setMeetingRooms(res?.floorBasedFilterDto?.meetingRoomDTOs);
+              setDesks(res?.floorBasedFilterDto?.deskDTOs);
+              setParkingSeats(res?.floorBasedFilterDto?.parkingSeatDTOs);
+            }
+          }).catch((error) => {
+            console.log("floor-based-filter", error);
+          }).finally(() => {
+            setLoading(false);
+          });
+        }
+      }
+    } else {
+      // Filter with date time and building & floor
+      if (selectedResource === 'All' || selectedResource === 'meetingRoom') {
+        // get meeting room list by filters
+        findMeetingRoomsbyFilters(selectedLocation, checkedEquipment.join(','), dateFormat(startDateTime), timeFormat(startDateTime), dateFormat(endDateTime), timeFormat(endDateTime), selectedBuilding, selectedFloor).then((res) => {
+          if (res.status) {
+            setMeetingRooms(res?.meetingRoomDTOs);
+          } else {
+            setMeetingRooms([]);
+          }
+        }).catch((error) => {
+          console.log("filter-room", error);
+        }).finally(() => {
+          setLoading(false);
+        });
+      }
+
+      if (selectedResource === 'All' || selectedResource === 'desk') {
+        // get desk list by filters
+        findDesksbyFilters(selectedLocation, dateFormat(startDateTime), timeFormat(startDateTime), dateFormat(endDateTime), timeFormat(endDateTime), selectedBuilding, selectedFloor).then((res) => {
+          if (res.status) {
+            setDesks(res?.deskDTOs);
+          } else {
+            setDesks([]);
+          }
+        }).catch((error) => {
+          console.log("filter-desk", error);
+        }).finally(() => {
+          setLoading(false);
+        });
+      }
+
+      if (selectedResource === 'All' || selectedResource === 'parkingSeat') {
+        // get parking seat
+        findParkingSeatbyFilters(selectedLocation, dateFormat(startDateTime), timeFormat(startDateTime), dateFormat(endDateTime), timeFormat(endDateTime), selectedBuilding, selectedFloor).then((res) => {
+          if (res.status) {
+            setParkingSeats(res?.parkingSeatDTOs||[]);
+          } else {
+            setParkingSeats([]);
+          }
+        }).catch((error) => {
+          console.log("filter-parking seat", error);
+        }).finally(() => {
+          setLoading(false);
+        });
+      }
+    }
+  }
+
+  // Clear filters
+  const clearFilter = (isReset) => {
+    setStartDateTime(new Date());
+    setEndDateTime();
+    setCheckedEquipment([]);
+    setSelectedResource('All');
+    setSelectedBuilding();
+    setSelectedFloor();
+    setSelectedDuration();
+    props?.setHeaderProps();
+    isReset && getUserLocation();
+  }
+
   // Set DateTime on filterclick
   useEffect(() => {
     if (props?.headerProps?.showFilter === true) {
       setStartDateTime(new Date());
-      setEndDateTime();
+      if (selectedDuration) {
+        changeDuration({ value: selectedDuration });
+      }
     }
-
   }, [props?.headerProps?.showFilter === true])
 
   useEffect(() => {
     if (isFocus) {
+      props?.setPre();
       setLoading(true);
       getUserLocation();
+
+      // Datetime data update
       closeAllDateTimeView();
-      setStartDateTime(new Date());
-      setEndDateTime();
-      setCheckedEquipment([]);
-      setSelectedResource('All');
+      clearFilter();
     }
   }, [isFocus])
 
-  useEffect(() => {
-    if (isFocus) {
-      locationList();
-      if (selectedLocation) {
-        getRoomsDeskSeat();
-        getEquipmentList();
-      }
-    }
-  }, [selectedLocation, selectedResource, isFocus])
-
   return (
     <View style={{ flex: 1 }}>
-      {loading && <LoadingIndicator />}
       <ScrollView style={styles.container}>
         {
           (meetingRooms?.length > 0 || desks?.length > 0 || parkingSeats?.length > 0) ? <>
             {
-              (selectedResource === 'All' || selectedResource === 'Meeting Room') && meetingRooms?.map((item, index) => listResourceView(index, item, 'Meeting Room'))
+              (selectedResource === 'All' || selectedResource === 'meetingRoom') && meetingRooms?.map((item, index) => listResourceView(index, item, 'meetingRoom'))
             }
             {
-              (selectedResource === 'All' || selectedResource === 'Desk') && desks?.map((item, index) => listResourceView(index, item, 'Desk'))
+              (selectedResource === 'All' || selectedResource === 'desk') && desks?.map((item, index) => listResourceView(index, item, 'desk'))
             }
             {
-              (selectedResource === 'All' || selectedResource === 'Parking Seat') && parkingSeats?.map((item, index) => listResourceView(index, item, 'Parking Seat'))
+              (selectedResource === 'All' || selectedResource === 'parkingSeat') && parkingSeats?.map((item, index) => listResourceView(index, item, 'parkingSeat'))
+            }
+            {/* Empty msg */}
+            {
+              selectedResource === 'meetingRoom' && meetingRooms?.length === 0 && <Text style={styles.noData}>No Data found!</Text>
+            }
+            {
+              selectedResource === 'desk' && desks?.length === 0 && <Text style={styles.noData}>No Data found!</Text>
+            }
+            {
+              selectedResource === 'parkingSeat' && parkingSeats?.length === 0 && <Text style={styles.noData}>No Data found!</Text>
             }
           </>
             :
             <Text style={styles.noData}>{loading ? '' : 'No Data found!'}</Text>
         }
+
       </ScrollView>
 
       {/* Service Modal */}
@@ -478,14 +694,15 @@ const Rooms = () => {
           <View style={styles.filterModal} >
             <TouchableWithoutFeedback>
               <View style={styles.filterModalContainer}>
+                {loading && <LoadingIndicator />}
                 <View style={{ padding: 10 }}>
                   <View style={styles.filterView}>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>Location *</Text>
+                      <Text style={styles.headText}>Location </Text>
                       <Dropdown
                         data={locations}
                         value={selectedLocation}
-                        onChange={({ value }) => setSelectedLocation(value)}
+                        onChange={changeLocation}
                         labelField="label"
                         valueField="value"
                         placeholder='Select location'
@@ -495,7 +712,7 @@ const Rooms = () => {
                       />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>Resources *</Text>
+                      <Text style={styles.headText}>Resources </Text>
                       <Dropdown
                         data={resources}
                         value={selectedResource}
@@ -509,7 +726,40 @@ const Rooms = () => {
                       />
                     </View>
                   </View>
-                  <View style={{ marginTop: 15 }}>
+                  <View style={styles.filterView}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.headText}>Building </Text>
+                      <Dropdown
+                        data={building}
+                        value={selectedBuilding}
+                        onChange={({ value }) => {
+                          setSelectedBuilding(value);
+                          getFloorEquipmentbyBuilding(value);
+                        }}
+                        labelField="label"
+                        valueField="value"
+                        placeholder='Select building'
+                        style={styles.dropdown}
+                        placeholderStyle={{ ...styles.dropItem, color: '#a8a8a8' }}
+                        selectedTextStyle={styles.dropItem}
+                      />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.headText}>Floor </Text>
+                      <Dropdown
+                        data={floor}
+                        value={selectedFloor}
+                        onChange={({ value }) => setSelectedFloor(value)}
+                        labelField="label"
+                        valueField="value"
+                        placeholder='Select Floor'
+                        style={styles.dropdown}
+                        placeholderStyle={{ ...styles.dropItem, color: '#a8a8a8' }}
+                        selectedTextStyle={styles.dropItem}
+                      />
+                    </View>
+                  </View>
+                  {selectedResource !== 'desk' && <View style={{ marginTop: 15 }}>
                     <Text style={styles.headText}>Equipments</Text>
                     <MultiSelect
                       data={equipmentList}
@@ -525,10 +775,10 @@ const Rooms = () => {
                       selectedTextStyle={styles.dropItem}
                       selectedStyle={styles.selectedItem}
                     />
-                  </View>
+                  </View>}
                   <View style={styles.filterView}>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>Start Date *</Text>
+                      <Text style={styles.headText}>Start Date </Text>
                       <TouchableOpacity style={styles.datetime} onPress={() => showDatePicker('start')} >
                         <Text style={{ color: '#000000' }}>{dateFormat(startDateTime)}</Text>
                         <Text style={styles.icon}> <Icon source='calendar' size={25} color="#000000" /> </Text>
@@ -546,7 +796,7 @@ const Rooms = () => {
                     )}
 
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>Start Time *</Text>
+                      <Text style={styles.headText}>Start Time </Text>
                       <TouchableOpacity style={styles.datetime} onPress={() => showTimepicker('start')} >
                         <Text style={{ color: '#000000' }}>{timeFormat(startDateTime)}</Text>
                         <Text style={styles.icon} > <Icon source='clock-outline' size={25} color="#000000" /> </Text>
@@ -564,10 +814,9 @@ const Rooms = () => {
                       />
                     )}
                   </View>
-
                   <View style={styles.filterView}>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>End Date *</Text>
+                      <Text style={styles.headText}>End Date </Text>
                       <TouchableOpacity style={styles.datetime} onPress={() => showDatePicker('end')} >
                         <Text style={{ color: endDateTime ? '#000000' : '#8a8a8a' }}>{endDateTime ? dateFormat(endDateTime) : 'YYYY-MM-DD'}</Text>
                         <Text style={styles.icon} > <Icon source='calendar' size={25} color="#000000" /> </Text>
@@ -585,7 +834,7 @@ const Rooms = () => {
                       )}
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>End Time *</Text>
+                      <Text style={styles.headText}>End Time </Text>
                       <TouchableOpacity style={styles.datetime} onPress={() => showTimepicker('end')} >
                         <Text style={{ color: endDateTime ? '#000000' : '#8a8a8a' }}>{endDateTime ? timeFormat(endDateTime) : 'HH:MM'}</Text>
                         <Text style={styles.icon} > <Icon source='clock-outline' size={25} color="#000000" /> </Text>
@@ -608,22 +857,28 @@ const Rooms = () => {
                   <View style={{ marginTop: 15 }}>
                     <Text style={styles.headText}>Time Duration</Text>
                     <Dropdown
-                      data={data}
+                      data={timeDuration}
                       mode='modal'
-                      value={[]}
-                      onChange={({ value }) => setLocation(value)}
+                      value={selectedDuration}
+                      onChange={changeDuration}
                       labelField="label"
                       valueField="value"
                       placeholder='Select Duration'
                       style={styles.dropdown}
                       placeholderStyle={{ ...styles.dropItem, color: '#a8a8a8' }}
                       selectedTextStyle={styles.dropItem}
+                      closeModalWhenSelectedItem={true}
                     />
                   </View>
                 </View>
-                <TouchableOpacity style={styles.button} onPress={() => props?.setHeaderProps()}>
-                  <Text style={{ color: '#fff', fontSize: 14, textAlign: 'center' }} onPress={handleFilterClick}>DONE</Text>
-                </TouchableOpacity>
+                <View style={{ ...styles.filterView, justifyContent: 'center' }}>
+                  <TouchableOpacity style={styles.button} onPress={handleFilterClick}>
+                    <Text style={{ color: '#fff', fontSize: 14, textAlign: 'center' }} >DONE</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{ ...styles.button, backgroundColor: '#ec3434' }} onPress={() => clearFilter(true)}>
+                    <Text style={{ color: '#fff', fontSize: 14, textAlign: 'center' }} >CLEAR</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </TouchableWithoutFeedback>
           </View>
@@ -675,7 +930,7 @@ const styles = StyleSheet.create({
   noData: {
     textAlign: 'center',
     fontSize: 18,
-    paddingTop: 20
+    paddingTop: 30
   },
   labelcard: {
     flex: 1,

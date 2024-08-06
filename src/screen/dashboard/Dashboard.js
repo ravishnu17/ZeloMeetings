@@ -94,6 +94,7 @@ const Dashboard = () => {
         if (isFocus) {
             props?.setActive(1);
             dashBoardDetails();
+            props?.setPre();
         }
     }, [isFocus]);
 

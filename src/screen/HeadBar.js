@@ -37,7 +37,7 @@ const HeadBar = () => {
         leftComponent={
           <View>
             {
-              index > 5 &&
+              preState?.id &&
               <TouchableOpacity
                 style={styles.backMenu}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}

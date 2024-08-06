@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import { useIsFocused } from '@react-navigation/native';
+import React, { useContext, useEffect, useState } from 'react';
 import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Card } from 'react-native-elements';
+import { context } from '../../navigation/Appnav';
 
 const Report = () => {
   const [location, setLocation] = useState();
   const [rooms, setRooms] = useState();
+  const isFocus= useIsFocused();
+  const props = useContext(context);
+  
   const data = [
     { label: 'Item 1', value: '1' },
     { label: 'Item 2', value: '2' },
@@ -27,6 +32,12 @@ const Report = () => {
       { text: 'OK', onPress: () => console.log('OK Pressed') },
     ]);
   };
+
+  useEffect(() => {
+    if (isFocus){
+      props?.setPre();
+    }
+  }, [isFocus]);
   return (
     <View style={styles.container} >
       <View style={{ flexDirection: 'row', columnGap: 10, marginTop: 10 }}>
