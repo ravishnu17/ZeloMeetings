@@ -423,28 +423,35 @@ const CalendarView = () => {
     return `${year}-${month}-${day}`;
   };
 
+  const handleEventClick = (event) => {
+    console.log("id", event);
+    navigation.navigate('EditBooking', { id: event });
+
+  };
+
 
   const renderEventDetails = (dateString) => {
     const eventDetails = events[dateString]?.events || [];
     if (eventDetails.length > 0) {
       return eventDetails.map((event, index) => (
+       
         <View key={index} style={styles.eventContainer}>
-        
-          <View>
-          {
-            selectResource === "meetingRoom"  &&  <Text style={styles.eventText}>{event?.meetingRoom?.name || 'N/A'}</Text>
-          }
-          {
-            selectResource === "desk"  &&  <Text style={styles.eventText}>{event?.desk?.name || 'N/A'}</Text>
-          }
-          {
-            selectResource === "parkingSeat"  &&  <Text style={styles.eventText}>{event?.parkingSeat?.name || 'N/A'}</Text>
-          }
-
-          </View>
+        <TouchableOpacity onPress={() => handleEventClick(event.id)}>
+          {selectResource === "meetingRoom" && (
+            <Text style={styles.eventText}>{event?.meetingRoom?.name || 'N/A'}</Text>
+          )}
+          {selectResource === "desk" && (
+            <Text style={styles.eventText}>{event?.desk?.name || 'N/A'}</Text>
+          )}
+          {selectResource === "parkingSeat" && (
+            <Text style={styles.eventText}>{event?.parkingSeat?.name || 'N/A'}</Text>
+          )}
           <Text style={styles.eventText}>{event?.subject}</Text>
-         
-        </View>
+        </TouchableOpacity>
+      </View>
+
+       
+       
       ));
     }
     return (

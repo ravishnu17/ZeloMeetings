@@ -14,6 +14,7 @@ import PrivacyPolicy from '../screen/dashboard/PrivacyPolicy';
 import ContactUs from '../screen/dashboard/ContactUs';
 import Feedback from '../screen/dashboard/Feedback';
 import LoadingIndicator from '../screen/LoadingIndicator';
+import EditBooking from '../screen/dashboard/EditBooking';
 
 const Stack = createNativeStackNavigator();
 export const context = createContext();
@@ -40,6 +41,8 @@ const Appnav = () => {
             <Stack.Screen name='PrivacyPolicy' component={PrivacyPolicy} />
             <Stack.Screen name="ContactUs" component={ContactUs} />
             <Stack.Screen name="Feedback" component={Feedback} />
+            <Stack.Screen name="EditBooking" component={EditBooking} />
+
           </Stack.Navigator>
         </View>
         <Footer />
