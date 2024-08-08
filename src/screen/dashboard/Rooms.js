@@ -22,7 +22,7 @@ const Rooms = () => {
   // useStates
   const [showModel, setShowModel] = useState(false);
   // const [userLocation, setUserLocation] = useState();
-  const [locations, setLocations] = useState();
+  const [locations, setLocations] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState();
   const [selectedResource, setSelectedResource] = useState('All');
   const [selectedDuration, setSelectedDuration] = useState();

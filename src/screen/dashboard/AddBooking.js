@@ -245,21 +245,25 @@ const [specialServiceisOpen,setSpecialServiceisOpen]=useState(false);
         getEndUsers();
         getVisitors();
 
-        console.log("prams", params);
+        setSelectedLocation(params?.locationID || null);
+        setSelectedBuilding(params?.buildingID || null)
+        setCheckedFloors(params?.floorID  ? {[params.floorID]:true} : {});
+
         if (params){
-            setSelectedLocation(params.locationID);
-            params.buildingID && setSelectedBuilding(params.buildingID);
-            params.floorID && setCheckedFloors(params.floorID);
             setSelectedResource(params.resource);
             if (params?.resource === 'meetingRoom'){
-                setSelectedMeetingRoom(params?.[params?.resource]);
+                setSelectedMeetingRoom(params?.meetingRoom);
             }else if(params?.resource === 'desk'){
-                setSelectedDesk(params?.[params?.resource]);
+                setSelectedDesk(params?.desk);
             }else if(params?.resource === 'parkingSeat'){
-                setSelectedParkingSeat(params?.[params?.resource]);
+                setSelectedParkingSeat(params?.parkingSeat);
             }
+        }else{
+            setSelectedMeetingRoom(null);
+            setSelectedDesk(null);
+            setSelectedParkingSeat(null);
         }
-    }, []);
+    }, [params]);
 
     useEffect(() => {
         Object.keys(loginUser).length > 0 && getlocationApi();
@@ -270,7 +274,7 @@ const [specialServiceisOpen,setSpecialServiceisOpen]=useState(false);
          if(userId){
             loginHomeAccess(userId).then((res) => {
                 if(res.status){
-                setLoginUser(res.user);
+                setLoginUser(res);
                 setRequesterName(res.user.firstName);
                 setRequesterEmail(res.user.email);
                 }
@@ -291,7 +295,7 @@ const [specialServiceisOpen,setSpecialServiceisOpen]=useState(false);
                 value: item.id
             }));
             setItemsLocations(locationOptions);
-            const itemsLocationsId=loginUser?.location?.id;
+            const itemsLocationsId=loginUser?.customerDetails?.location?.id || loginUser?.user?.location?.id;
             // console.log("itemsLocationsId ",itemsLocationsId);
             locationOptions.map((item)=>{
                 if(item.value === itemsLocationsId){
@@ -400,7 +404,6 @@ const selectedVisitorNames = Object.entries(checkVisitor)
         findBuildingListBasedonLocationId(id).then((res) => {
             // console.log("building ", res.buildings);
             setItemsBuildings([]);
-            setSelectedBuilding(null);
             if(res.status){
           
             const buildingOptions = res.buildings.map(item => ({
@@ -408,6 +411,7 @@ const selectedVisitorNames = Object.entries(checkVisitor)
                 value: item.id
             }))
             setItemsBuildings(buildingOptions);
+            setSelectedBuilding(null || params?.buildingID);
         }
         })
     }
@@ -418,7 +422,7 @@ const selectedVisitorNames = Object.entries(checkVisitor)
             // console.log("floor ", res.floors);
             // console.log("floor List Building Baesd ",res.floors);
             setItemsFloors([]);
-            setCheckedFloors({});
+            !params?.floorID && setCheckedFloors({});
 
             if(res.status){
             setItemsFloors(res.floors);
@@ -890,7 +894,7 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
     // console.log("selectedBuilding ",selectedBuilding);
     // console.log("checkedEquipments ",checkedEquipments);
     // console.log("selectedCapacity ",selectedCapacity);
-
+console.log("checkedFloors ",checkedFloors);
 
     if(Object.keys(checkedEquipments).length > 0  && selectedCapacity !== null ){
         // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding);
@@ -906,7 +910,7 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         }));
 
         setMeetingRoom(mappedItems);
-        setSelectedMeetingRoom(null || params?.[params?.resource]);
+        setSelectedMeetingRoom(null || params?.meetingRoom);
 
             }
         })
@@ -923,7 +927,7 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         }));
 
         setMeetingRoom(mappedItems);
-        setSelectedMeetingRoom(null || params?.[params?.resource]);
+        setSelectedMeetingRoom(null || params?.meetingRoom);
             }
         })
         
@@ -939,13 +943,36 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         }));
 
         setMeetingRoom(mappedItems);
-        setSelectedMeetingRoom(null || params?.[params?.resource]);
+        setSelectedMeetingRoom(null || params?.meetingRoom);
                 
             }
         })
     }else if(Object.keys(checkedFloors).length > 0 ){
-        // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding," checkedFloors ",checkedFloors);
+        console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding," checkedFloors ",checkedFloors);
         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
+            console.log("mroom ",res);
+            setMeetingRoom([]);
+            if(res?.status){
+                
+        const mappedItems = res.meetingRoomDTOs.map(resource => ({
+            label: resource.name,
+            value: resource.id,
+        }));
+
+        setMeetingRoom(mappedItems);
+        setSelectedMeetingRoom(null || params?.meetingRoom);
+                
+            }
+        })
+
+        getDesk(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors);
+        getParkingSeats(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors);
+
+        
+    }else if(selectedLocation && selectedBuilding){
+        // console.log("Both ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
+        // getMettingRooms(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
+        getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
             // console.log("mroom ",res);
             setMeetingRoom([]);
             if(res?.status){
@@ -960,14 +987,6 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
                 
             }
         })
-
-        getDesk(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors);
-        getParkingSeats(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors);
-
-        
-    }else if(selectedLocation && selectedBuilding){
-        // console.log("Both ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
-        getMettingRooms(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
         getDesk(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors);
         getParkingSeats(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors);
 
@@ -999,7 +1018,6 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
     getMeetingRoomList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime).then((res) => {
         // console.log("meeting Room ", res.meetingRoomDTOs);
         setMeetingRoom([]);
-        setSelectedMeetingRoom(null);
         if(res?.status){
        
         const mappedItems = res.meetingRoomDTOs.map(resource => ({
@@ -1008,6 +1026,7 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         }));
 
         setMeetingRoom(mappedItems);
+        setSelectedMeetingRoom(null || params?.meetingRoom);
     }
     })
   }
@@ -1025,7 +1044,7 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         }));
 
         setDesk(mappedItems);
-        setSelectedDesk(null || params?.[params?.resource]);
+        setSelectedDesk(null || params?.desk);
     }
     })
   }
@@ -1037,7 +1056,6 @@ const getParkingSeats = (selectedLocation,selectedBuilding,startDate,startTime,e
         // console.log("parking seat ", res.parkingSeatDTOs);
            // Map backend response to dropdown items
            setParkingseat([]);
-           setSelectedParkingSeat(null);
            if(res?.status){
       
            const mappedItems = res?.parkingSeatDTOs?.map(resource => ({
@@ -1046,6 +1064,7 @@ const getParkingSeats = (selectedLocation,selectedBuilding,startDate,startTime,e
         }));
 
         setParkingseat(mappedItems);
+        setSelectedParkingSeat(null || params?.parkingSeat);
     }
 
     })
@@ -1196,8 +1215,10 @@ const catringdataId=Object.keys(checkCatering).filter(key => checkCatering[key] 
             })
         }
 
-        const parkingSeatIds=[selectedParkingSeat];
-        console.log("parkingSeatIds ",parkingSeatIds);
+        const parkingSeatIds=[];
+        if(selectedParkingSeat !=null){
+             parkingSeatIds=[selectedParkingSeat];
+        }
 
        datas= {
             locationId:selectedLocation,
@@ -1258,7 +1279,6 @@ const catringdataId=Object.keys(checkCatering).filter(key => checkCatering[key] 
 //    } 
 } 
 
-    console.log("room value", selectedLocation, selectedBuilding, checkedFloors, selectedResource, selectedMeetingRoom, selectedDesk, selectedParkingSeat);
 // console.log(selectedLocation, itemsLocations);
     return (
         <SafeAreaView style={styles.container}>
@@ -1561,7 +1581,7 @@ const catringdataId=Object.keys(checkCatering).filter(key => checkCatering[key] 
             </View>
             <View style={styles.pickerContainer}>
                 <Text>Subject *</Text>
-                <TextInput style={styles.textInput} placeholder="Requester Email" className="input" value={subject} onChangeText={text => setSubject(text)} />
+                <TextInput style={styles.textInput} placeholder="Subject" className="input" value={subject} onChangeText={text => setSubject(text)} />
 
             </View>
             <View style={styles.pickerContainer}>

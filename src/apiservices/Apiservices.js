@@ -755,3 +755,34 @@ export const FloorBasedFilter=async (floorID)=>{
     throw error;
   }
 }
+
+export const EquipmentByRoomId=async (roomId)=>{
+  try{
+    const res=await axiosInstance.get(`/meetingRoomEquipment/listmeetingroomequipmentsbymeetingroom?meetingRoomId=${roomId}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+// Report module API
+export const reportEquipment = async (data)=>{
+  try{
+    const res=await axiosInstance.post(`/reportEquipment/reportbyenduser`,data);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const ResolveEquipmentReport = async (data)=>{
+  try{
+    const res=await axiosInstance.post(`/reportEquipment/fixbycustomeradmin`,data);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}

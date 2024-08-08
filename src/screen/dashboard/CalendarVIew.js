@@ -12,7 +12,7 @@ import { context } from '../../navigation/Appnav';
 const CalendarView = () => {
   const props = useContext(context);
   const setLoading = props?.setLoading;
-  const isFocus= useIsFocused();
+  const isFocus = useIsFocused();
   const navigation = useNavigation();
   const [events, setEvents] = useState({});
 
@@ -43,7 +43,7 @@ const CalendarView = () => {
 
 
   useEffect(() => {
-    if (isFocus){
+    if (isFocus) {
       props?.setPre();
       getLoginUser();
       const today = new Date().toISOString().split('T')[0];
@@ -52,16 +52,15 @@ const CalendarView = () => {
 
 
       const today1 = new Date();
-          const year = today1.getFullYear();
+      const year = today1.getFullYear();
       const month = today1.getMonth() + 1; // Months are zero-based in JavaScript
-      
+
       // Function to pad single digit month and day with leading zero
       const padZero = (num) => (num < 10 ? `0${num}` : num);
-      
+
       // Start date of the current month
       const startDate = `${year}-${padZero(month)}-01`;
-      
-      console.log("month ",month);
+
       // End date of the selected month
       const nextMonthFirstDay = new Date(year, month, 1);
       // console.log("nextMonthFirstDay  intial ",nextMonthFirstDay);
@@ -79,7 +78,7 @@ const CalendarView = () => {
       setMonthStartDate(startDate);
       setMonthEndDate(endDate);
     }
-  }, [ isFocus ]);
+  }, [isFocus]);
 
 
   const onMonthChange = (month) => {
@@ -94,30 +93,29 @@ const CalendarView = () => {
     // const startDate = `${year}-${padZero(newMonth)}-01`;
     // const endDate = new Date(year, newMonth, 0).toISOString().split('T')[0];
 
-    console.log("month ", month);
     // Update the start and end dates for the new month
-  const year = month.year;
-  const newMonth = month.month; // month.month is already 1-based (1 for January, 2 for February, etc.)
+    const year = month.year;
+    const newMonth = month.month; // month.month is already 1-based (1 for January, 2 for February, etc.)
 
-  const padZero = (num) => (num < 10 ? `0${num}` : num);
+    const padZero = (num) => (num < 10 ? `0${num}` : num);
 
-  // Start date of the selected month
-  const startDate = `${year}-${padZero(newMonth)}-01`;
+    // Start date of the selected month
+    const startDate = `${year}-${padZero(newMonth)}-01`;
 
-  // End date of the selected month
-  const nextMonthFirstDay = new Date(year, newMonth, 1);
-  // console.log("nextMonthFirstDay  intial ",nextMonthFirstDay);
+    // End date of the selected month
+    const nextMonthFirstDay = new Date(year, newMonth, 1);
+    // console.log("nextMonthFirstDay  intial ",nextMonthFirstDay);
 
-  nextMonthFirstDay.setDate(nextMonthFirstDay.getDate());
+    nextMonthFirstDay.setDate(nextMonthFirstDay.getDate());
 
-  // console.log("nextMonthFirstDay  asas",nextMonthFirstDay.getDate());
+    // console.log("nextMonthFirstDay  asas",nextMonthFirstDay.getDate());
 
 
 
-  const endDate = nextMonthFirstDay.toISOString().split('T')[0];
+    const endDate = nextMonthFirstDay.toISOString().split('T')[0];
 
-  // console.log(' month Start Date:', startDate);
-  // console.log(' month End Date:', endDate);
+    // console.log(' month Start Date:', startDate);
+    // console.log(' month End Date:', endDate);
 
     setMonthStartDate(startDate);
     setMonthEndDate(endDate);
@@ -133,7 +131,7 @@ const CalendarView = () => {
   useEffect(() => {
     if (selectedLocation) {
       getBulidingListApi(selectedLocation);
-      
+
     }
   }, [selectedLocation]);
 
@@ -144,18 +142,18 @@ const CalendarView = () => {
   }, [selectedBuilding]);
 
   useEffect(() => {
-    if(selectedBuilding){
-      getMeetingRoomListByBuildingAndFloorId(selectedBuilding,selectFloors);
-      getDeskListByBuildingAndFloorId(selectedBuilding,selectFloors);
-      getParkingSeatListByBuildingAndFloorId(selectedBuilding,selectFloors);
+    if (selectedBuilding) {
+      getMeetingRoomListByBuildingAndFloorId(selectedBuilding, selectFloors);
+      getDeskListByBuildingAndFloorId(selectedBuilding, selectFloors);
+      getParkingSeatListByBuildingAndFloorId(selectedBuilding, selectFloors);
 
-    }else if(selectedLocation){
+    } else if (selectedLocation) {
       getMeetingRoomListByLocationId(selectedLocation);
       getDeskListByLocationId(selectedLocation);
       getParkinseatsListByLocationId(selectedLocation);
     }
-   
-  }, [selectedLocation,selectedBuilding,selectFloors]);
+
+  }, [selectedLocation, selectedBuilding, selectFloors]);
 
   useEffect(() => {
     // console.log("selectedDate",selectedDate);
@@ -164,81 +162,72 @@ const CalendarView = () => {
     // console.log("selectedDesk",selectedDesk);
     // console.log("selectedParkingSeat",selectedParkingSeat);
 
-   
 
 
-    if(selectedMeetingRoom !==null || selectedDesk !==null || selectedParkingSeat !==null){
 
-    resourcedateBasedBooking(selectedLocation,selectResource,selectedMeetingRoom,selectedDesk,selectedParkingSeat,monthStartDate,monthEndDate);
-    // console.log("resource based");
-      
-    }else{
-      calenderApi(selectedLocation, selectedBuilding, selectFloors, selectResource,monthStartDate,monthEndDate);
+    if (selectedMeetingRoom !== null || selectedDesk !== null || selectedParkingSeat !== null) {
+
+      resourcedateBasedBooking(selectedLocation, selectResource, selectedMeetingRoom, selectedDesk, selectedParkingSeat, monthStartDate, monthEndDate);
+      // console.log("resource based");
+
+    } else {
+      calenderApi(selectedLocation, selectedBuilding, selectFloors, selectResource, monthStartDate, monthEndDate);
     }
-    
 
-  }, [selectedLocation, selectedBuilding, selectFloors,selectResource,monthStartDate,monthEndDate,selectedMeetingRoom,selectedDesk,selectedParkingSeat]);
 
-  const calenderApi = (locationId, buildingId, floorId, resource,startDate,endDate) => {
-    
+  }, [selectedLocation, selectedBuilding, selectFloors, selectResource, monthStartDate, monthEndDate, selectedMeetingRoom, selectedDesk, selectedParkingSeat]);
+
+  const calenderApi = (locationId, buildingId, floorId, resource, startDate, endDate) => {
+    setLoading(true);
     getCalenderData(resource, locationId, startDate, endDate, buildingId, floorId).then((res) => {
       setEvents({});
-      setLoading(true);
       if (res?.status) {
-    const eventMarks = res?.bookings?.reduce((acc, event) => { 
-      const date = event.startDate;
-      if (date && date.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        if (!acc[date]) {
-          acc[date] = { marked: true, dotColor: 'blue', events: [] };
-        }
-        acc[date].events.push(event);
-      }
-      return acc;
-    }, {});
-
-    setEvents(eventMarks);
-
-    setLoading(false);
-      } 
-    })
+        const eventMarks = res?.bookings?.reduce((acc, event) => {
+          const date = event.startDate;
+          if (date && date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            if (!acc[date]) {
+              acc[date] = { marked: true, dotColor: 'blue', events: [] };
+            }
+            acc[date].events.push(event);
+          }
+          return acc;
+        }, {});
+        setEvents(eventMarks);}
+    }).finally(() =>setLoading(false));
   };
 
-  const resourcedateBasedBooking = (locationId,resource,meetingRoom,desk,parkingSeat,monthStartDate,monthEndDate) => {
+  const resourcedateBasedBooking = (locationId, resource, meetingRoom, desk, parkingSeat, monthStartDate, monthEndDate) => {
 
-    datas={
-      carId:null,
-      chargingCarId:null,
-      customerLocationId:locationId,
-      deskId:desk,
-      endDate:monthEndDate,
-      meetingRoomId:meetingRoom,
-      parkingSeatId:parkingSeat,
-      sourceType:resource,
-      startDate:monthStartDate,
-}
+    datas = {
+      carId: null,
+      chargingCarId: null,
+      customerLocationId: locationId,
+      deskId: desk,
+      endDate: monthEndDate,
+      meetingRoomId: meetingRoom,
+      parkingSeatId: parkingSeat,
+      sourceType: resource,
+      startDate: monthStartDate,
+    }
 
 
-    
-      getCalenderResourceData(datas).then((res) => {
+    setLoading(true);
+    getCalenderResourceData(datas).then((res) => {
       setEvents({});
-      setLoading(true);
       if (res?.status) {
-
-    const eventMarks = res?.bookings?.reduce((acc, event) => { 
-      const date = event.startDate;
-      if (date && date.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        if (!acc[date]) {
-          acc[date] = { marked: true, dotColor: 'blue', events: [] };
-        }
-        acc[date].events.push(event);
+        const eventMarks = res?.bookings?.reduce((acc, event) => {
+          const date = event.startDate;
+          if (date && date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            if (!acc[date]) {
+              acc[date] = { marked: true, dotColor: 'blue', events: [] };
+            }
+            acc[date].events.push(event);
+          }
+          return acc;
+        }, {});
+        setEvents(eventMarks);
       }
-      return acc;
-    }, {});
-
-    setEvents(eventMarks);
-    setLoading(false);
-      } 
-    })
+    }).finally(() =>setLoading(false));
   };
 
   const getLoginUser = async () => {
@@ -246,7 +235,7 @@ const CalendarView = () => {
     if (userId) {
       loginHomeAccess(userId).then((res) => {
         if (res.status) {
-          setLoginUser(res.user);
+          setLoginUser(res);
         }
       });
     }
@@ -261,7 +250,7 @@ const CalendarView = () => {
           value: item.id,
         }));
         setItemsLocations(locationOptions);
-        const itemsLocationsId = loginUser?.location?.id;
+        const itemsLocationsId = loginUser?.customerDetails?.location?.id || loginUser?.user?.location?.id;
         locationOptions.forEach((item) => {
           if (item.value === itemsLocationsId) {
             setSelectedLocation(item.value);
@@ -283,11 +272,11 @@ const CalendarView = () => {
         //   id: null,
         //   name: "Select Building",
         // };
-  
+
         // if (!updatedList.includes(newdata)) {
         //   updatedList = [newdata, ...updatedList];
         // }
-  
+
         // const transformedData = updatedList.map(capacity => ({
         //   label: item.name,
         //   value: item.id,
@@ -302,7 +291,7 @@ const CalendarView = () => {
 
         setItemsBuildings(buildingOptions);
 
-       
+
       }
     });
   };
@@ -338,8 +327,8 @@ const CalendarView = () => {
 
 
   //building And Floor Based Meeting Room
-  const getMeetingRoomListByBuildingAndFloorId = (selectedBuilding,selectFloors) => {
-    getMeetingRoomListBuildingAndFloor(selectedBuilding,selectFloors).then((res) => {
+  const getMeetingRoomListByBuildingAndFloorId = (selectedBuilding, selectFloors) => {
+    getMeetingRoomListBuildingAndFloor(selectedBuilding, selectFloors).then((res) => {
       setMeetingRoom([]);
       setSelectedMeetingRoom(null);
       if (res.status) {
@@ -351,7 +340,7 @@ const CalendarView = () => {
       }
     });
   };
-//location based desk
+  //location based desk
 
   const getDeskListByLocationId = (id) => {
     getDesksByLocationId(id).then((res) => {
@@ -369,8 +358,8 @@ const CalendarView = () => {
 
 
   //building And Floor Based Desk
-  const getDeskListByBuildingAndFloorId = (selectedBuilding,selectFloors) => {
-    getDeskListBuildingAndFloor(selectedBuilding,selectFloors).then((res) => {
+  const getDeskListByBuildingAndFloorId = (selectedBuilding, selectFloors) => {
+    getDeskListBuildingAndFloor(selectedBuilding, selectFloors).then((res) => {
       setDesk([]);
       setSelectedDesk(null);
       if (res.status) {
@@ -384,7 +373,7 @@ const CalendarView = () => {
   };
 
 
-//location based parkingSeats
+  //location based parkingSeats
   const getParkinseatsListByLocationId = (id) => {
     getParkingSeatByLocationId(id).then((res) => {
       setParkingSeat([]);
@@ -401,8 +390,8 @@ const CalendarView = () => {
   };
 
   //building And Floor Based ParkingSeats
-  const getParkingSeatListByBuildingAndFloorId = (selectedBuilding,selectFloors) => {
-    getParkingSeatListBuildingAndFloor(selectedBuilding,selectFloors).then((res) => {
+  const getParkingSeatListByBuildingAndFloorId = (selectedBuilding, selectFloors) => {
+    getParkingSeatListBuildingAndFloor(selectedBuilding, selectFloors).then((res) => {
       setParkingSeat([]);
       setSelectedParkingSeat(null);
       if (res.status) {
@@ -424,7 +413,6 @@ const CalendarView = () => {
   };
 
   const handleEventClick = (event) => {
-    console.log("id", event);
     navigation.navigate('EditBooking', { id: event });
 
   };
@@ -434,34 +422,34 @@ const CalendarView = () => {
     const eventDetails = events[dateString]?.events || [];
     if (eventDetails.length > 0) {
       return eventDetails.map((event, index) => (
-       
-        <View key={index} style={styles.eventContainer}>
-        <TouchableOpacity onPress={() => handleEventClick(event.id)}>
-          {selectResource === "meetingRoom" && (
-            <Text style={styles.eventText}>{event?.meetingRoom?.name || 'N/A'}</Text>
-          )}
-          {selectResource === "desk" && (
-            <Text style={styles.eventText}>{event?.desk?.name || 'N/A'}</Text>
-          )}
-          {selectResource === "parkingSeat" && (
-            <Text style={styles.eventText}>{event?.parkingSeat?.name || 'N/A'}</Text>
-          )}
-          <Text style={styles.eventText}>{event?.subject}</Text>
-        </TouchableOpacity>
-      </View>
 
-       
-       
+        <View key={index} style={styles.eventContainer}>
+          <TouchableOpacity onPress={() => handleEventClick(event.id)}>
+            {selectResource === "meetingRoom" && (
+              <Text style={styles.eventText}>{event?.meetingRoom?.name || 'N/A'}</Text>
+            )}
+            {selectResource === "desk" && (
+              <Text style={styles.eventText}>{event?.desk?.name || 'N/A'}</Text>
+            )}
+            {selectResource === "parkingSeat" && (
+              <Text style={styles.eventText}>{event?.parkingSeat?.name || 'N/A'}</Text>
+            )}
+            <Text style={styles.eventText}>{event?.subject}</Text>
+          </TouchableOpacity>
+        </View>
+
+
+
       ));
     }
     return (
       <View style={styles.eventContainer}>
-        <Text style={[styles.eventText,{color:"red"}]}>No events for this date</Text>
+        <Text style={[styles.eventText, { color: "red" }]}>No events for this date</Text>
       </View>
     );
   };
 
-// console.log("selectResource",selectResource);
+  // console.log("selectResource",selectResource);
 
 
 
@@ -469,178 +457,178 @@ const CalendarView = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView}>
-      <Calendar
-        current={selectedDate}
-        onDayPress={(day) => {
-          setSelectedDate(day.dateString);
-        }}
-        onMonthChange={onMonthChange}
-        markedDates={events}
-      />
-      <View style={styles.pickerContainer}>
-        <View style={styles.locationview}>
-          <Text>Location</Text>
-          <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            data={itemsLocations}
-            labelField="label"
-            valueField="value"
-            placeholder="Select Location"
-            value={selectedLocation}
-            onChange={(item) => setSelectedLocation(item.value)}
-          />
-        </View>
-        <View style={styles.locationview}>
-          <Text>Building</Text>
-          <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            data={itemsBuildings}
-            labelField="label"
-            valueField="value"
-            placeholder="Select Building"
-            value={selectedBuilding}
-            onChange={(item) => setSelectedBuilding(item.value)}
-          />
-        </View>
-      
-      </View>
-      <View style={styles.pickerContainer}>
-      <View style={styles.locationview}>
-          <Text>Floor</Text>
-          <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            data={itemsFloors}
-            labelField="label"
-            valueField="value"
-            placeholder="Select Floor"
-            value={selectFloors}
-            onChange={(item) => setSelectFloors(item.value)}
-          />
-        </View>
-        {
-          selectResource ==='meetingRoom' &&
+        <Calendar
+          current={selectedDate}
+          onDayPress={(day) => {
+            setSelectedDate(day.dateString);
+          }}
+          onMonthChange={onMonthChange}
+          markedDates={events}
+        />
+        <View style={styles.pickerContainer}>
           <View style={styles.locationview}>
-          <Text>Meeting Room</Text>
-          <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            data={meetingRoom}
-            labelField="label"
-            valueField="value"
-            placeholder="Select Meeting Room"
-            value={selectedMeetingRoom}
-            onChange={(item) => setSelectedMeetingRoom(item.value)}
-          />
-        </View>
-        }
-
-        {
-          selectResource ==='desk' &&
+            <Text>Location</Text>
+            <Dropdown
+              style={styles.dropdown}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              data={itemsLocations}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Location"
+              value={selectedLocation}
+              onChange={(item) => setSelectedLocation(item.value)}
+            />
+          </View>
           <View style={styles.locationview}>
-          <Text>Desk</Text>
-          <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            data={desk}
-            labelField="label"
-            valueField="value"
-            placeholder="Select Desk"
-            value={selectedDesk}
-            onChange={(item) => setSelectedDesk(item.value)}
-          />
+            <Text>Building</Text>
+            <Dropdown
+              style={styles.dropdown}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              data={itemsBuildings}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Building"
+              value={selectedBuilding}
+              onChange={(item) => setSelectedBuilding(item.value)}
+            />
+          </View>
+
         </View>
-        }
-        {
-          selectResource ==='parkingSeat' &&
+        <View style={styles.pickerContainer}>
           <View style={styles.locationview}>
-          <Text>Parking Seat</Text>
-          <Dropdown
-            style={styles.dropdown}
-            placeholderStyle={styles.placeholderStyle}
-            selectedTextStyle={styles.selectedTextStyle}
-            inputSearchStyle={styles.inputSearchStyle}
-            data={parkingSeat}
-            labelField="label"
-            valueField="value"
-            placeholder="Select Parking Seat"
-            value={selectedParkingSeat}
-            onChange={(item) => setSelectedParkingSeat(item.value)}
-          />
+            <Text>Floor</Text>
+            <Dropdown
+              style={styles.dropdown}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              inputSearchStyle={styles.inputSearchStyle}
+              data={itemsFloors}
+              labelField="label"
+              valueField="value"
+              placeholder="Select Floor"
+              value={selectFloors}
+              onChange={(item) => setSelectFloors(item.value)}
+            />
+          </View>
+          {
+            selectResource === 'meetingRoom' &&
+            <View style={styles.locationview}>
+              <Text>Meeting Room</Text>
+              <Dropdown
+                style={styles.dropdown}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                data={meetingRoom}
+                labelField="label"
+                valueField="value"
+                placeholder="Select Meeting Room"
+                value={selectedMeetingRoom}
+                onChange={(item) => setSelectedMeetingRoom(item.value)}
+              />
+            </View>
+          }
+
+          {
+            selectResource === 'desk' &&
+            <View style={styles.locationview}>
+              <Text>Desk</Text>
+              <Dropdown
+                style={styles.dropdown}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                data={desk}
+                labelField="label"
+                valueField="value"
+                placeholder="Select Desk"
+                value={selectedDesk}
+                onChange={(item) => setSelectedDesk(item.value)}
+              />
+            </View>
+          }
+          {
+            selectResource === 'parkingSeat' &&
+            <View style={styles.locationview}>
+              <Text>Parking Seat</Text>
+              <Dropdown
+                style={styles.dropdown}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                data={parkingSeat}
+                labelField="label"
+                valueField="value"
+                placeholder="Select Parking Seat"
+                value={selectedParkingSeat}
+                onChange={(item) => setSelectedParkingSeat(item.value)}
+              />
+            </View>
+          }
+
+
         </View>
-        }
-       
 
-      </View>
-    
-      <View style={styles.buttonsContainer}>
-        {
-          selectResource ==='meetingRoom' ? (
-            
-            <TouchableOpacity style={styles.selectRoomButton} onPress={() => setSelectResource('meetingRoom')}>
-            <Text style={styles.buttonText} >Meeting Rooms</Text>
-          </TouchableOpacity>
-              
-          
-          ) : (
-            <TouchableOpacity style={styles.roombutton} onPress={() => setSelectResource('meetingRoom')}>
-            <Text style={styles.buttonText} >Meeting Rooms</Text>
-          </TouchableOpacity>
-          )
-        }
+        <View style={styles.buttonsContainer}>
+          {
+            selectResource === 'meetingRoom' ? (
 
-        {
-          selectResource ==='desk' ? (
-            
-            <TouchableOpacity style={styles.selectDeskButton} onPress={() => setSelectResource('desk')}>
-            <Text style={styles.buttonText} >Desks</Text>
-          </TouchableOpacity>
-              
-          
-          ) : (
-            <TouchableOpacity style={styles.deskbutton} onPress={() => setSelectResource('desk')}>
-            <Text style={styles.buttonText} >Desks</Text>
-          </TouchableOpacity>
-          )
-        }
-        {
-          selectResource ==='parkingSeat' ? (
-            
-            <TouchableOpacity style={styles.selectParkingseatButton} onPress={() => setSelectResource('parkingSeat')}>
-            <Text style={styles.buttonText} >Parking Seats</Text>
-          </TouchableOpacity>
-              
-          
-          ) : (
-            <TouchableOpacity style={styles.parkingseatbutton} onPress={() => setSelectResource('parkingSeat')}>
-            <Text style={styles.buttonText} >Parking Seats</Text>
-          </TouchableOpacity>
-          )
-        }
-     
-       
-      </View>
+              <TouchableOpacity style={styles.selectRoomButton} onPress={() => setSelectResource('meetingRoom')}>
+                <Text style={styles.buttonText} >Meeting Rooms</Text>
+              </TouchableOpacity>
 
-      <Text style={styles.heading}>Bookings</Text>
-      <ScrollView>{renderEventDetails(selectedDate)}</ScrollView>
-      <View style={styles.addButtonContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate('AddBooking')}>
-          <Icon name="plus-circle" size={30} color="#007bff" />
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+
+            ) : (
+              <TouchableOpacity style={styles.roombutton} onPress={() => setSelectResource('meetingRoom')}>
+                <Text style={styles.buttonText} >Meeting Rooms</Text>
+              </TouchableOpacity>
+            )
+          }
+
+          {
+            selectResource === 'desk' ? (
+
+              <TouchableOpacity style={styles.selectDeskButton} onPress={() => setSelectResource('desk')}>
+                <Text style={styles.buttonText} >Desks</Text>
+              </TouchableOpacity>
+
+
+            ) : (
+              <TouchableOpacity style={styles.deskbutton} onPress={() => setSelectResource('desk')}>
+                <Text style={styles.buttonText} >Desks</Text>
+              </TouchableOpacity>
+            )
+          }
+          {
+            selectResource === 'parkingSeat' ? (
+
+              <TouchableOpacity style={styles.selectParkingseatButton} onPress={() => setSelectResource('parkingSeat')}>
+                <Text style={styles.buttonText} >Parking Seats</Text>
+              </TouchableOpacity>
+
+
+            ) : (
+              <TouchableOpacity style={styles.parkingseatbutton} onPress={() => setSelectResource('parkingSeat')}>
+                <Text style={styles.buttonText} >Parking Seats</Text>
+              </TouchableOpacity>
+            )
+          }
+
+
+        </View>
+
+        <Text style={styles.heading}>Bookings</Text>
+        <ScrollView>{renderEventDetails(selectedDate)}</ScrollView>
+        <View style={styles.addButtonContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate('AddBooking')}>
+            <Icon name="plus-circle" size={30} color="#007bff" />
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -707,7 +695,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#007bff',
     borderRadius: 5,
   },
-  selectRoomButton:{
+  selectRoomButton: {
     padding: 10,
     backgroundColor: '#007bff',
     borderRadius: 5,
@@ -719,7 +707,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#28a745',
     borderRadius: 5,
   },
-  selectDeskButton:{
+  selectDeskButton: {
     padding: 10,
     backgroundColor: '#28a745',
     borderRadius: 5,
@@ -731,7 +719,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F17E44',
     borderRadius: 5,
   },
-  selectParkingseatButton:{
+  selectParkingseatButton: {
     padding: 10,
     backgroundColor: '#F17E44',
     borderRadius: 5,
