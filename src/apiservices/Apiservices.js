@@ -349,6 +349,7 @@ export const getMeetingRoomList = async (location, building, startDate, startTim
 
 //Equiments and capacity and other 
 export const getMeetingRoomListForEquipmentAndCapacity = async (location, building, startDate, startTime, endDate, endTime, equipment, capacity, floorList) => {
+//  console.log("Api intials stage  ","location ",location, " building ",building,"start ",startDate," start time ",startTime," end ",endDate," end time ",endTime," equipment ",equipment,"capacity", capacity,"floorList" ,floorList);
   const locationId = Number(location);
   const buildingId = Number(building);
   // const equipmentId = Object.keys(equipment).filter(key=> equipment[key] === true).join(',');
@@ -367,23 +368,33 @@ export const getMeetingRoomListForEquipmentAndCapacity = async (location, buildi
   // console.log(" Object.Keys(equipmentId).length > 0",Object.Keys(equipmentId).length > 0);
   try {
     if (capacityId > 0 && equipmentId && floorIds) {
-      // console.log("capacity",capacityId ,"equipment",equipmentId ,"floor",floorIds);
+      // console.log("API CALL",  "capacity",capacityId ,"equipment",equipmentId ,"floor",floorIds);
+      // http://192.168.1.143:9092/mrroom/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=3128&buildingId=5104&floorId=5227&customerEquipmentIds=5320&startDate=2024-08-07&startTime=15:43&endDate=2024-08-07&endTime=16:13&editBookingId=0&capacityNumber=2
       const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId}`);
+      // const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId}`);
       return response.data;
     }
     else if (capacityId > 0 && equipmentId) {
-      // console.log("equipment",equipmentId ,"capacity",capacityId);
-      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId}`);
+      // console.log("API CALL", "equipment",equipmentId ,"capacity",capacityId);
+      // http://192.168.1.143:9092/mrroom/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=3128&buildingId=5104&customerEquipmentIds=5319&startDate=2024-08-07&startTime=15:43&endDate=2024-08-07&endTime=16:13&editBookingId=0&capacityNumber=
+      // const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId}`);
+      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId}`);
       return response.data;
     } else if (equipmentId && floorIds) {
-      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
+      // console.log("API CALL", "equipment",equipmentId ,"floor",floorIds);
+      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds ? floorIds : 0}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=0`);
+      // const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
       return response.data;
     } else if (equipmentId) {
-      // console.log("equipment",equipmentId );
-      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
+      // console.log("API CALL", "equipment",equipmentId);
+      // http://192.168.1.143:9092/mrroom/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=3128&buildingId=5104&floorId=5227&customerEquipmentIds=5319&startDate=2024-08-07&startTime=15:43&endDate=2024-08-07&endTime=16:13&editBookingId=0&capacityNumber=0
+      // 9092/mrroom/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=3128&buildingId=5104&customerEquipmentIds=5319&startDate=2024-08-07&startTime=15:43&endDate=2024-08-07&endTime=16:13&editBookingId=0&capacityNumber
+      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=0`);
+     
+      // const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
       return response.data;
-    } else if (capacityId > 0 || capacity === 0 && floorIds) {
-      // console.log("floor and capacity" ,"capacity 0",capacityId ,"floor",floorIds);
+    } else if ( capacityId > 0 ||  capacity === 0 && floorIds) {
+      console.log("floor and capacity" ,"capacity 0",capacityId ,"floor",floorIds);
       const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=${capacityId ? capacityId : capacity}`);
       return response.data;
 
@@ -398,7 +409,12 @@ export const getMeetingRoomListForEquipmentAndCapacity = async (location, buildi
       // console.log(" only  floor ",floorIds);
 
       ///meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=6984&buildingId=176019&floorId=176050&startDate=2024-08-05&startTime=12:52&endDate=2024-08-05&endTime=13:22&editBookingId=0&capacityNumber=0
-      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=0`);
+      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId}&floorId=${floorIds}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=0`);
+      return response.data;
+    }else if(buildingId){
+      // console.log(" only  building ",buildingId);
+      // http://192.168.1.143:9092/mrroom/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=3128&buildingId=5104&startDate=2024-08-07&startTime=17:29&endDate=2024-08-07&endTime=17:59&editBookingId=0&capacityNumber=0
+      const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&capacityNumber=0`);
       return response.data;
     }
   } catch (error) {
@@ -418,6 +434,7 @@ export const getDeskList = async (location, building, startDate, startTime, endD
       const response = await axiosInstance.get(`/desk/listdesks/bylocationandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds} &startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
       return response.data;
     } else {
+      // console.log("Desk Building ",buildingId);
       const response = await axiosInstance.get(`/desk/listdesks/bylocationandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
       return response.data;
     }
@@ -528,7 +545,7 @@ export const updateBookingRequest = async (id, status) => {
 // Add Booking APIs
 
 export const addBookingApi = async (data) => {
-  console.log("data Api");
+  // console.log("data Api");
   try {
     const response = await axiosInstance.post('/booking/create', data);
     return response.data;
@@ -537,6 +554,19 @@ export const addBookingApi = async (data) => {
     throw error;
   }
 };
+
+// find booking by id
+export const findBookingById = async (id) => {
+  const num = Number(id);
+  try {
+    const response = await axiosInstance.get(`/booking/find?id=${num}`);
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
 
 //calender fiter Api
 
