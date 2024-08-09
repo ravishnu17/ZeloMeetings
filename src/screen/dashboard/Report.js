@@ -139,6 +139,7 @@ const Report = () => {
     setSelectedBuilding();
     setSelectedFloor();
     setSelectedRoom();
+    setFloor([]);
     setEquipments([]);
   }
   // Handle building change event
