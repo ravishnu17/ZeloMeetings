@@ -571,10 +571,12 @@ const AddBooking = ({ route }) => {
     const cateringApi = (selectedLocation) => {
         // console.log("selectedLocation  Addbooking ",selectedLocation);
         findCateringStatusBasedonCustomerLocationId(selectedLocation).then((res) => {
-            setCateringFormEnable(false);
+            // console.log("line 574", res);
             if (res.status) {
                 // console.log("catering status ", res.customerCateringSetting.isAllowedCateringWithinHours);
                 setCateringFormEnable(res.customerCateringSetting.isAllowedCateringWithinHours);
+            }else{
+                setCateringFormEnable(false);
             }
         })
         findCateringListBasedonCustomerLocationId(selectedLocation).then((res) => {
@@ -598,10 +600,12 @@ const AddBooking = ({ route }) => {
 
         findCateringStatusBasedonBasedonBuildingId(selectedBuilding).then((res) => {
             // console.log("catering status Building Baesd ");
-            setCateringFormEnable(false);
+            // console.log("line 603", res);
             if (res.status) {
                 // console.log("catering status ", res.customerCateringSetting.isAllowedCateringWithinHours);
                 setCateringFormEnable(res.customerCateringSetting.isAllowedCateringWithinHours);
+            }else{
+                setCateringFormEnable(false);
             }
         })
 
@@ -627,7 +631,6 @@ const AddBooking = ({ route }) => {
 
     const handleCateringToggle = () => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        // setIsOpen(!isOpen);
         setCateringisOpen(!cateringisOpen);
     };
 
@@ -644,12 +647,12 @@ const AddBooking = ({ route }) => {
     //Cleaning Api
     const cleaningApi = (selectedLocation) => {
         findCustomerCleaningStatusBasedonCustomerLocationId(selectedLocation).then((res) => {
-            setCateringFormEnable(false);
             if (res.status) {
-
                 // console.log("cleaning status ", res.customerCleaning.cleaningTimeStatus);
                 setCleaningFormEnable(res.customerCleaning.cleaningTimeStatus);
                 // setCleaningFormEnable(res.customerCleaningSetting.isAllowedCleaningWithinHours);
+            }else{
+                setCleaningFormEnable(false);
             }
         })
     }
@@ -657,9 +660,10 @@ const AddBooking = ({ route }) => {
     const cleaningApiwithBuilding = (selectedBuilding) => {
         findCustomerCleaningSattusBasedonBuildingId(selectedBuilding).then((res) => {
             // console.log("cleaning status Building Baesd ");
-            setCateringFormEnable(false);
             if (res.status) {
-                setCateringFormEnable(res.customerCleaning.cleaningTimeStatus);
+                setCleaningFormEnable(res.customerCleaning.cleaningTimeStatus);
+            }else{
+                setCleaningFormEnable(false);
             }
         })
     }
@@ -1253,6 +1257,7 @@ const AddBooking = ({ route }) => {
             visitorIds: visitorId,
             floorIds: floorIds
         }
+        console.log("submit data", datas);
         addBookingApi(datas).then((res) => {
             Toast.showWithGravity(
                 res?.information?.description,
@@ -1267,6 +1272,8 @@ const AddBooking = ({ route }) => {
             props?.setLoading(false);
         })
     }
+
+    // console.log("cateringFormEnable",cateringFormEnable);
     
     return (
         <SafeAreaView style={styles.container}>
@@ -1930,6 +1937,7 @@ const styles = StyleSheet.create({
     pickerContainer: {
         width: '100%',
         marginBottom: 20,
+        padding: 7,
     },
     dateTimeContainer: {
         flexDirection: 'row',
@@ -2040,7 +2048,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 5,
-
+        padding: 7,
         textAlignVertical: 'top', // Ensures text starts at the top of the input
     },
     textInputPragraph: {

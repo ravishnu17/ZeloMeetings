@@ -7,7 +7,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { addBookingApi, findBookingById, findBuildingListBasedonLocationId, findCapacityBuildingBased, findCapacityLocationBased, findCateringListBasedonBuildingId, findCateringListBasedonCustomerLocationId, findCateringStatusBasedonBasedonBuildingId, findCateringStatusBasedonCustomerLocationId, findCustomerCleaningSattusBasedonBuildingId, findCustomerCleaningStatusBasedonCustomerLocationId, findCustomeritsupportsettingListBasedonBuildingId, findCustomeritsupportsettingListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonBuildingId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerMobileEquipmentStatusBasedonBuildingId, findCustomerMobileEquipmentStatusBasedonCustomerLocationId, findCustomerSpecialSettingBasedonBuildingId, findCustomerSpecialSettingBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonBuildingId, findCustomerSpecialSettingListBasedonCustomerLocationId, findEquipmentsListBasedonBuildingId, findEquipmentsListBasedonCustomerLocationId, findFloorsListBasedonBuildingId, findITSupporttBasedonBuildingId, findITSupporttBasedonCustomerLocationId, findMobileEquipmentsBasedonCustomerLocationId, getDeskList, getEditDeskList, getEditMeetingRoomList, getEditMeetingRoomListForEquipmentAndCapacity, getEditParkingSeatList, getEndUserList, getLocationlist, getMeetingRoomList, getMeetingRoomListForEquipmentAndCapacity, getParkingSeatList, getVisitorList, loginHomeAccess, visitorCreateAndUpdate } from '../../apiservices/Apiservices';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 // create a component
 const EditBooking = ({ route }) => {
@@ -15,6 +15,7 @@ const EditBooking = ({ route }) => {
     // console.log("params ",params?.id);
     const navigation = useNavigation();
     const { colors } = useTheme();
+    const isFocus = useIsFocused();
  
     const [bookingResponse,setBookingResponse] = useState({});
      const [itemsLocations, setItemsLocations] = useState([]);
@@ -143,6 +144,8 @@ const EditBooking = ({ route }) => {
          { label: 'All Day', value: '1440' }
      ]);
  
+     const [disableUpdate, setDisableUpdate] = useState(true);
+
      const addVisitorFormStatus = () => {
          if(visitorFormEnable){
              setVisitorFormEnable(false);
@@ -155,6 +158,8 @@ const EditBooking = ({ route }) => {
         getBookingDetails(params?.id);
          
      },[params?.id])
+
+
 
      const getBookingDetails =(bookingId) => {
         findBookingById(bookingId).then((res) => {
@@ -177,6 +182,15 @@ const EditBooking = ({ route }) => {
                 setIsCleaning(res?.booking?.defaultCleaningStatus);
                 setSpecialServiceDescription(res?.booking?.customerSpecialServiceDescription);
                 setMobileEquipmentDescription(res?.booking?.customerMobileEquipmentDescription);
+                let starttime= res?.booking?.startTime.split(':');
+                setDate(new Date(new Date(res?.booking?.startDate).setHours(starttime[0], starttime[1])));
+                let endtime= res?.booking?.endTime.split(':');
+                let endDateTimeObj= new Date(new Date(res?.booking?.endDate).setHours(endtime[0], endtime[1]))
+                setEndDate(endDateTimeObj);
+                
+                // disable update if end date time is less than current time
+                setDisableUpdate(new Date().toLocaleString() > endDateTimeObj.toLocaleString());
+
 
                 // if(res?.booking.floorIds !=null){
                 //     // Assuming res is your response object
@@ -242,22 +256,22 @@ const EditBooking = ({ route }) => {
          showMode('time');
      };
  
-     useEffect(() => {
+    //  useEffect(() => {
           
-         if(selectedResource === 'meetingRoom' || selectedResource === 'parkingSeat'){
-           setDurationValue(duration.find((d) => d.value === '30').value);
+    //      if(selectedResource === 'meetingRoom' || selectedResource === 'parkingSeat'){
+    //        setDurationValue(duration.find((d) => d.value === '30').value);
  
-         }else if(selectedResource === 'desk'){
-             setDurationValue(duration.find((d) => d.value === '120').value);
-         }
+    //      }else if(selectedResource === 'desk'){
+    //          setDurationValue(duration.find((d) => d.value === '120').value);
+    //      }
          
-     },[selectedResource])
+    //  },[selectedResource])
  
      useEffect(() => {
         //  console.log("Start Date ",date);
         //  console.log("End Date ",endDate);
 
-        // console.log("bookingResponse start Date : ",bookingResponse?.startDate);
+       
         // console.log("bookingResponse end Date : ",bookingResponse?.endDate);
         // console.log("bookingResponse start Time : ",bookingResponse?.startTime);
         // console.log("bookingResponse end Time : ",bookingResponse?.endTime);
@@ -267,36 +281,19 @@ const EditBooking = ({ route }) => {
          const endDate1 = formatDate(endDate);
          const endTime = formatTime(endDate);
 
-         if(bookingResponse?.startDate !== null){
-            setStartDate(bookingResponse?.startDate);
-         }else{
-            setStartDate(startDate);
-         }
-        
-         if(bookingResponse?.startTime !== null){
-            setStartTime(bookingResponse?.startTime);
-         }else{
-            setStartTime(startTime);
-         }
-        
-        if(bookingResponse?.endDate !== null){
-            setEndDate1(bookingResponse?.endDate);
-        }else{
-            setEndDate1(endDate1);
-        }
-         
-        if(bookingResponse?.endTime !== null){
-            setEndTime(bookingResponse?.endTime);
-        }else{
-            setEndTime(endTime);
-        }
+        //  console.log("bookingResponse start Date : ",bookingResponse?.startDate, .toLocaleString());
+        //  console.log("startDate",startDate);
+
        
-        //  console.log("Start Date ",startDate);
-        //  console.log("start Time ",startTime);
-     
+            setStartDate(startDate);
         
+            setStartTime(startTime);
+        
+            setEndDate1(endDate1);
+       
+            setEndTime(endTime);
  
-     }, [date, endDate,bookingResponse]);
+     }, [date, endDate]);
  
      useEffect(() => {
          if (durationValue !== null) {
@@ -762,9 +759,12 @@ if( bookingResponse?.attendee !== null){
          findCateringListBasedonCustomerLocationId(selectedLocation).then((res) => {
              setCatering([]);
              setCheckCatering({});
-             if(res.status){
+             if(res?.status){
                
-                 setCatering(res.customerCaterings);
+                 setCatering(res?.customerCaterings);
+                 if(bookingResponse?.bookingCateringDTOs && bookingResponse?.bookingCateringDTOs.length > 0){
+                    initializeCheckedCatring(res?.customerCaterings,bookingResponse?.bookingCateringDTOs);
+                 }
                  // const initialCheckedState = res.customerCaterings.reduce((acc, equipment) => {
                  //     acc[equipment.id] = false;
                  //     return acc;
@@ -793,7 +793,12 @@ if( bookingResponse?.attendee !== null){
              setCheckCatering({});
              if(res.status){
                
-                 setCatering(res.customerCaterings);
+                 setCatering(res?.customerCaterings);
+                
+                 if(bookingResponse?.bookingCateringDTOs && bookingResponse?.bookingCateringDTOs?.length > 0){
+                    initializeCheckedCatring(res?.customerCaterings, bookingResponse?.bookingCateringDTOs);
+                 }
+               
                  // const initialCheckedState = res.customerCaterings.reduce((acc, equipment) => {
                  //     acc[equipment.id] = false;
                  //     return acc;
@@ -810,14 +815,19 @@ if( bookingResponse?.attendee !== null){
 
          //  / Function to initialize Mobile checkedEquipments based on booking response
          const initializeCheckedCatring = (catrings, customerCatrings) => {
-            const catringIdsArray = customerCatrings.map(catring => catring.id);
+            // console.log("customerCatrings ", customerCatrings);
+            // console.log("catrings ", catrings);
+            const catringIdsArray = customerCatrings.map(catring => catring?.customerCateringId);
             const checkedState = {};
+            // console.log("catringIdsArray ", catringIdsArray);
     
-            catrings.forEach(catring => {
-                checkedState[catring.id] = catringIdsArray?.includes(catring.id);
+            catrings?.forEach(catring => {
+                checkedState[catring?.id] = catringIdsArray?.includes(catring?.id);
             });
+
+            // console.log("checkedState ", checkedState);
     
-            // setCheckedEquipments(checkedState);
+           
             setCheckCatering(checkedState);
         };
 
@@ -842,11 +852,11 @@ if( bookingResponse?.attendee !== null){
    //Cleaning Api
    const cleaningApi =(selectedLocation) =>  {
      findCustomerCleaningStatusBasedonCustomerLocationId(selectedLocation).then((res) => {
-         setCateringFormEnable(false);
-         if(res.status){
+        setCleaningFormEnable(false);
+         if(res?.status){
  
              // console.log("cleaning status ", res.customerCleaning.cleaningTimeStatus);
-             setCleaningFormEnable(res.customerCleaning.cleaningTimeStatus);
+             setCleaningFormEnable(res?.customerCleaning?.cleaningTimeStatus);
              // setCleaningFormEnable(res.customerCleaningSetting.isAllowedCleaningWithinHours);
          }
      })
@@ -855,9 +865,9 @@ if( bookingResponse?.attendee !== null){
    const cleaningApiwithBuilding =(selectedBuilding) =>  {
      findCustomerCleaningSattusBasedonBuildingId(selectedBuilding).then((res) => {
          // console.log("cleaning status Building Baesd ");
-         setCateringFormEnable(false);
-         if(res.status){
-             setCateringFormEnable(res.customerCleaning.cleaningTimeStatus);
+         setCleaningFormEnable(false);
+         if(res?.status){
+            setCleaningFormEnable(res?.customerCleaning?.cleaningTimeStatus);
          }
      })
    }
@@ -877,9 +887,9 @@ if( bookingResponse?.attendee !== null){
      findCustomerMobileEquipmentListBasedonCustomerLocationId(selectedLocation).then((res) => {
          setMobileEquipment([]);
          setCheckedMobileEquipment({});
-         if(res.status){
+         if(res?.status){
             
-             setMobileEquipment(res.customerMobileEquipments);
+             setMobileEquipment(res?.customerMobileEquipments);
              if(bookingResponse?.customerMobileEquipments){
                 initializeCheckedMobileEquipments(res.customerMobileEquipments, bookingResponse?.customerMobileEquipments);
              }
@@ -907,11 +917,11 @@ if( bookingResponse?.attendee !== null){
          // console.log("mobile equipment List Building Baesd ");
          setMobileEquipment([]);
          setCheckedMobileEquipment({});
-         if(res.status){
+         if(res?.status){
            
-             setMobileEquipment(res.customerMobileEquipments);
+             setMobileEquipment(res?.customerMobileEquipments);
              if(bookingResponse?.customerMobileEquipments){
-                initializeCheckedMobileEquipments(res.customerMobileEquipments, bookingResponse?.customerMobileEquipments);
+                initializeCheckedMobileEquipments(res?.customerMobileEquipments, bookingResponse?.customerMobileEquipments);
              }
 
            
@@ -927,11 +937,11 @@ if( bookingResponse?.attendee !== null){
 
      //  / Function to initialize Mobile checkedEquipments based on booking response
      const initializeCheckedMobileEquipments = (equipments, customerEquipments) => {
-        const equipmentIdsArray = customerEquipments.map(equipment => equipment.id);
+        const equipmentIdsArray = customerEquipments?.map(equipment => equipment?.id);
         const checkedState = {};
 
-        equipments.forEach(equipment => {
-            checkedState[equipment.id] = equipmentIdsArray.includes(equipment.id);
+        equipments?.forEach(equipment => {
+            checkedState[equipment?.id] = equipmentIdsArray.includes(equipment?.id);
         });
 
         // setCheckedEquipments(checkedState);
@@ -1141,7 +1151,7 @@ useEffect(() => {
     // console.log("checkedEquipments ",checkedEquipments);
     // console.log("selectedCapacity ",selectedCapacity);
 // console.log("checkedFloors ",checkedFloors);
-console.log("bookingResponse ",bookingResponse);
+// console.log("bookingResponse ",bookingResponse);
 
 const bookingId = bookingResponse?.id;
 
@@ -1574,8 +1584,9 @@ const bookingId = bookingResponse?.id;
                 
             //  console.log("parkingSeatIds ",parkingSeatIds);
 
-          console.log("users ",users);
-         
+        //   console.log("users ",users);
+        //   console.log("requesterName ",requesterName);
+        //   console.log("requesterEmail ",requesterEmail);
  
         datas= {
             id:bookingResponse?.id,
@@ -1595,7 +1606,7 @@ const bookingId = bookingResponse?.id;
              bookingDescription: description,
              attendeeIds: users,
              visitorEmails: [],
-             parkingSeatsIds:parkingSeatIds ? parkingSeatIds : [],
+             parkingSeatsIds:parkingSeatIds,
              chargingCarIds: [],
              cleaningRequired: isCleaning,
              customerCleaningDescription: cleaning,
@@ -1629,7 +1640,7 @@ const bookingId = bookingResponse?.id;
         addBookingApi(datas).then((res) => {
         //  console.log("add booking  outer", res);
             if(res.status){
-                console.log("add booking  success", res);
+                // console.log("add booking  success", res);
                 navigation.navigate('CalendarScreen')
             }
         })
@@ -1639,6 +1650,11 @@ const bookingId = bookingResponse?.id;
  
  
  // console.log(selectedLocation, itemsLocations);
+
+
+
+
+
      return (
          <SafeAreaView style={styles.container}>
              <Text style={styles.title}>Edit Booking</Text>
@@ -1838,7 +1854,7 @@ const bookingId = bookingResponse?.id;
              {endShow && (
                  <DateTimePicker
                      testID="dateTimePicker"
-                     value={date}
+                     value={endDate}
                      mode={endMode}
                      display="default"
                      onChange={onChangeEnd}
@@ -1848,7 +1864,7 @@ const bookingId = bookingResponse?.id;
              {endShowTime && (
                  <DateTimePicker
                      testID="timePicker"
-                     value={date}
+                     value={endDate}
                      mode="time"
                      display="default"
                      onChange={onChangeEnd}
@@ -2045,14 +2061,15 @@ const bookingId = bookingResponse?.id;
              }
          </View>
       }
- 
+  {/* web below option edit not show for web so i resstricetion */}
              
      {
                  (viewMoreenable && (selectedResource === 'meetingRoom' || selectedResource === 'desk')) &&
                  
                  <View>
+                    {/* catring Hide For Web  */}
                   {
-                     cateringFormEnable &&
+                    (bookingResponse?.bookingCateringDTOs.length == 0 && cateringFormEnable )  &&
                      <View style={styles.pickerContainer}>
                      <Text> Catering  </Text>
                      <View style={styles.dropdownContainer}>      
@@ -2081,7 +2098,11 @@ const bookingId = bookingResponse?.id;
                      </View>
                  </View>
                   }
-                     {
+
+                     {/* Cleaning  Hide For Web  */}
+
+
+                     {/* {
                          cleaningFormEnable &&
                          <View style={styles.pickerContainer}>
                               <View style={styles.pickerContainer}>
@@ -2107,9 +2128,11 @@ const bookingId = bookingResponse?.id;
  
              </View>
                          </View>
-                     }
+                     } */}
+
+
                     {
-                     mobileEquipmentFormEnable &&
+                      (bookingResponse?.customerMobileEquipments?.length == 0 &&  mobileEquipmentFormEnable )&&
                      <View >
                           <View style={styles.pickerContainer}>
                      <Text> Mobile Equipments </Text>
@@ -2154,10 +2177,10 @@ const bookingId = bookingResponse?.id;
                     }
  
                     {
-                     itSupportFormEnable &&
+                      (bookingResponse?.customerITSupports?.length == 0 &&  itSupportFormEnable) &&
                      <View>
                         <View style={styles.pickerContainer}>
-                     <Text> Mobile Equipments </Text>
+                     <Text> It Support </Text>
                      <View style={styles.dropdownContainer}>      
                  <TouchableOpacity onPress={handleItSupportToggle} style={styles.dropdownHeader}>
                      {selectedItSupportNames.length > 0 ? (
@@ -2197,7 +2220,7 @@ const bookingId = bookingResponse?.id;
                     }
                     
                      {
-                         specialServiceFormEnable &&
+                        (bookingResponse?.customerSpecialServices?.length == 0 && specialServiceFormEnable)  &&
                          <View> 
  
  <View style={styles.pickerContainer}>
@@ -2270,11 +2293,13 @@ const bookingId = bookingResponse?.id;
        >
          Cancel
        </Button>
+       
        <Button
          mode="contained"
          onPress={handleClickSubmit}
          style={styles.button}
          buttonColor={colors.primary}
+         disabled={disableUpdate}
        >
          Update
        </Button>
@@ -2292,6 +2317,7 @@ const bookingId = bookingResponse?.id;
          flex: 1,
          padding: 16,
          backgroundColor: '#fff',
+         
      },
      title: {
          fontSize: 24,
@@ -2300,6 +2326,7 @@ const bookingId = bookingResponse?.id;
      },
        pickerContainer: {
          width: '100%',
+         padding: 7,
          marginBottom: 20,
      },
      dateTimeContainer: {
@@ -2411,7 +2438,7 @@ const bookingId = bookingResponse?.id;
          borderColor: '#ccc',
          borderWidth: 1,
          borderRadius: 5,
-         
+         padding: 7,
          textAlignVertical: 'top', // Ensures text starts at the top of the input
      },
      textInputPragraph: {

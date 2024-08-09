@@ -123,26 +123,26 @@ const CalendarView = () => {
   };
 
   useEffect(() => {
-    if (Object.keys(loginUser).length > 0) {
+    if (Object.keys(loginUser).length > 0 && isFocus) {
       getlocationApi();
     }
-  }, [loginUser]);
+  }, [loginUser, isFocus]);
 
   useEffect(() => {
-    if (selectedLocation) {
+    if (selectedLocation && isFocus) {
       getBulidingListApi(selectedLocation);
 
     }
-  }, [selectedLocation]);
+  }, [selectedLocation, isFocus]);
 
   useEffect(() => {
-    if (selectedBuilding) {
+    if (selectedBuilding && isFocus) {
       getFloorListApi(selectedBuilding);
     }
-  }, [selectedBuilding]);
+  }, [selectedBuilding, isFocus]);
 
   useEffect(() => {
-    if (selectedBuilding) {
+    if (selectedBuilding && isFocus) {
       getMeetingRoomListByBuildingAndFloorId(selectedBuilding, selectFloors);
       getDeskListByBuildingAndFloorId(selectedBuilding, selectFloors);
       getParkingSeatListByBuildingAndFloorId(selectedBuilding, selectFloors);
@@ -153,7 +153,7 @@ const CalendarView = () => {
       getParkinseatsListByLocationId(selectedLocation);
     }
 
-  }, [selectedLocation, selectedBuilding, selectFloors]);
+  }, [selectedLocation, selectedBuilding, selectFloors, isFocus]);
 
   useEffect(() => {
     // console.log("selectedDate",selectedDate);
@@ -165,7 +165,8 @@ const CalendarView = () => {
 
 
 
-    if (selectedMeetingRoom !== null || selectedDesk !== null || selectedParkingSeat !== null) {
+   if (isFocus)
+   { if (selectedMeetingRoom !== null || selectedDesk !== null || selectedParkingSeat !== null) {
 
       resourcedateBasedBooking(selectedLocation, selectResource, selectedMeetingRoom, selectedDesk, selectedParkingSeat, monthStartDate, monthEndDate);
       // console.log("resource based");
@@ -173,9 +174,10 @@ const CalendarView = () => {
     } else {
       calenderApi(selectedLocation, selectedBuilding, selectFloors, selectResource, monthStartDate, monthEndDate);
     }
+  }
 
 
-  }, [selectedLocation, selectedBuilding, selectFloors, selectResource, monthStartDate, monthEndDate, selectedMeetingRoom, selectedDesk, selectedParkingSeat]);
+  }, [isFocus, selectedLocation, selectedBuilding, selectFloors, selectResource, monthStartDate, monthEndDate, selectedMeetingRoom, selectedDesk, selectedParkingSeat]);
 
   const calenderApi = (locationId, buildingId, floorId, resource, startDate, endDate) => {
     setLoading(true);
@@ -456,7 +458,7 @@ const CalendarView = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={{padding: 6}}>
         <Calendar
           current={selectedDate}
           onDayPress={(day) => {
