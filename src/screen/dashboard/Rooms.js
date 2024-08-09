@@ -428,7 +428,7 @@ const Rooms = () => {
   // Handle Filter click
   const handleFilterClick = () => {
     setLoading(true);
-    props?.setHeaderProps();
+    props?.setHeaderProps({});
     // For location resource change
     if (!selectedDuration && !endDateTime) {
       if (!selectedBuilding) {
@@ -518,7 +518,7 @@ const Rooms = () => {
     setSelectedBuilding();
     setSelectedFloor();
     setSelectedDuration();
-    props?.setHeaderProps();
+    props?.setHeaderProps({});
     isReset && getUserLocation();
   }
 
@@ -699,9 +699,9 @@ const Rooms = () => {
 
       {/* Filter Modal */}
       <Modal animationType="fade" transparent={true} visible={props?.headerProps?.showFilter || false}
-        onDismiss={() => props?.setHeaderProps()} onRequestClose={() => props?.setHeaderProps()}
+        onDismiss={() => props?.setHeaderProps()} onRequestClose={() => props?.setHeaderProps({})}
       >
-        <TouchableWithoutFeedback onPress={() => props?.setHeaderProps()}>
+        <TouchableWithoutFeedback onPress={() => props?.setHeaderProps({})}>
           <View style={styles.filterModal} >
             <TouchableWithoutFeedback>
               <View style={styles.filterModalContainer}>

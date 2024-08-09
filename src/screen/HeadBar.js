@@ -1,10 +1,11 @@
 import { useNavigation } from '@react-navigation/native';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Text, TouchableWithoutFeedback } from 'react-native';
 import { View, StyleSheet, TouchableOpacity, Image, Modal } from 'react-native';
 import { Header } from 'react-native-elements';
 import { Icon, RadioButton } from 'react-native-paper';
 import { context } from '../navigation/Appnav';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const HeadBar = () => {
@@ -15,6 +16,11 @@ const HeadBar = () => {
 
   const navigation = useNavigation();
   const [showModel, setShowModel] = useState(false);
+  const [language, setLanguage] = useState('en');
+
+  const getLanguage = async () => {
+    setLanguage(await AsyncStorage.getItem('language'));
+  }
 
   const back = () => {
     setActive(preState.id);
@@ -31,6 +37,26 @@ const HeadBar = () => {
     else if (index === 9)
       return 'Feedback'
   }
+
+  const getChecked = (type) => {
+    if (language === type){
+      return 'checked'
+    }else{
+      return 'unchecked'
+    }
+  }
+
+  const ChangeLanguage = (language) => {
+    setShowModel(!showModel);
+    setLanguage(language);
+    AsyncStorage.setItem('language', language);
+    props?.setHeaderProps({'language':language});
+  }
+
+  useEffect(() => {
+    getLanguage();
+  }, [language])
+  
   return (
     <View>
       <Header placement={index <= 5 ? 'center' : 'left'} backgroundColor='#035676' statusBarProps={{ barStyle: 'light-content', backgroundColor: '#034a66' }}
@@ -78,7 +104,7 @@ const HeadBar = () => {
             }
             {
               index === 3 &&
-              <TouchableOpacity onPress={() => props?.setHeaderProps(pre=>({...pre, showFilter: true }))}>
+              <TouchableOpacity onPress={() => props?.setHeaderProps({showFilter: true })}>
                 <Icon
                   source="filter"
                   size={30}
@@ -87,10 +113,12 @@ const HeadBar = () => {
               </TouchableOpacity>
             }
             {
-              index === 6 &&
+              index === 5 &&
               <TouchableOpacity onPress={() => setShowModel(true)} >
                 <Image
-                  source={require('../assets/portugal.png')} style={{ width: 50, height: 30 }} />
+                  source={language === 'pt' ? require('../assets/portugal.png') :
+                    language === 'es' ? require('../assets/spain.png') :
+                        require('../assets/US.png')} style={{ width: 50, height: 30 }} />
               </TouchableOpacity>
             }
           </View>
@@ -104,17 +132,17 @@ const HeadBar = () => {
               <View style={styles.modalContainer}>
                 <Text style={{ fontWeight: 'bold', fontSize: 18, textAlign: 'center', marginBottom: 20 }}>Language</Text>
                 <View style={styles.modelItem}>
-                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" />
+                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('en')} onPress={() => ChangeLanguage('en')} />
                   <Image source={require('../assets/US.png')} style={styles.modelImg} />
                   <Text>English</Text>
                 </View>
                 <View style={styles.modelItem}>
-                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" />
+                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('pt')} onPress={() => ChangeLanguage('pt')} />
                   <Image source={require('../assets/portugal.png')} style={styles.modelImg} />
                   <Text>Portuguese</Text>
                 </View>
                 <View style={styles.modelItem}>
-                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" />
+                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('es')} onPress={() => ChangeLanguage('es')} />
                   <Image source={require('../assets/spain.png')} style={styles.modelImg} />
                   <Text>Spanish</Text>
                 </View>

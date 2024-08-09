@@ -70,7 +70,7 @@ const Menu = () => {
       props?.setPre();
       getUserData();
     }
-  }, [isFocus]);
+  }, [isFocus, props?.headerProps?.language]);
   return (
     <ScrollView style={styles.container}>
       <View style={{ ...styles.card, marginBottom: 20, paddingVertical: 7 }}>

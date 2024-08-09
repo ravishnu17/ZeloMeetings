@@ -9,7 +9,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Dropdown } from 'react-native-element-dropdown';
 import Toast from 'react-native-simple-toast';
-import { ToastColor } from '../utils/ToastColors';
 
 function Profile() {
     const isFocus = useIsFocused();
@@ -106,7 +105,6 @@ function Profile() {
             setLoading(false);
         })
     }
-
     // get buildings by location
     const getBuildings = async (location) => {
         setLoading(true);
@@ -175,13 +173,14 @@ function Profile() {
         setLoading(true);
         updateUserProfile(postData).then(res => {
             if (res?.status) {
-                getUserData();
                 Toast.showWithGravity(res?.information?.description, Toast.SHORT, Toast.CENTER);
-                if (postData?.email !== userData?.customerDetails?.user?.email) {
+                if (res?.user?.email !== userData?.user?.email) {
+                    AsyncStorage.clear();
                     props?.setActive(1);
                     props?.setHeaderProps({});
-                    AsyncStorage.clear();
                     navigate.navigate('LoginScreen');
+                } else {
+                    getUserData();
                 }
             } else {
                 console.log("Error update", res);
@@ -203,8 +202,8 @@ function Profile() {
         <ScrollView style={styles.container}>
             <View style={styles.profile}>
                 <Image style={styles.img} source={userData?.customerDetails?.user?.profileImg ? { uri: userData?.customerDetails?.user?.profileImg } : require('../../assets/user.png')} />
-                <Text style={{ marginTop: 8, marginBottom: 4, fontWeight: 'bold' }}>{userData?.customerDetails?.user?.firstName}</Text>
-                <Text>{userData?.customerDetails?.user?.role?.role}</Text>
+                <Text style={{ marginTop: 8, marginBottom: 4, fontWeight: 'bold' }}>{userData?.user?.firstName}</Text>
+                <Text>{userData?.user?.role?.role}</Text>
             </View>
             <View style={styles.row}>
                 <Text style={styles.label}>Name <Text style={styles.error}>*</Text></Text>
@@ -354,11 +353,9 @@ function Profile() {
             <TouchableOpacity style={styles.button} onPress={handleSubmit(updateProfile)}>
                 <Text style={styles.buttonText}>Update</Text>
             </TouchableOpacity>
-
         </ScrollView>
     )
 }
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,

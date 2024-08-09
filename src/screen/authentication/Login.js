@@ -56,6 +56,7 @@ const Login = () => {
             if (result?.response?.code === 200 && result?.response.role !== 'BACK OFFICE ADMIN') {
                 let rights = result?.response?.rights.toUpperCase()
                 AsyncStorage.setItem('user_token', result?.response?.Authorization);
+                AsyncStorage.setItem('language', 'en');
                 AsyncStorage.setItem('rights', rights);
                 AsyncStorage.setItem('userId', result?.response?.id);
                 navigation?.navigate('HomeScreen');

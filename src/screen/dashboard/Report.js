@@ -299,7 +299,7 @@ const Report = () => {
     <View style={styles.container} >
       <View style={{ flexDirection: 'row', columnGap: 10, marginTop: 10 }}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headText}>Location</Text>
+          <Text style={styles.headText}>Location <Text style={{ color: 'red' }}>*</Text></Text>
           <Dropdown
             data={locations}
             value={selectedLocation}
@@ -374,7 +374,7 @@ const Report = () => {
               renderItem={renderEquipment}
             />
             :
-            <Text style={styles.noData}>No data found</Text>
+            <Text style={styles.noData}>No service data available!</Text>
         }
       </Card>
     </View>

@@ -22,7 +22,7 @@ export const context = createContext();
 const Appnav = () => {
   const [active, setActive] = useState(1);
   const [pre, setPre] = useState();
-  const [headerProps, setHeaderProps] = useState();
+  const [headerProps, setHeaderProps] = useState(); // used for room filters & update language 
   const [loading, setLoading] = useState(false);
   return (
     <View style={styles.container}>
