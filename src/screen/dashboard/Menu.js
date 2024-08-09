@@ -1,14 +1,20 @@
 import { useIsFocused, useNavigation } from '@react-navigation/native'
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Icon } from 'react-native-paper'
 import { context } from '../../navigation/Appnav'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { loginHomeAccess } from '../../apiservices/Apiservices';
+import Toast from 'react-native-simple-toast';
+import { ToastColor } from '../utils/ToastColors';
 
 const Menu = () => {
   const navigation = useNavigation();
   const props = useContext(context);
   const isFocus = useIsFocused();
+
+  // Use states
+  const [userData, setUserData]= useState();
 
   const handleClick = (to) => {
     props?.setPre({ id: 5, name: 'MenuScreen' });
@@ -38,20 +44,42 @@ const Menu = () => {
       { cancelable: false }
     );
   }
+
+  // get user 
+  const getUserData = async () => {
+    props?.setLoading(true);
+    let userId = await AsyncStorage.getItem('userId');
+    loginHomeAccess(userId).then(res =>{
+      if (res?.status){
+        setUserData(res);
+      }else{
+        console.log("Error user data", res);
+        Toast.showWithGravity(
+          res?.information?.description,
+          Toast.SHORT,
+          ToastColor.ERROR
+        )
+      }
+    }).finally(() => {
+      props?.setLoading(false);
+    })
+  }
+
   useEffect(() => {
     if (isFocus) {
       props?.setPre();
+      getUserData();
     }
   }, [isFocus]);
   return (
     <ScrollView style={styles.container}>
       <View style={{ ...styles.card, marginBottom: 20, paddingVertical: 7 }}>
-        <Image style={styles.img} source={require('../../assets/user.png')} />
+        <Image style={styles.img} source={userData?.user?.profileImg ? { uri: userData?.user?.profileImg } : require('../../assets/user.png')} />
 
         <View style={{ rowGap: 6 }}>
-          <Text style={{ fontWeight: 'bold', fontSize: 17 }}>Joe Nishanth</Text>
-          <Text style={{ fontSize: 14 }}>CUSTOMER ADMIN</Text>
-          <Text style={{ fontWeight: '400' }}>joe.shc@gmail.com</Text>
+          <Text style={{ fontWeight: 'bold', fontSize: 17 }}>{userData?.user?.firstName}</Text>
+          <Text style={{ fontSize: 14 }}>{userData?.user?.role?.role}</Text>
+          <Text style={{ fontWeight: '400' }}>{userData?.user?.email}</Text>
         </View>
 
         <View style={{ flex: 1, alignItems: 'flex-end', alignSelf: 'flex-end' }}>

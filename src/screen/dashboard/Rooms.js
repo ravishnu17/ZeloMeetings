@@ -21,7 +21,7 @@ const Rooms = () => {
   const navigate= useNavigation();
   // useStates
   const [showModel, setShowModel] = useState(false);
-  // const [userLocation, setUserLocation] = useState();
+  const [rights, setRights] = useState();
   const [locations, setLocations] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState();
   const [selectedResource, setSelectedResource] = useState('All');
@@ -87,11 +87,12 @@ const Rooms = () => {
   // get user location
   const getUserLocation = async () => {
     setLoading(true);
+    let Userrights= await AsyncStorage.getItem('rights');
+    setRights(Userrights);
     let userId = await AsyncStorage.getItem('userId');
     let userData = await loginHomeAccess(userId);
-    // setUserLocation(userData?.customerDetails?.location?.id || userData?.user?.location?.id);
     // get Location List
-    locationList(userData?.customerDetails?.location?.id || userData?.user?.location?.id);
+    locationList(userData?.user?.location?.id || userData?.customerDetails?.location?.id);
   }
 
   // Get all locations
@@ -160,25 +161,26 @@ const Rooms = () => {
   // Get Service data
   const getServiceData = async (equipments) => {
     setLoading(true);
-    let service = { equipment: equipments, catering: [], IT_support: [], mobileEquip: [], Special: [] };
+    let service = { equipment: [], catering: [], IT_support: [], mobileEquip: [], Special: [] };
+    service.equipment= equipments || [];
     let catering = await findCateringListBasedonCustomerLocationId(selectedLocation);
     if (catering.status) {
-      service.catering = catering.customerCaterings;
+      service.catering = catering.customerCaterings || [];
     }
 
     let itSupp = await findITSupporttBasedonCustomerLocationId(selectedLocation);
     if (itSupp.status) {
-      service.IT_support = itSupp.customerITSupports;
+      service.IT_support = itSupp.customerITSupports || [];
     }
 
     let mobileEquip = await findCustomerMobileEquipmentListBasedonCustomerLocationId(selectedLocation);
     if (mobileEquip.status) {
-      service.mobileEquip = mobileEquip.customerMobileEquipments;
+      service.mobileEquip = mobileEquip.customerMobileEquipments || [];
     }
 
     let special = await findCustomerSpecialSettingListBasedonCustomerLocationId(selectedLocation);
     if (special.status) {
-      service.Special = special.customerSpecialServices;
+      service.Special = special.customerSpecialServices || [];
     }
     setServices(service);
     setLoading(false);
@@ -231,6 +233,7 @@ const Rooms = () => {
   const BookResource =(resourceType, resourceId) =>{
     props?.setPre({ id: 3, name: 'RoomScreen' });
     navigate.navigate('AddBooking', { 
+      from:'RoomScreen',
       locationID: selectedLocation, 
       buildingID: selectedBuilding, 
       floorID: selectedFloor, 
@@ -240,17 +243,21 @@ const Rooms = () => {
   }
 
   // List resource view
-  const listResourceView = (index, item, type) => {
+  const renderResourceView = (index, item, type) => {
     let resourceImg = null;
+    let enableBooking = false;
 
     if (item?.imagePath) {
       resourceImg = item?.imagePath
     } else if (type === 'meetingRoom') {
       resourceImg = meetingRoomImg
+      enableBooking= rights?.includes('BOOK A ROOM');
     } else if (type === 'desk') {
       resourceImg = deskImg
+      enableBooking= rights?.includes('BOOK A DESK');
     } else if (type === 'parkingSeat') {
       resourceImg = parkingSeatImg
+      enableBooking= rights?.includes('BOOK A PARKING SEAT');
     }
 
     return (
@@ -290,9 +297,9 @@ const Rooms = () => {
             <Text style={styles.menuText}>View Plant</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem} onPress={()=>BookResource(type, item?.id)} >
+          {enableBooking && <TouchableOpacity style={styles.menuItem} onPress={()=>BookResource(type, item?.id)} >
             <Text style={styles.menuText}>Book</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>}
         </View>
       </View>
     )
@@ -543,13 +550,13 @@ const Rooms = () => {
         {
           (meetingRooms?.length > 0 || desks?.length > 0 || parkingSeats?.length > 0) ? <>
             {
-              (selectedResource === 'All' || selectedResource === 'meetingRoom') && meetingRooms?.map((item, index) => listResourceView(index, item, 'meetingRoom'))
+              (selectedResource === 'All' || selectedResource === 'meetingRoom') && meetingRooms?.map((item, index) => renderResourceView(index, item, 'meetingRoom'))
             }
             {
-              (selectedResource === 'All' || selectedResource === 'desk') && desks?.map((item, index) => listResourceView(index, item, 'desk'))
+              (selectedResource === 'All' || selectedResource === 'desk') && desks?.map((item, index) => renderResourceView(index, item, 'desk'))
             }
             {
-              (selectedResource === 'All' || selectedResource === 'parkingSeat') && parkingSeats?.map((item, index) => listResourceView(index, item, 'parkingSeat'))
+              (selectedResource === 'All' || selectedResource === 'parkingSeat') && parkingSeats?.map((item, index) => renderResourceView(index, item, 'parkingSeat'))
             }
             {/* Empty msg */}
             {
@@ -673,6 +680,10 @@ const Rooms = () => {
                     ))
                   }
                 </>
+              }
+              {
+                (loading===false && services?.equipment?.length === 0 && services?.catering?.length === 0 && services?.IT_support?.length === 0 && services?.mobileEquip?.length === 0 && services?.Special?.length === 0) &&
+                <Text style={styles.noData}>Services not available!</Text>
               }
             </ScrollView>
 
@@ -930,7 +941,8 @@ const styles = StyleSheet.create({
   noData: {
     textAlign: 'center',
     fontSize: 18,
-    paddingTop: 30
+    paddingTop: 30,
+    color: '#9b2929'
   },
   labelcard: {
     flex: 1,

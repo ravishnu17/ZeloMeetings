@@ -415,7 +415,7 @@ export const getEditMeetingRoomListForEquipmentAndCapacity = async (location, bu
       // const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&customerEquipmentIds=${equipmentId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0`);
       return response.data;
     } else if ( capacityId > 0 ||  capacity === 0 && floorIds) {
-      console.log("floor and capacity" ,"capacity 0",capacityId ,"floor",floorIds);
+      // console.log("floor and capacity" ,"capacity 0",capacityId ,"floor",floorIds);
       const response = await axiosInstance.get(`/meetingRoom/listmeetingrooms/bylocationandequipmentandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId ? buildingId : 0}&floorId=${floorIds}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=${editBookingId}&capacityNumber=${capacityId ? capacityId : capacity}`);
       return response.data;
 
@@ -895,6 +895,69 @@ export const FloorBasedFilter=async (floorID)=>{
   try{
     const res=await axiosInstance.get(`/floor/floorBasedFilter?id=${floorID}`);
     return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+// Report screen API
+export const EquipmentByRoomId=async (roomId)=>{
+  try{
+    const res=await axiosInstance.get(`/meetingRoomEquipment/listmeetingroomequipmentsbymeetingroom?meetingRoomId=${roomId}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+// Report module API
+export const reportEquipment = async (data)=>{
+  try{
+    const res=await axiosInstance.post(`/reportEquipment/reportbyenduser`,data);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const ResolveEquipmentReport = async (data)=>{
+  try{
+    const res=await axiosInstance.post(`/reportEquipment/fixbycustomeradmin`,data);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+// Profile screen API
+export const getCountryList = async ()=>{
+  try{
+    const res=await axiosInstance.get(`/country/listactivecountries`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const getCustomerLoationByCountryId= async (countryId)=>{
+  try{
+    const res=await axiosInstance.get(`/customerlocation/listactive/bycountry?id=${countryId}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const updateUserProfile = async (data)=>{
+  try{
+    const res= await axiosInstance.put(`/user/update`,data);
+    return res.data
   }catch(error){
     console.error('API Error:', error);
     throw error;

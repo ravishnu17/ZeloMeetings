@@ -434,9 +434,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff'
   },
   imgContainer: {
-    padding: 10,
+    padding: 5,
     borderRadius: 100,
-    borderWidth: 4,
+    borderWidth: 3.5,
     borderColor: '#575757'
   },
   cardImg: {

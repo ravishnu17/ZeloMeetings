@@ -8,7 +8,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { loginUser } from '../../apiservices/Apiservices';
 import LaiaLogo from '../../assets/zelo_logo.png';
 import Toast from 'react-native-simple-toast';
-import { TostColor } from '../utils/ToastColors';
+import { ToastColor } from '../utils/ToastColors';
 import m_logo from '../../assets/M_logo.png';
 import g_logo from '../../assets/google_logo.png';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -19,7 +19,6 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
 
     const microsoftLoginUrl = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?scope=service%3A%3Aaccount.microsoft.com%3A%3AMBI_SSL+openid+profile+offline_access&response_type=code&client_id=81feaced-5ddd-41e7-8bef-3e20a2689bb7&redirect_uri=https%3A%2F%2Faccount.microsoft.com%2Fauth%2Fcomplete-signin-oauth&client-request-id=2a6c9fa8-ca32-4061-a5c3-d28ec17177d3&x-client-SKU=MSAL.Desktop&x-client-Ver=4.61.3.0&x-client-OS=Windows+Server+2019+Datacenter&prompt=login&client_info=1&state=H4sIAAAAAAAEAAXBy6JCQAAA0H9pa4FkmEULlAnJzSvsyMxg8iiv8vX3nJ2F1PmnVFmwgHvOJ_Xh2UUc_4l7ODgLo4sFC4GWZEOqX8xrPAme8s0_LAaUYWexfsMMZDKQBOBX0bAQf-cB5NLhMXYxT2UAfBFXqjkKlKHlnHmjkOp9deVgZD_sv7RMulif_RRS6MzCVqZSPxRYD4zX5JBa23Tea5s6SiqOJ_RlIjH_Jf5ACOspuRjrxuZEbmpDy0au23CvFoul8Gi19p4pRZ4JBXVfgxs60xTXT1scDYYyk7Sl2FSoKnCbCHrO8Yhjxkl-XgO3zG9UnJTbtFlhSqThLbYs1C58GqubroWnzcQItu4yQrcmH_1h3x0gL1CurPeK7MAmZV6Urbsej7t_B3E1NVoBAAA&msaoauth2=true&lc=2057';
-
 
     const {
         control,
@@ -55,9 +54,9 @@ const Login = () => {
             const result = await loginUser(userData);
             console.log("login result", result?.response.role);
             if (result?.response?.code === 200 && result?.response.role !== 'BACK OFFICE ADMIN') {
-                // let rights = result?.response?.rights.toUpperCase()
+                let rights = result?.response?.rights.toUpperCase()
                 AsyncStorage.setItem('user_token', result?.response?.Authorization);
-                // AsyncStorage.setItem('rights', rights);
+                AsyncStorage.setItem('rights', rights);
                 AsyncStorage.setItem('userId', result?.response?.id);
                 navigation?.navigate('HomeScreen');
             } else {
@@ -65,7 +64,7 @@ const Login = () => {
                     'Check username and password',//result?.response?.error,
                     Toast.LONG,
                     Toast.BOTTOM,
-                    TostColor.ERROR
+                    ToastColor.ERROR
 
                 );
                 navigation?.navigate('LoginScreen');
@@ -75,8 +74,6 @@ const Login = () => {
         }
         setLoading(false);
     };
-
-
 
     return (
 
