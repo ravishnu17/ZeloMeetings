@@ -76,7 +76,7 @@ const Report = () => {
     setLoading(true);
     getMeetingRoomsByLocationId(location).then((res) => {
       if (res.status) {
-        setRooms(res.meetingRoomDTOs?.map(item => ({ label: item.name, value: item.id })));
+        res.meetingRoomDTOs?.length > 0 ? setRooms(res.meetingRoomDTOs?.map(item => ({ label: item.name, value: item.id }))) : setRooms([]); ;
       } else {
         setRooms([]);
       }
@@ -266,12 +266,10 @@ const Report = () => {
   const renderEquipment = ({ item }) => {
     return (
       <TouchableOpacity style={styles.cardItems} onPress={() => handleEquipmentclick(item?.customerEquipment?.id, item?.status)}>
-        <View style={styles.imgContainer}>
           <Image
             source={{ uri: item?.customerEquipment?.equipmentIcon?.equipmentIconPath }}
             style={{ ...styles.cardImg, backgroundColor: item?.status ? 'green' : 'red' }}
           />
-        </View>
         <Text style={styles.cardText}>{item?.customerEquipment?.name}</Text>
       </TouchableOpacity>
     )
@@ -432,12 +430,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.7,
     shadowRadius: 1,
     backgroundColor: '#fff'
-  },
-  imgContainer: {
-    padding: 5,
-    borderRadius: 100,
-    borderWidth: 3.5,
-    borderColor: '#575757'
   },
   cardImg: {
     width: 70,

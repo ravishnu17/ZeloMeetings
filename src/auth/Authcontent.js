@@ -5,10 +5,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // const apiUrl = 'https://zelomeetings.com:9094/mrroom';
  
 //local server
-const apiUrl = 'http://192.168.1.143:9092/mrroom';
+// const apiUrl = 'http://192.168.1.143:9092/mrroom';
 
 //Live server
-// const apiUrl = 'https://zelo.zelomeetings.com/mrroom';
+const apiUrl = 'https://zelo.zelomeetings.com/mrroom';
 
 
 
