@@ -2437,7 +2437,7 @@ const bookingId = bookingResponse?.id;
         
          borderColor: '#ccc',
          borderWidth: 1,
-         borderRadius: 5,
+         borderRadius: 11,
          padding: 7,
          textAlignVertical: 'top', // Ensures text starts at the top of the input
      },
@@ -2446,7 +2446,7 @@ const bookingId = bookingResponse?.id;
          borderColor: '#ccc',
          borderWidth: 1,
          borderRadius: 5,
-         padding: 10,
+         padding: 11,
          textAlignVertical: 'top', // Ensures text starts at the top of the input
      },
  

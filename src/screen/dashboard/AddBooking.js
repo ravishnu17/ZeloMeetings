@@ -2048,7 +2048,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 5,
-        padding: 7,
+        padding:11,
         textAlignVertical: 'top', // Ensures text starts at the top of the input
     },
     textInputPragraph: {
@@ -2056,7 +2056,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 5,
-        padding: 10,
+        padding: 1,
         textAlignVertical: 'top', // Ensures text starts at the top of the input
     },
 
