@@ -271,6 +271,7 @@ const [specialServiceisOpen,setSpecialServiceisOpen]=useState(false);
 
     const getLoginUser = async () => {
         const userId =await AsyncStorage.getItem('userId');
+        console.log("userId ",userId);
          if(userId){
             loginHomeAccess(userId).then((res) => {
                 if(res.status){
@@ -894,17 +895,17 @@ const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
     // console.log("selectedBuilding ",selectedBuilding);
     // console.log("checkedEquipments ",checkedEquipments);
     // console.log("selectedCapacity ",selectedCapacity);
-console.log("checkedFloors ",checkedFloors);
+// console.log("checkedFloors ",checkedFloors);
 
     if(Object.keys(checkedEquipments).length > 0  && selectedCapacity !== null ){
         // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding);
         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
             // console.log("Equipment And Capacity ",res);
             setMeetingRoom([]);
-            if(res.status){
+            if(res?.status){
                 // console.log("Equipment And Capacity ",res.meetingRoomDTOs);
                
-        const mappedItems = res.meetingRoomDTOs.map(resource => ({
+        const mappedItems = res?.meetingRoomDTOs.map(resource => ({
             label: resource.name,
             value: resource.id,
         }));
@@ -919,9 +920,9 @@ console.log("checkedFloors ",checkedFloors);
         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
             // console.log("Equipment",res);
             setMeetingRoom([]);
-            if(res.status){
+            if(res?.status){
                
-        const mappedItems = res.meetingRoomDTOs.map(resource => ({
+        const mappedItems = res?.meetingRoomDTOs.map(resource => ({
             label: resource.name,
             value: resource.id,
         }));
@@ -935,9 +936,9 @@ console.log("checkedFloors ",checkedFloors);
         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
             // console.log("Capacity ",res);
             setMeetingRoom([]);
-            if(res.status){
+            if(res?.status){
                 
-        const mappedItems = res.meetingRoomDTOs.map(resource => ({
+        const mappedItems = res?.meetingRoomDTOs.map(resource => ({
             label: resource.name,
             value: resource.id,
         }));
@@ -948,9 +949,9 @@ console.log("checkedFloors ",checkedFloors);
             }
         })
     }else if(Object.keys(checkedFloors).length > 0 ){
-        console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding," checkedFloors ",checkedFloors);
+        // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding," checkedFloors ",checkedFloors);
         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
-            console.log("mroom ",res);
+            // console.log("mroom ",res);
             setMeetingRoom([]);
             if(res?.status){
                 
@@ -1191,6 +1192,7 @@ const getParkingSeats = (selectedLocation,selectedBuilding,startDate,startTime,e
    }
 
    const handleClickSubmit = () => {
+    console.log("inside");
  // Get an array of equipment IDs where the value is true
 const equipmentIds = Object.keys(checkedEquipments).filter(key => checkedEquipments[key] === true);
 const mobileEquipmentIds = Object.keys(checkedMobileEquipment).filter(key => checkedMobileEquipment[key] === true);
@@ -1215,11 +1217,9 @@ const catringdataId=Object.keys(checkCatering).filter(key => checkCatering[key] 
             })
         }
 
-        const parkingSeatIds=[];
-        if(selectedParkingSeat !=null){
-             parkingSeatIds=[selectedParkingSeat];
-        }
+        // console.log("user id submit ", loginUser?.user?.id);
 
+        const parkingSeatIds=selectedParkingSeat ?[selectedParkingSeat] : [];
        datas= {
             locationId:selectedLocation,
             buildingId:selectedBuilding,
@@ -1247,7 +1247,7 @@ const catringdataId=Object.keys(checkCatering).filter(key => checkCatering[key] 
             customerITSupportDescription:itSupportDescription,
             customerSpecialServicesIds:specialServiceIds,
             customerSpecialServiceDescription: specialServiceDescription,
-            requesterId: loginUser.id,
+            requesterId: loginUser?.user?.id,
             subject:subject,
             test: null,
             capacity1: selectedCapacity,
@@ -1269,7 +1269,7 @@ const catringdataId=Object.keys(checkCatering).filter(key => checkCatering[key] 
     //    console.log("add booking  Payload datas ", datas);
       
        addBookingApi(datas).then((res) => {
-        // console.log("add booking  outer", res);
+        console.log("add booking  outer", res);
            if(res.status){
             //    console.log("add booking  success", res);
                navigation.navigate('CalendarScreen')

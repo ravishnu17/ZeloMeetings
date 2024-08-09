@@ -6,16 +6,17 @@ import { Checkbox } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { addBookingApi, findBuildingListBasedonLocationId, findCapacityBuildingBased, findCapacityLocationBased, findCateringListBasedonBuildingId, findCateringListBasedonCustomerLocationId, findCateringStatusBasedonBasedonBuildingId, findCateringStatusBasedonCustomerLocationId, findCustomerCleaningSattusBasedonBuildingId, findCustomerCleaningStatusBasedonCustomerLocationId, findCustomeritsupportsettingListBasedonBuildingId, findCustomeritsupportsettingListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonBuildingId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerMobileEquipmentStatusBasedonBuildingId, findCustomerMobileEquipmentStatusBasedonCustomerLocationId, findCustomerSpecialSettingBasedonBuildingId, findCustomerSpecialSettingBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonBuildingId, findCustomerSpecialSettingListBasedonCustomerLocationId, findEquipmentsListBasedonBuildingId, findEquipmentsListBasedonCustomerLocationId, findFloorsListBasedonBuildingId, findITSupporttBasedonBuildingId, findITSupporttBasedonCustomerLocationId, findMobileEquipmentsBasedonCustomerLocationId, getDeskList, getEndUserList, getLocationlist, getMeetingRoomList, getMeetingRoomListForEquipmentAndCapacity, getParkingSeatList, getVisitorList, loginHomeAccess, visitorCreateAndUpdate } from '../../apiservices/Apiservices';
+import { addBookingApi, findBookingById, findBuildingListBasedonLocationId, findCapacityBuildingBased, findCapacityLocationBased, findCateringListBasedonBuildingId, findCateringListBasedonCustomerLocationId, findCateringStatusBasedonBasedonBuildingId, findCateringStatusBasedonCustomerLocationId, findCustomerCleaningSattusBasedonBuildingId, findCustomerCleaningStatusBasedonCustomerLocationId, findCustomeritsupportsettingListBasedonBuildingId, findCustomeritsupportsettingListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonBuildingId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerMobileEquipmentStatusBasedonBuildingId, findCustomerMobileEquipmentStatusBasedonCustomerLocationId, findCustomerSpecialSettingBasedonBuildingId, findCustomerSpecialSettingBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonBuildingId, findCustomerSpecialSettingListBasedonCustomerLocationId, findEquipmentsListBasedonBuildingId, findEquipmentsListBasedonCustomerLocationId, findFloorsListBasedonBuildingId, findITSupporttBasedonBuildingId, findITSupporttBasedonCustomerLocationId, findMobileEquipmentsBasedonCustomerLocationId, getDeskList, getEditDeskList, getEditMeetingRoomList, getEditMeetingRoomListForEquipmentAndCapacity, getEditParkingSeatList, getEndUserList, getLocationlist, getMeetingRoomList, getMeetingRoomListForEquipmentAndCapacity, getParkingSeatList, getVisitorList, loginHomeAccess, visitorCreateAndUpdate } from '../../apiservices/Apiservices';
 import { useNavigation } from '@react-navigation/native';
 
 // create a component
 const EditBooking = ({ route }) => {
     const params = route.params;
-    console.log("params ",params?.id);
+    // console.log("params ",params?.id);
     const navigation = useNavigation();
     const { colors } = useTheme();
  
+    const [bookingResponse,setBookingResponse] = useState({});
      const [itemsLocations, setItemsLocations] = useState([]);
      const [selectedLocation, setSelectedLocation] = useState(null);
  
@@ -150,7 +151,65 @@ const EditBooking = ({ route }) => {
          }
          
      }
- 
+     useEffect(() => {
+        getBookingDetails(params?.id);
+         
+     },[params?.id])
+
+     const getBookingDetails =(bookingId) => {
+        findBookingById(bookingId).then((res) => {
+            // console.log("find by booking id ", res);
+            if(res?.status){
+                // console.log("find by booking id ", res);
+                setBookingResponse(res?.booking);
+
+                // console.log("booking response ",res?.booking);
+
+                setSelectedResource(res?.booking?.bookingType);
+               
+                setDescription(res?.booking?.bookingDescription);
+                
+                setSubject(res?.booking?.subject);
+                setRequesterName(res?.booking.requesterName);
+                setRequesterEmail(res?.booking?.requesterEmail);
+               
+                setCleaning(res?.booking?.customerCleaningDescription);
+                setIsCleaning(res?.booking?.defaultCleaningStatus);
+                setSpecialServiceDescription(res?.booking?.customerSpecialServiceDescription);
+                setMobileEquipmentDescription(res?.booking?.customerMobileEquipmentDescription);
+
+                // if(res?.booking.floorIds !=null){
+                //     // Assuming res is your response object
+                //     const floorIdsString = res?.booking?.floorIds; // "221,222,223"
+                //     const floorIdsArray = floorIdsString ? floorIdsString.split(',') : [];
+
+                //     // Create an object to represent the checked floors
+                //     const checkedFloorsObject = floorIdsArray.reduce((acc, floorId) => {
+                //     acc[floorId] = true; // or any initial value indicating checked state
+                //     return acc;
+                //     }, {});
+
+                //     // Update the state
+                //     setCheckedFloors(checkedFloorsObject);
+                // }
+
+               
+
+            //     // booking.visitor
+            //     if(res?.booking?.visitor !=null){
+            //         const initialCheckedVisitor = res?.booking?.visitor.reduce((acc, visitor) => {
+            //      acc[visitor.id] = false;
+            //      return acc;
+            //  }, {});
+          
+            //  setCheckVisitor(initialCheckedVisitor);
+            //     }
+              
+                
+            }
+            
+        })
+     }
      const onChange = (event, selectedDate) => {
          const currentDate = selectedDate || date;
  
@@ -195,22 +254,49 @@ const EditBooking = ({ route }) => {
      },[selectedResource])
  
      useEffect(() => {
-         // console.log("Start Date ",date);
-         // console.log("End Date ",endDate);
+        //  console.log("Start Date ",date);
+        //  console.log("End Date ",endDate);
+
+        // console.log("bookingResponse start Date : ",bookingResponse?.startDate);
+        // console.log("bookingResponse end Date : ",bookingResponse?.endDate);
+        // console.log("bookingResponse start Time : ",bookingResponse?.startTime);
+        // console.log("bookingResponse end Time : ",bookingResponse?.endTime);
      
          const startDate = formatDate(date);
          const startTime = formatTime(date);
          const endDate1 = formatDate(endDate);
          const endTime = formatTime(endDate);
- 
-         setStartDate(startDate);
-         setStartTime(startTime);
-         setEndDate1(endDate1);
-         setEndTime(endTime);
+
+         if(bookingResponse?.startDate !== null){
+            setStartDate(bookingResponse?.startDate);
+         }else{
+            setStartDate(startDate);
+         }
+        
+         if(bookingResponse?.startTime !== null){
+            setStartTime(bookingResponse?.startTime);
+         }else{
+            setStartTime(startTime);
+         }
+        
+        if(bookingResponse?.endDate !== null){
+            setEndDate1(bookingResponse?.endDate);
+        }else{
+            setEndDate1(endDate1);
+        }
+         
+        if(bookingResponse?.endTime !== null){
+            setEndTime(bookingResponse?.endTime);
+        }else{
+            setEndTime(endTime);
+        }
+       
+        //  console.log("Start Date ",startDate);
+        //  console.log("start Time ",startTime);
      
         
  
-     }, [date, endDate]);
+     }, [date, endDate,bookingResponse]);
  
      useEffect(() => {
          if (durationValue !== null) {
@@ -244,6 +330,8 @@ const EditBooking = ({ route }) => {
      const endShowTimepicker = () => {
          endShowMode('time');
      };
+
+     
  
      useEffect(() => {
          getLoginUser();
@@ -283,15 +371,28 @@ const EditBooking = ({ route }) => {
              setItemsLocations(locationOptions);
              const itemsLocationsId=loginUser?.location?.id;
              // console.log("itemsLocationsId ",itemsLocationsId);
-             locationOptions.map((item)=>{
-                 if(item.value === itemsLocationsId){
-                     setSelectedLocation(item.value);
-                 }
-             })
+
+            //  console.log("loaction Id", bookingResponse?.customerLocation?.id);
+             if(selectedLocation === null){
+                locationOptions.map((item)=>{
+                    if(item.value === bookingResponse?.customerLocation?.id){
+                        // console.log("contions");
+                        setSelectedLocation(item.value);
+                    }else if(item.value === itemsLocationsId){
+                        setSelectedLocation(item.value);
+                    }
+                   
+                })
+             }
+          
          }
          })
  
      }
+
+     useEffect(() => {
+         getEndUsers();
+     },[bookingResponse?.attendee])
  
  
      const getEndUsers = () => {
@@ -299,19 +400,36 @@ const EditBooking = ({ route }) => {
          getEndUserList().then((res) => {
              setUser([]);
              setCheckUser({});
-             if(res.status){
+             if(res?.status){
            
-             setUser(res.users);
- 
-    const initialCheckedState = res.users.reduce((acc, user) => {
-             acc[user.id] = false;
-             return acc;
-         }, {});
-         setCheckUser(initialCheckedState);
+             setUser(res?.users);
+            //  console.log("backendResponse",bookingResponse);
+if( bookingResponse?.attendee !== null){
+    // console.log("user inside call");
+    initializeCheckedEndUser(res?.users, bookingResponse?.attendee);
+}
+             
+
      }
          })
          
      }
+
+
+    //  / Function to initialize checkedEndUsers based on booking response
+    const initializeCheckedEndUser = (endusers, attendee) => {
+        // console.log("attendee",attendee);
+        // console.log("endusers",endusers);
+        const userIdsArray = attendee?.map(user => user?.id);
+        const checkedState = {};
+// console.log("userid Array",userIdsArray);
+        endusers?.forEach(user => {
+            checkedState[user?.id] = userIdsArray?.includes(user?.id);
+        });
+
+        setCheckUser(checkedState);
+    };
+
  
   
      const handleuserToggle = () => {
@@ -327,6 +445,11 @@ const EditBooking = ({ route }) => {
      const selectedUerNames = Object.entries(checkUser)
          .filter(([id, isChecked]) => isChecked)
          .map(([id]) => user.find(item => item.id === Number(id))?.username || '');
+
+
+         useEffect(() => {
+             getVisitors();
+         },[bookingResponse?.visitor])
  
     const getVisitors =() =>{
       getVisitorList().then((res) => {
@@ -336,11 +459,29 @@ const EditBooking = ({ route }) => {
         
          // console.log("visitor ", res.visitors);
          setVisitor(res.visitors);
+
+        
+         if(bookingResponse?.visitor){
+            initializeCheckedVisitor(res?.visitors, bookingResponse?.visitor);
+         }
+       
          }
  
         
      })
     }    
+
+     //  / Function to initialize checkedEndUsers based on booking response
+     const initializeCheckedVisitor = (visitors, responseVisitor) => {
+        const visitorIdsArray = responseVisitor?.map(visitor => visitor?.id);
+        const checkedState = {};
+
+        visitors?.forEach(visitor => {
+            checkedState[visitor?.id] = visitorIdsArray?.includes(visitor?.id);
+        });
+
+        setCheckVisitor(checkedState);
+    };
  
     const handleVisitorToggle = () => {
      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -398,23 +539,53 @@ const EditBooking = ({ route }) => {
                  value: item.id
              }))
              setItemsBuildings(buildingOptions);
+
+
+             if(selectedBuilding === null){
+                buildingOptions?.map((item)=>{
+                    // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
+                    if(item.value === bookingResponse?.building?.id){
+                        // console.log("contions");
+                        setSelectedBuilding(item.value);
+                    }
+                   
+                })
+             }
          }
          })
      }
  
      const getFloorListApi =(id) =>{
          // console.log("id ",id);
+        //  console.log("response Floor ",bookingResponse.floorIds);
          findFloorsListBasedonBuildingId(id).then((res) => {
-             // console.log("floor ", res.floors);
+            //  console.log("floor ", res.floors);
              // console.log("floor List Building Baesd ",res.floors);
              setItemsFloors([]);
              setCheckedFloors({});
  
              if(res.status){
              setItemsFloors(res.floors);
+             initializeCheckedFloors(res.floors, bookingResponse?.floorIds);
          }
          })
      }
+
+
+    //  Function to parse FloorIds and initialize checkedFloors
+     const initializeCheckedFloors = (floors, floorIds) => {
+         const floorIdsArray = floorIds.split(',').map(id => parseInt(id, 10));
+         const checkedState = {};
+        //  console.log("floorIdsArray ", floorIdsArray);
+ 
+         floors.forEach(floor => {
+             checkedState[floor.id] = floorIdsArray.includes(floor.id);
+         });
+        //  console.log("checkedState ", checkedState);
+ 
+         setCheckedFloors(checkedState);
+     };
+
  
      // console.log(" cateringFormEnable ", cateringFormEnable );
   const handleFloorToggle = () => {
@@ -443,6 +614,10 @@ const EditBooking = ({ route }) => {
             
  
              setEquipmentData(res.customerEquipments);
+             if(bookingResponse?.customerEquipments !== null){
+                initializeCheckedEquipments(res?.customerEquipments, bookingResponse?.customerEquipments);
+             }
+             
              // const initialCheckedState = res.customerEquipments.reduce((acc, equipment) => {
              //     acc[equipment.id] = false;
              //     return acc;
@@ -461,6 +636,12 @@ const EditBooking = ({ route }) => {
              if(res.status){
              
              setEquipmentData(res.customerEquipments);
+
+             if(bookingResponse?.customerEquipments !== null){
+                initializeCheckedEquipments(res?.customerEquipments, bookingResponse?.customerEquipments);
+             }
+
+            //  console.log("bookingResponse",bookingResponse.customerEquipments);
              // const initialCheckedState = res.customerEquipments.reduce((acc, equipment) => {
              //     acc[equipment.id] = false;
              //     return acc;
@@ -471,6 +652,17 @@ const EditBooking = ({ route }) => {
      }
  
     
+    //  / Function to initialize checkedEquipments based on booking response
+     const initializeCheckedEquipments = (equipments, customerEquipments) => {
+         const equipmentIdsArray = customerEquipments.map(equipment => equipment.id);
+         const checkedState = {};
+ 
+         equipments.forEach(equipment => {
+             checkedState[equipment.id] = equipmentIdsArray.includes(equipment.id);
+         });
+ 
+         setCheckedEquipments(checkedState);
+     };
  
  
      const capcityAp =(id) =>{
@@ -482,15 +674,6 @@ const EditBooking = ({ route }) => {
                 
              // Transform the data
              if(res?.meetingRoomCapacityDTO?.listcapacity.length > 0){
-                 // console.log("capacity ", res?.meetingRoomCapacityDTO?.listcapacity);
-                 // const transformedData = res?.meetingRoomCapacityDTO?.listcapacity.map(capacity => ({
-                 //     label: capacity.toString(),
-                 //     value: capacity
-                 //   }));
-               
-                 //   // Update the state
-                 //   setItemsCapacity(transformedData);
- 
                  let updatedCapacityList = res.meetingRoomCapacityDTO.listcapacity;
                  const newCapacity = 0;
            
@@ -504,6 +687,8 @@ const EditBooking = ({ route }) => {
                  }));
            
                  setItemsCapacity(transformedData);
+
+
                  
              }
   
@@ -621,6 +806,22 @@ const EditBooking = ({ route }) => {
      }
  
      // console.log(" cateringFormEnable ", cateringFormEnable );
+
+
+         //  / Function to initialize Mobile checkedEquipments based on booking response
+         const initializeCheckedCatring = (catrings, customerCatrings) => {
+            const catringIdsArray = customerCatrings.map(catring => catring.id);
+            const checkedState = {};
+    
+            catrings.forEach(catring => {
+                checkedState[catring.id] = catringIdsArray?.includes(catring.id);
+            });
+    
+            // setCheckedEquipments(checkedState);
+            setCheckCatering(checkedState);
+        };
+
+
  
      const handleCateringToggle = () => {
          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -679,6 +880,9 @@ const EditBooking = ({ route }) => {
          if(res.status){
             
              setMobileEquipment(res.customerMobileEquipments);
+             if(bookingResponse?.customerMobileEquipments){
+                initializeCheckedMobileEquipments(res.customerMobileEquipments, bookingResponse?.customerMobileEquipments);
+             }
              // const initialCheckedState = res.customerMobileEquipments.reduce((acc, equipment) => {
              //     acc[equipment.id] = false;
              //     return acc;
@@ -706,6 +910,11 @@ const EditBooking = ({ route }) => {
          if(res.status){
            
              setMobileEquipment(res.customerMobileEquipments);
+             if(bookingResponse?.customerMobileEquipments){
+                initializeCheckedMobileEquipments(res.customerMobileEquipments, bookingResponse?.customerMobileEquipments);
+             }
+
+           
              // const initialCheckedState = res.customerMobileEquipments.reduce((acc, equipment) => {
              //     acc[equipment.id] = false;
              //     return acc;
@@ -715,6 +924,19 @@ const EditBooking = ({ route }) => {
      })
    }
  
+
+     //  / Function to initialize Mobile checkedEquipments based on booking response
+     const initializeCheckedMobileEquipments = (equipments, customerEquipments) => {
+        const equipmentIdsArray = customerEquipments.map(equipment => equipment.id);
+        const checkedState = {};
+
+        equipments.forEach(equipment => {
+            checkedState[equipment.id] = equipmentIdsArray.includes(equipment.id);
+        });
+
+        // setCheckedEquipments(checkedState);
+        setCheckedMobileEquipment(checkedState);
+    };
  
    const handleMobileEquipmentToggle = () => {
      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -747,9 +969,12 @@ const EditBooking = ({ route }) => {
          // console.log("it support ", res);
          setItSupport([]);
          setCheckedItSupport({});
-         if(res.status){
+         if(res?.status){
             
-             setItSupport(res.customerITSupports);
+             setItSupport(res?.customerITSupports);
+             if(bookingResponse?.customerITSupports !=null){
+                initializeCheckedItSupport(res.customerITSupports, bookingResponse?.customerITSupports);
+            }
              // const initialCheckedState = res.customerITSupports.reduce((acc, equipment) => {
              //     acc[equipment.id] = false;
              //     return acc;
@@ -773,9 +998,13 @@ const EditBooking = ({ route }) => {
          // console.log("it support Setting List ");
          setItSupport([]);
          setCheckedItSupport({});
-         if(res.status){
+         if(res?.status){
             
-             setItSupport(res.customerITSupports);
+             setItSupport(res?.customerITSupports);
+if(bookingResponse?.customerITSupports !=null){
+    initializeCheckedItSupport(res.customerITSupports, bookingResponse?.customerITSupports);
+}
+            
              // const initialCheckedState = res.customerITSupports.reduce((acc, equipment) => {
              //     acc[equipment.id] = false;
              //     return acc;
@@ -785,7 +1014,16 @@ const EditBooking = ({ route }) => {
      })
  
    }
- 
+   const initializeCheckedItSupport = (itsupports, customerItsupport) => {
+    const itsupportIdsArray = customerItsupport?.map(itsupport => itsupport?.id);
+    const checkedState = {};
+
+    itsupports?.forEach(itsupport => {
+        checkedState[itsupport?.id] = itsupportIdsArray?.includes(itsupport?.id);
+    });
+
+   setCheckedItSupport(checkedState);
+};
  
     const handleItSupportToggle = () => {
      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -823,6 +1061,9 @@ const EditBooking = ({ route }) => {
          if(res.status){
            
              setSpecialService(res.customerSpecialServices);
+             if(bookingResponse?.customerSpecialServices !=null){
+                initializeCheckedSpecialService(res.customerSpecialServices, bookingResponse?.customerSpecialServices);
+            }
              // const initialCheckedState = res.customerSpecialServices.reduce((acc, equipment) => {
              //     acc[equipment.id] = false;
              //     return acc;
@@ -849,6 +1090,10 @@ const EditBooking = ({ route }) => {
          setCheckedSpecialService({});
          if(res.status){
              setSpecialService(res.customerSpecialServices);
+            if(bookingResponse?.customerSpecialServices !=null){
+                initializeCheckedSpecialService(res.customerSpecialServices, bookingResponse?.customerSpecialServices);
+            }
+            
              // const initialCheckedState = res.customerSpecialServices.reduce((acc, equipment) => {
              //     acc[equipment.id] = false;
              //     return acc;      
@@ -858,6 +1103,18 @@ const EditBooking = ({ route }) => {
             
      })
   }
+
+
+  const initializeCheckedSpecialService = (specialServices, customerSpecialServices) => {
+    const specialserviceIdsArray = customerSpecialServices?.map(special => special?.id);
+    const checkedState = {};
+
+    specialServices?.forEach(special => {
+        checkedState[special?.id] = specialserviceIdsArray?.includes(special?.id);
+    });
+
+   setCheckedSpecialService(checkedState);
+};
  
   const handleSpecialServiceToggle = () => {
      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -874,101 +1131,179 @@ const EditBooking = ({ route }) => {
      .map(([id]) => specialService.find(item => item.id === Number(id))?.name || '');
  
  
-    useEffect(() => {
- 
-     // console.log("selectedLocation ",selectedLocation);
-     // console.log("selectedBuilding ",selectedBuilding);
-     // console.log("checkedEquipments ",checkedEquipments);
-     // console.log("selectedCapacity ",selectedCapacity);
- 
- 
-     if(Object.keys(checkedEquipments).length > 0  && selectedCapacity !== null ){
-         // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding);
-         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
-             // console.log("Equipment And Capacity ",res);
-             setMeetingRoom([]);
-             setSelectedMeetingRoom(null);
-             if(res.status){
-                 // console.log("Equipment And Capacity ",res.meetingRoomDTOs);
-                
-         const mappedItems = res.meetingRoomDTOs.map(resource => ({
-             label: resource.name,
-             value: resource.id,
-         }));
- 
-         setMeetingRoom(mappedItems);
-             }
-         })
-         
-     }else if(Object.keys(checkedEquipments).length > 0 ){
-         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
-             // console.log("Equipment",res);
-             setMeetingRoom([]);
-             setSelectedMeetingRoom(null);
-             if(res.status){
-                
-         const mappedItems = res.meetingRoomDTOs.map(resource => ({
-             label: resource.name,
-             value: resource.id,
-         }));
- 
-         setMeetingRoom(mappedItems);
-             }
-         })
-         
-     }else if(selectedCapacity !== null ){
-         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
-             // console.log("Capacity ",res);
-             setMeetingRoom([]);
-             setSelectedMeetingRoom(null);
-             if(res.status){
-                 
-         const mappedItems = res.meetingRoomDTOs.map(resource => ({
-             label: resource.name,
-             value: resource.id,
-         }));
- 
-         setMeetingRoom(mappedItems);
-                 
-             }
-         })
-     }else if(Object.keys(checkedFloors).length > 0 ){
-         // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding," checkedFloors ",checkedFloors);
-         getMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors).then((res) => {
-             // console.log("mroom ",res);
-             setMeetingRoom([]);
-             setSelectedMeetingRoom(null);
-             if(res?.status){
-                 
-         const mappedItems = res.meetingRoomDTOs.map(resource => ({
-             label: resource.name,
-             value: resource.id,
-         }));
- 
-         setMeetingRoom(mappedItems);
-                 
-             }
-         })
- 
-         getDesk(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors);
-         getParkingSeats(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors);
- 
-         
-     }else if(selectedLocation && selectedBuilding){
-         // console.log("Both ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
-         getMettingRooms(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
-         getDesk(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors);
-         getParkingSeats(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors);
- 
-        }else if(selectedLocation){
-         // console.log("Location ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
-         getMettingRooms(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime);
-         getDesk(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedFloors);
-         getParkingSeats(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedFloors);
-            
-        }
+// console.log("bookingResponse ",bookingResponse);
+
+
+useEffect(() => {
+
+    // console.log("selectedLocation ",selectedLocation);
+    // console.log("selectedBuilding ",selectedBuilding);
+    // console.log("checkedEquipments ",checkedEquipments);
+    // console.log("selectedCapacity ",selectedCapacity);
+// console.log("checkedFloors ",checkedFloors);
+console.log("bookingResponse ",bookingResponse);
+
+const bookingId = bookingResponse?.id;
+
+// console.log("bookingId ",bookingId);
+
+    if(Object.keys(checkedEquipments).length > 0  && selectedCapacity !== null ){
+        // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding);
+        getEditMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors,bookingId).then((res) => {
+            // console.log("Equipment And Capacity ",res);
+            setMeetingRoom([]);
+            if(res?.status){
+                // console.log("Equipment And Capacity ",res.meetingRoomDTOs);
+               
+        const mappedItems = res?.meetingRoomDTOs?.map(resource => ({
+            label: resource.name,
+            value: resource.id,
+        }));
+
+        setMeetingRoom(mappedItems);
+        // setSelectedMeetingRoom(null || params?.meetingRoom);
+        if(selectedMeetingRoom === null){
+            mappedItems?.map((item)=>{
+                // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
+                if(item.value === bookingResponse?.meetingRoom?.id){
+                    setSelectedMeetingRoom(item.value);
+                }
+               
+            })
+         }
+
+            }
+        })
         
-    },[selectedLocation,selectedBuilding,startDate,endDate1,startTime,endTime,checkedEquipments,selectedCapacity,checkedFloors])
+    }else if(Object.keys(checkedEquipments).length > 0 ){
+        getEditMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors,bookingId).then((res) => {
+            // console.log("Equipment",res);
+            setMeetingRoom([]);
+            if(res?.status){
+               
+        const mappedItems = res?.meetingRoomDTOs?.map(resource => ({
+            label: resource.name,
+            value: resource.id,
+        }));
+
+        setMeetingRoom(mappedItems);
+        // setSelectedMeetingRoom(null || params?.meetingRoom);
+        if(selectedMeetingRoom === null){
+            mappedItems?.map((item)=>{
+                // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
+                if(item.value === bookingResponse?.meetingRoom?.id){
+                    setSelectedMeetingRoom(item.value);
+                }
+               
+            })
+         }
+            }
+        })
+        
+    }else if(selectedCapacity !== null ){
+        getEditMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors,bookingId).then((res) => {
+            // console.log("Capacity ",res);
+            setMeetingRoom([]);
+            if(res?.status){
+                
+        const mappedItems = res?.meetingRoomDTOs?.map(resource => ({
+            label: resource.name,
+            value: resource.id,
+        }));
+
+        setMeetingRoom(mappedItems);
+        // setSelectedMeetingRoom(null || params?.meetingRoom);
+        if(selectedMeetingRoom === null){
+            mappedItems?.map((item)=>{
+                // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
+                if(item.value === bookingResponse?.meetingRoom?.id){
+                    setSelectedMeetingRoom(item.value);
+                }
+               
+            })
+         }
+                
+            }
+        })
+    }else if(Object.keys(checkedFloors).length > 0 ){
+       
+        // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding," checkedFloors ",checkedFloors);
+        getEditMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors,bookingId).then((res) => {
+            // console.log("mroom ",res);
+            setMeetingRoom([]);
+            if(res?.status){
+                
+        const mappedItems = res?.meetingRoomDTOs?.map(resource => ({
+            label: resource.name,
+            value: resource.id,
+        }));
+
+        setMeetingRoom(mappedItems);
+        // setSelectedMeetingRoom(null || params?.meetingRoom);
+
+        if(selectedMeetingRoom === null){
+            mappedItems?.map((item)=>{
+                // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
+                if(item.value === bookingResponse?.meetingRoom?.id){
+                    setSelectedMeetingRoom(item.value);
+                }
+               
+            })
+         }
+                
+            }
+        })
+
+        // console.log(" call Floor",selectedBuilding,"booking id ",bookingId);
+
+        getDesk(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors,bookingId);
+        getParkingSeats(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors,bookingId);
+
+        
+    }else if(selectedBuilding){
+        // console.log(" call selectedBuilding",selectedBuilding,"booking id ",bookingId);
+        // console.log("Both ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
+        // getMettingRooms(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
+        getEditMeetingRoomListForEquipmentAndCapacity(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedEquipments,selectedCapacity,checkedFloors,bookingId).then((res) => {
+            // console.log("mroom ",res);
+            setMeetingRoom([]);
+            if(res?.status){
+                
+        const mappedItems = res?.meetingRoomDTOs?.map(resource => ({
+            label: resource.name,
+            value: resource.id,
+        }));
+
+        setMeetingRoom(mappedItems);
+        // setSelectedMeetingRoom(null || params?.[params?.resource]);
+
+        if(selectedMeetingRoom === null){
+            mappedItems?.map((item)=>{
+                // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
+                if(item.value === bookingResponse?.meetingRoom?.id){
+                    setSelectedMeetingRoom(item.value);
+                }
+               
+            })
+         }
+                
+            }
+        })
+        // console.log("bookingId ",bookingId);
+        getDesk(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors,bookingId);
+        getParkingSeats(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors,bookingId);
+
+       }else if(selectedLocation){
+
+        // console.log("desk call  selectedLocation");
+        // console.log("Location ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
+        getMettingRooms(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,bookingId);
+        getDesk(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedFloors,bookingId);
+        getParkingSeats(selectedLocation,selectedBuilding ?selectedBuilding : 0,startDate,startTime,endDate1,endTime,checkedFloors,bookingId);
+           
+       }
+       
+   },[selectedLocation,selectedBuilding,startDate,endDate1,startTime,endTime,checkedEquipments,selectedCapacity,checkedFloors])
  
     const formatDate = (date1) => {
      const day = date1.getDate().toString().padStart(2, '0');
@@ -983,28 +1318,42 @@ const EditBooking = ({ route }) => {
      return `${hours}:${minutes}`;
    };
  
-   const getMettingRooms = (selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime) => {
+   const getMettingRooms = (selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,bookingId) => {
      // console.log("getMettingRooms ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
-     getMeetingRoomList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime).then((res) => {
+     getEditMeetingRoomList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,bookingId).then((res) => {
          // console.log("meeting Room ", res.meetingRoomDTOs);
          setMeetingRoom([]);
          setSelectedMeetingRoom(null);
          if(res?.status){
         
-         const mappedItems = res.meetingRoomDTOs.map(resource => ({
+         const mappedItems = res?.meetingRoomDTOs?.map(resource => ({
              label: resource.name,
              value: resource.id,
          }));
  
          setMeetingRoom(mappedItems);
+
+         if(selectedMeetingRoom === null){
+            mappedItems?.map((item)=>{
+                // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
+                if(item.value === bookingResponse?.meetingRoom?.id){
+                    setSelectedMeetingRoom(item.value);
+                }
+               
+            })
+         }
      }
      })
    }
+
+   
  
-   const getDesk =(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors) => {
-     getDeskList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors).then((res) => {
-         // console.log("desk ", res);
+   const getDesk =(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors,bookingId) => {
+    // console.log("desk call ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors,"booking Id",bookingId);
+    getEditDeskList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors,bookingId).then((res) => {
+        //  console.log("desk ", res);
            // Map backend response to dropdown items
+      
            setDesk([]);
            setSelectedDesk(null);
            if(res?.status){
@@ -1015,14 +1364,26 @@ const EditBooking = ({ route }) => {
          }));
  
          setDesk(mappedItems);
+        //  console.log("booking response ",bookingResponse?.desk?.id);
+         if(bookingResponse?.desk?.id){
+            mappedItems?.map((item)=>{
+                // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
+                if(item.value === bookingResponse?.desk?.id){
+                    setSelectedDesk(item.value);
+                }
+               
+            })
+         }
+
+         
      }
      })
    }
  
- const getParkingSeats = (selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors) => {
+ const getParkingSeats = (selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors,bookingId) => {
      // console.log("parking seat ", res.parkingSeatDTOs);
-     getParkingSeatList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors).then((res) => {
-         // console.log("parking seat ", res);
+     getEditParkingSeatList(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,checkedFloors,bookingId).then((res) => {
+        //  console.log("parking seat ", res);
          // console.log("parking seat ", res.parkingSeatDTOs);
             // Map backend response to dropdown items
             setParkingseat([]);
@@ -1035,6 +1396,18 @@ const EditBooking = ({ route }) => {
          }));
  
          setParkingseat(mappedItems);
+
+        //  console.log("booking response ",bookingResponse?.parkingSeats);
+
+         if(bookingResponse?.parkingSeats[0]?.id){
+            mappedItems?.map((item)=>{
+                // console.log("bookingResponse?.building?.id ",bookingResponse?.parkingSeats[0]?.id);
+                if(item.value ===bookingResponse?.parkingSeats[0]?.id){
+                    setSelectedParkingSeat(item.value);
+                }
+               
+            })
+         }
      }
  
      })
@@ -1052,9 +1425,20 @@ const EditBooking = ({ route }) => {
          }));
  
          setItemsResources(resourceOptions);
+         
+        //  console.log("bookingResponse ",bookingResponse.bookingType);
+
          if(selectedResource === null){
-             setSelectedResource(resourceOptions[0].value);
- 
+           
+            resourceOptions?.map((item)=>{
+                    // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
+                    if(item.value ===bookingResponse.bookingType){
+                        // console.log("contions");
+                        setSelectedResource(item.value);
+                    }
+                   
+                })
+             
          }
         
      }, []);
@@ -1157,7 +1541,8 @@ const EditBooking = ({ route }) => {
      
      
     const handleClickCancel = () => {
-     // navigation.navigate('Dashboard');    
+     // navigation.navigate('Dashboard');  
+     navigation.navigate('CalendarScreen')
     }
  
     const handleClickSubmit = () => {
@@ -1185,15 +1570,15 @@ const EditBooking = ({ route }) => {
              })
          }
  
-         const parkingSeatIds=[];
-         if(selectedParkingSeat !=null){
-              parkingSeatIds=[selectedParkingSeat];
-         }
+         const parkingSeatIds=selectedParkingSeat ?[selectedParkingSeat] : [];
                 
             //  console.log("parkingSeatIds ",parkingSeatIds);
+
+          console.log("users ",users);
          
  
         datas= {
+            id:bookingResponse?.id,
              locationId:selectedLocation,
              buildingId:selectedBuilding,
              floorId: null,
@@ -1244,7 +1629,7 @@ const EditBooking = ({ route }) => {
         addBookingApi(datas).then((res) => {
         //  console.log("add booking  outer", res);
             if(res.status){
-             //    console.log("add booking  success", res);
+                console.log("add booking  success", res);
                 navigation.navigate('CalendarScreen')
             }
         })
