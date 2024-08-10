@@ -155,15 +155,13 @@ const AddBooking = ({ route }) => {
 
     const onChange = (event, selectedDate) => {
         const currentDate = selectedDate || date;
-
+        setShow(false);
+        setShowTime(false);
         if (mode === 'date') {
             setDate(new Date(currentDate.setHours(date.getHours(), date.getMinutes())));
         } else {
             setDate(new Date(date.setHours(currentDate.getHours(), currentDate.getMinutes())));
         }
-
-        setShow(false);
-        setShowTime(false);
     };
 
     const showMode = (currentMode) => {
@@ -1963,7 +1961,7 @@ const AddBooking = ({ route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 16,
+        padding: 5,
         backgroundColor: '#fff',
     },
     title: {

@@ -354,22 +354,23 @@ const Rooms = () => {
     if (event.type === 'dismissed')
       return;
 
+    setShowStartDate(false);
+    setShowStartTime(false);
+
     const currentDate = selectedDate || date;
     if (type === 'date') {
       setStartDateTime(currentDate);
     } else {
       setStartDateTime(new Date(startDateTime.setHours(currentDate.getHours(), currentDate.getMinutes())));
     }
-    setTimeout(() => {
-      setShowStartDate(false);
-      setShowStartTime(false);
-    }, 10);
-
   };
 
   const onChangeEndDateTime = (event, selectedDate, type, e) => {
     if (event.type === 'dismissed')
       return
+    
+    setShowEndDate(false);
+    setShowEndTime(false);
 
     const currentDate = selectedDate || date;
     if (type === 'date') {
@@ -380,9 +381,6 @@ const Rooms = () => {
       else
         setEndDateTime(currentDate);
     }
-    setShowEndDate(false);
-    setShowEndTime(false);
-
   };
 
   const dateFormat = (date) => {
