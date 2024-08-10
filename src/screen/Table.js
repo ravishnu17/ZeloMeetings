@@ -21,8 +21,8 @@ const Table = ({ cols, rows, handleCancelAcceptClick, handleEdit, menuIndex, set
                   Object.keys(row).map((cell, index1) =>
                     !['id', 'isEnded'].includes(cell) && <Text style={{ ...styles.cell, fontSize: 12 }} key={index1}>{row[cell]}</Text>
                   )}
-                <Text style={{ alignSelf: 'center', fontSize: 12, marginLeft: 10 }}>
-                  <Icon name={menuIndex === index ? 'caret-up' : 'caret-down'} type='font-awesome' size={25} color='#1cbdfd' />
+                <Text style={{ alignSelf: 'center', fontSize: 12, marginLeft: 0 }}>
+                  <Icon name={menuIndex === index ? 'caret-up' : 'caret-down'} type='font-awesome' size={20} color='#1cbdfd' />
                 </Text>
               </TouchableOpacity>
               {
@@ -62,13 +62,14 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: 'row'
   },
   cell: {
     flex: 1,
-    padding: 6,
-    marginTop: 15,
+    padding: 0,
+    marginTop: 12,
     textAlign: 'center',
+    marginBottom: 3
   },
   menuText: {
     fontSize: 12,

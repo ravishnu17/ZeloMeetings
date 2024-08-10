@@ -363,7 +363,7 @@ const Rooms = () => {
     setTimeout(() => {
       setShowStartDate(false);
       setShowStartTime(false);
-    }, 10); r
+    }, 10);
 
   };
 
@@ -797,8 +797,7 @@ const Rooms = () => {
                         <Text style={{ color: '#000000' }}>{dateFormat(startDateTime)}</Text>
                         <Text style={styles.icon}> <Icon source='calendar' size={25} color="#000000" /> </Text>
                       </TouchableOpacity>
-                    </View>
-                    {showStartDate && (
+                      {showStartDate && (
                       <DateTimePicker
                         testID="datePicker1"
                         value={startDateTime}
@@ -808,6 +807,7 @@ const Rooms = () => {
                         minimumDate={new Date()}
                       />
                     )}
+                    </View>
 
                     <View style={{ flex: 1 }}>
                       <Text style={styles.headText}>Start Time </Text>
@@ -815,8 +815,7 @@ const Rooms = () => {
                         <Text style={{ color: '#000000' }}>{timeFormat(startDateTime)}</Text>
                         <Text style={styles.icon} > <Icon source='clock-outline' size={25} color="#000000" /> </Text>
                       </TouchableOpacity>
-                    </View>
-                    {showStartTime && (
+                      {showStartTime && (
                       <DateTimePicker
                         testID="timePicker1"
                         value={startDateTime}
@@ -827,6 +826,7 @@ const Rooms = () => {
                         onTouchCancel={() => setShowStartTime(false)}
                       />
                     )}
+                    </View>
                   </View>
                   <View style={styles.filterView}>
                     <View style={{ flex: 1 }}>
@@ -986,7 +986,8 @@ const styles = StyleSheet.create({
     borderRadius: 100
   },
   modalContainer: {
-    height: '100%',
+    marginTop: 45,
+    height: '90%',
     backgroundColor: '#ffffff',
     borderRadius: 3,
   },
@@ -1068,10 +1069,10 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 10,
 
-    borderColor: '#a1a1a1',
+    // borderColor: '#a1a1a1',
     backgroundColor: 'white',
     borderRadius: 12,
-    borderTopWidth: 0.2,
+    // borderTopWidth: 0.2,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

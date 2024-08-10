@@ -233,15 +233,14 @@ const EditBooking = ({ route }) => {
      }
      const onChange = (event, selectedDate) => {
          const currentDate = selectedDate || date;
- 
+        console.log("tine", selectedDate);
          if (mode === 'date') {
              setDate(new Date(currentDate.setHours(date.getHours(), date.getMinutes())));
          } else {
              setDate(new Date(date.setHours(currentDate.getHours(), currentDate.getMinutes())));
          }
- 
-         setShow(Platform.OS === 'ios');
-         setShowTime(Platform.OS === 'ios');
+         setShow(false);
+         setShowTime(false);
      };
  
      const showMode = (currentMode) => {
@@ -311,8 +310,8 @@ const EditBooking = ({ route }) => {
  
      const onChangeEnd = (event, selectedDate) => {
          const currentDate = selectedDate || endDate;
-         setEndShow(Platform.OS === 'ios');
-         setEndShowTime(Platform.OS === 'ios');
+         setEndShow(false);
+         setEndShowTime(false);
          setEndDate(currentDate);
      };
  
@@ -1445,21 +1444,24 @@ const bookingId = bookingResponse?.id;
         let enableRooms=false;
         let enableDesks=false;
         let enableParkingSeats=false;
+        let enableAll= false;
 
-          const backendResponse = [];
-          enableRooms= rights?.includes('BOOK A ROOM');
-          enableDesks= rights?.includes('BOOK A DESK');
-          enableParkingSeats= rights?.includes('BOOK A PARKING SEAT');
+        const backendResponse = [];
+        enableRooms= rights?.includes('BOOK A ROOM');
+        enableDesks= rights?.includes('BOOK A DESK');
+        enableParkingSeats= rights?.includes('BOOK A PARKING SEAT');
+        enableAll= rights?.includes('ALL');
         //   console.log("enableRooms ",enableRooms, rights?.includes('BOOK A ROOM')," enableDesks",enableDesks,rights?.includes('BOOK A DESK')," enableParkingSeats",enableParkingSeats ,rights?.includes('BOOK A PARKING SEAT'));
-        if (enableRooms) {
+        if (enableRooms || enableAll) {
             backendResponse.push({ id: "meetingRoom", resource: "Meeting Room" });
         }
-        if (enableDesks) {
+        if (enableDesks || enableAll) {
             backendResponse.push({ id: "desk", resource: "Desk" });
         }
-        if (enableParkingSeats) {
+        if (enableParkingSeats || enableAll) {
             backendResponse.push({ id: "parkingSeat", resource: "Parking seat" });
         }
+
 
 
         // console.log("backendResponse ",backendResponse);
@@ -1837,20 +1839,12 @@ const bookingId = bookingResponse?.id;
              <Text >Start Time</Text>
              </View>
                  <View style={styles.dateTimeContainer}>
-                    
-                     <TouchableOpacity onPress={showDatepicker} style={styles.dateTimePicker}>
+                    <View style={{flex: 1}}>
+                    <TouchableOpacity onPress={showDatepicker} style={styles.dateTimePicker}>
                          <Text style={styles.selectedText}>{date.toLocaleDateString()}</Text>
                          <Icon name="calendar" size={20} color="#000" style={styles.icon} />
                      </TouchableOpacity>
- 
-                    
-                     <TouchableOpacity onPress={showTimepicker} style={styles.dateTimePicker}>
-                         <Text style={styles.selectedText}>{date.toLocaleTimeString()}</Text>
-                         <Icon name="clock-o" size={20} color="#000" style={styles.icon} />
-                     </TouchableOpacity>
-                 </View>
- 
-                 {show && (
+                     {show && (
                      <DateTimePicker
                          testID="dateTimePicker"
                          value={date}
@@ -1859,8 +1853,14 @@ const bookingId = bookingResponse?.id;
                          onChange={onChange}
                      />
                  )}
- 
-                 {showTime && (
+
+                    </View>
+                    <View style={{flex: 1}}>
+                    <TouchableOpacity onPress={showTimepicker} style={styles.dateTimePicker}>
+                         <Text style={styles.selectedText}>{date.toLocaleTimeString()}</Text>
+                         <Icon name="clock-o" size={20} color="#000" style={styles.icon} />
+                     </TouchableOpacity>
+                     {showTime && (
                      <DateTimePicker
                          testID="timePicker"
                          value={date}
@@ -1869,6 +1869,8 @@ const bookingId = bookingResponse?.id;
                          onChange={onChange}
                      />
                  )}
+                    </View>
+                 </View>
              </View>
  
              <View style={styles.pickerContainer}>
@@ -1877,22 +1879,14 @@ const bookingId = bookingResponse?.id;
                  <Text>End Time</Text>
              </View>
              <View style={styles.dateTimeContainer}>
-                 <TouchableOpacity onPress={endshowDatepicker} style={styles.dateTimePicker}>
+                <View style={{flex: 1}}>
+                <TouchableOpacity onPress={endshowDatepicker} style={styles.dateTimePicker}>
                      <Text style={styles.selectedText}>
                          {endDate ? endDate.toLocaleDateString() : 'Select End Date'}
                      </Text>
                      <Icon name="calendar" size={20} color="#000" style={styles.icon} />
                  </TouchableOpacity>
- 
-                 <TouchableOpacity onPress={endShowTimepicker} style={styles.dateTimePicker}>
-                     <Text style={styles.selectedText}>
-                         {endDate ? endDate.toLocaleTimeString() : 'Select End Time'}
-                     </Text>
-                     <Icon name="clock-o" size={20} color="#000" style={styles.icon} />
-                 </TouchableOpacity>
-             </View>
- 
-             {endShow && (
+                 {endShow && (
                  <DateTimePicker
                      testID="dateTimePicker"
                      value={endDate}
@@ -1901,8 +1895,15 @@ const bookingId = bookingResponse?.id;
                      onChange={onChangeEnd}
                  />
              )}
- 
-             {endShowTime && (
+                </View>
+                <View style={{flex: 1}}>
+                <TouchableOpacity onPress={endShowTimepicker} style={styles.dateTimePicker}>
+                     <Text style={styles.selectedText}>
+                         {endDate ? endDate.toLocaleTimeString() : 'Select End Time'}
+                     </Text>
+                     <Icon name="clock-o" size={20} color="#000" style={styles.icon} />
+                 </TouchableOpacity>
+                 {endShowTime && (
                  <DateTimePicker
                      testID="timePicker"
                      value={endDate}
@@ -1911,6 +1912,8 @@ const bookingId = bookingResponse?.id;
                      onChange={onChangeEnd}
                  />
              )}
+                </View>
+             </View>
          </View>
                  <View style={styles.pickerContainer}>
                      <Text>Duration</Text>
@@ -2044,11 +2047,11 @@ const bookingId = bookingResponse?.id;
  
                      <View>
  
-                         <View style={styles.dateTimeContainer}>
+                         <View style={{...styles.dateTimeContainer, alignItems:'center', marginLeft:8}}>
               
                  {/* <TextInput style={styles.textInput} placeholder="" className="input" value={visitor} onChangeText={text => setVisitor(text)} /> */}
                  <View  style={styles.visitorContainer}>
-                     <Text>Add VisitorS </Text>
+                     <Text>Add Visitors </Text>
                      <View style={styles.dropdownContainer}>      
                  <TouchableOpacity onPress={handleVisitorToggle} style={styles.dropdownHeader}>
                      {selectedVisitorNames.length > 0 ? (
@@ -2331,6 +2334,7 @@ const bookingId = bookingResponse?.id;
          onPress={handleClickCancel}
          style={[styles.button, styles.cancelButton]}
          buttonColor="red"
+         textColor='#fff'
        >
          Cancel
        </Button>
@@ -2436,6 +2440,7 @@ const bookingId = bookingResponse?.id;
      dateTimeContainer: {
          flexDirection: 'row',
          justifyContent: 'space-between',
+         columnGap: 8
      },
      dateTimePicker: {
          flexDirection: 'row',
@@ -2446,7 +2451,7 @@ const bookingId = bookingResponse?.id;
          borderColor: '#ccc',
          borderWidth: 1,
          marginBottom: 10,
-         width: '48%',
+        //  width: '48%',
      },
      selectedText: {
          marginLeft: 10,
@@ -2479,7 +2484,7 @@ const bookingId = bookingResponse?.id;
          borderColor: '#ccc',
          borderWidth: 1,
          borderRadius: 11,
-         padding: 7,
+         padding: 11,
          textAlignVertical: 'top', // Ensures text starts at the top of the input
      },
      textInputPragraph: {
@@ -2499,7 +2504,7 @@ const bookingId = bookingResponse?.id;
      vistorbuttonContainer: {
          width: '45%',
          // marginBottom: 20,
-         marginTop: 25,
+        //  marginTop: 25,
      },
      iconRow: {
          flexDirection: 'row',
