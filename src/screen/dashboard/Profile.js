@@ -173,7 +173,7 @@ function Profile() {
         setLoading(true);
         updateUserProfile(postData).then(res => {
             if (res?.status) {
-                Toast.showWithGravity(res?.information?.description, Toast.SHORT, Toast.CENTER);
+                Toast.showWithGravity(res?.information?.description, Toast.SHORT, Toast.BOTTOM);
                 if (res?.user?.email !== userData?.user?.email) {
                     AsyncStorage.clear();
                     props?.setActive(1);
@@ -184,7 +184,7 @@ function Profile() {
                 }
             } else {
                 console.log("Error update", res);
-                Toast.showWithGravity(res?.information?.description, Toast.SHORT, Toast.CENTER);
+                Toast.showWithGravity(res?.information?.description, Toast.SHORT, Toast.BOTTOM);
             }
         }).catch(err => {
             console.log("Error update", err);

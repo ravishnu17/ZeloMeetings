@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 
-const Table = ({ cols, rows, onClick, menuIndex, setMenuIndex, loading }) => {
-
+const Table = ({ cols, rows, handleCancelAcceptClick, handleEdit, menuIndex, setMenuIndex, loading }) => {
   return (
     <>
       {/* Table Header */}
@@ -20,7 +19,7 @@ const Table = ({ cols, rows, onClick, menuIndex, setMenuIndex, loading }) => {
               <TouchableOpacity style={styles.row} onPress={() => setMenuIndex(pre => pre === index ? null : index)}>
                 {
                   Object.keys(row).map((cell, index1) =>
-                    index1 !== 0 && <Text style={{ ...styles.cell, fontSize: 12 }} key={index1}>{row[cell]}</Text>
+                    !['id', 'isEnded'].includes(cell) && <Text style={{ ...styles.cell, fontSize: 12 }} key={index1}>{row[cell]}</Text>
                   )}
                 <Text style={{ alignSelf: 'center', fontSize: 12, marginLeft: 10 }}>
                   <Icon name={menuIndex === index ? 'caret-up' : 'caret-down'} type='font-awesome' size={25} color='#1cbdfd' />
@@ -32,17 +31,17 @@ const Table = ({ cols, rows, onClick, menuIndex, setMenuIndex, loading }) => {
                   <Button title='Edit'
                     buttonStyle={{ backgroundColor: '#1cbdfd' }}
                     titleStyle={styles.menuText}
-                    onPress={() => { }}
+                    onPress={() => { handleEdit(row?.id) }}
                   />
                   <Button title='Cancel'
                     buttonStyle={{ backgroundColor: '#fd1c4d' }}
                     titleStyle={styles.menuText}
-                    onPress={() => { onClick(row?.id, false) }}
+                    onPress={() => { handleCancelAcceptClick(row?.id, false) }}
                   />
                   <Button title='Accept'
                     buttonStyle={{ backgroundColor: 'green' }}
                     titleStyle={styles.menuText}
-                    onPress={() => { onClick(row?.id, true) }}
+                    onPress={() => { handleCancelAcceptClick(row?.id, true) }}
                   />
                   <View style={{ position: 'absolute', top: 15, right: 0 }}>
                     <Icon source='close' size={20} onPress={() => setMenuIndex()} />
@@ -51,7 +50,7 @@ const Table = ({ cols, rows, onClick, menuIndex, setMenuIndex, loading }) => {
               }
             </View>)
           :
-          <Text style={styles.nodata}>{loading ? '':'Data Not Found!'}</Text>
+          <Text style={styles.nodata}>{loading ? '' : 'Data Not Found!'}</Text>
       }
     </>
   );
@@ -63,7 +62,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   row: {
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   cell: {
     flex: 1,

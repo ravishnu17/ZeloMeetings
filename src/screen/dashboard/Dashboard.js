@@ -6,7 +6,7 @@ import { Alert } from 'react-native';
 import { context } from '../../navigation/Appnav';
 import Toast from 'react-native-simple-toast';
 import { ToastColor } from '../utils/ToastColors';
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 
 const Dashboard = () => {
     const [dashboard, setDashboard] = useState();
@@ -15,7 +15,9 @@ const Dashboard = () => {
     const props = useContext(context);
     const setLoading = props?.setLoading;
     const cols = ['Type', 'Room / Desk', 'Requester', 'Start Time', 'End Time'];
+    const tableDisplayResource= ['meetingRoom', 'desk'];
     const isFocus = useIsFocused();
+    const navigate= useNavigation();
 
     const dashBoardDetails = async () => {
         setLoading(true);
@@ -90,11 +92,15 @@ const Dashboard = () => {
         )
     }
 
+    const handleEdit = (id) =>{
+        navigate.navigate('EditBooking', { id: id, from : 'DashboardScreen'});    }
+
     useEffect(() => {
         if (isFocus) {
             props?.setActive(1);
             dashBoardDetails();
             props?.setPre();
+            setMenuIndex(-1);
         }
     }, [isFocus]);
 
@@ -150,8 +156,9 @@ const Dashboard = () => {
                 <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Room / Desk booking requests</Text>
                 <Table
                     cols={cols}
-                    rows={dashboard?.bookingList ? dashboard?.bookingList?.map((item) => getDetails(item)).filter((item) => item.isEnded === false) : []}
-                    onClick={updateRequest}
+                    rows={dashboard?.bookingList ? dashboard?.bookingList?.filter(item => tableDisplayResource.includes(item?.bookingType)).map((item) => getDetails(item)).filter((item) => item.isEnded === false) : []}
+                    handleCancelAcceptClick={updateRequest}
+                    handleEdit={handleEdit}
                     menuIndex={menuIndex}
                     setMenuIndex={setMenuIndex}
                     loading={props?.loading}

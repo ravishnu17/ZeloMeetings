@@ -267,7 +267,7 @@ const AddBooking = ({ route }) => {
     }, [params]);
 
     useEffect(() => {
-        Object.keys(loginUser).length > 0 && getlocationApi();
+        getlocationApi();
     }, [loginUser])
 
     const getLoginUser = async () => {
@@ -301,7 +301,7 @@ const AddBooking = ({ route }) => {
                     value: item.id
                 }));
                 setItemsLocations(locationOptions);
-                const itemsLocationsId = loginUser?.customerDetails?.location?.id || loginUser?.user?.location?.id;
+                const itemsLocationsId = params?.locationID ? params?.locationID : loginUser?.customerDetails?.location?.id || loginUser?.user?.location?.id;
                 // console.log("itemsLocationsId ",itemsLocationsId);
                 locationOptions.map((item) => {
                     if (item.value === itemsLocationsId) {

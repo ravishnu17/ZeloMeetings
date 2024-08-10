@@ -33,6 +33,15 @@ const Login = () => {
         reset();
     }, [clearErrors, reset]);
 
+    // // check async storage for user token if exist move to home screen
+    // useEffect(() => {
+    //     AsyncStorage.getItem('user_token').then((value) => {
+    //         if (value) {
+    //             navigation?.navigate('HomeScreen');
+    //         }
+    //     });
+    // }, []);
+
 
     const onPressMicrosoftLogin = () => {
         console.log("microsoft login url");
@@ -155,19 +164,19 @@ const Login = () => {
 
 
                 <View style={styles.imageContainer}>
-                   
-                  {/* <TouchableOpacity
+
+                    {/* <TouchableOpacity
                     style={styles.imageWrapper}
                     onPress={onPressMicrosoftLogin}>
                     <Image source={m_logo} style={styles.image} />
                     <Text style={styles.text}>Microsoft</Text>
                     </TouchableOpacity> */}
 
-<TouchableOpacity
-                    style={styles.imageWrapper}
-                    onPress={onPressMicrosoftLogin}>
-                    <Image source={m_logo} style={styles.image} />
-                    <Text style={styles.text}>Microsoft</Text>
+                    <TouchableOpacity
+                        style={styles.imageWrapper}
+                        onPress={onPressMicrosoftLogin}>
+                        <Image source={m_logo} style={styles.image} />
+                        <Text style={styles.text}>Microsoft</Text>
                     </TouchableOpacity>
 
 
@@ -175,11 +184,11 @@ const Login = () => {
                         <Image source={g_logo} style={styles.image} />
                         <Text style={styles.text}>Google</Text>
                     </View> */}
-                 <TouchableOpacity
-                    style={styles.imageWrapper}
-                    onPress={onPressGoogleLogin}>
-                    <Image source={g_logo} style={styles.image} />
-                    <Text style={styles.text}>Google</Text>
+                    <TouchableOpacity
+                        style={styles.imageWrapper}
+                        onPress={onPressGoogleLogin}>
+                        <Image source={g_logo} style={styles.image} />
+                        <Text style={styles.text}>Google</Text>
                     </TouchableOpacity>
 
                 </View>
@@ -290,7 +299,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-around',
         alignItems: 'center',
         width: '100%',
-        padding:5,  // Optional: Add padding to the container
+        padding: 5,  // Optional: Add padding to the container
         marginTop: 10,
     },
     imageWrapper: {
@@ -313,10 +322,10 @@ const styles = StyleSheet.create({
         marginRight: 10,
     },
     text: {
-        fontSize:18,
+        fontSize: 18,
         color: '#333',  // Text color
         fontWeight: 'bold',
-        marginRight:10,
+        marginRight: 10,
     },
 
 

@@ -1680,7 +1680,7 @@ const bookingId = bookingResponse?.id;
         );
             if(res.status){
                 // console.log("add booking  success", res);
-                navigation.navigate('CalendarScreen')
+                params?.from ? navigation.navigate(params?.from) : navigation.navigate('CalendarScreen')
             }
         }).finally(() => {
             props?.setLoading(false);

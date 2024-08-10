@@ -260,6 +260,9 @@ const Rooms = () => {
       enableBooking= rights?.includes('BOOK A PARKING SEAT');
     }
 
+    if (rights?.includes('ALL'))
+      enableBooking= true
+
     return (
       <View key={index} style={styles.card}>
         <View style={{ width: '100%', height: 200 }}>

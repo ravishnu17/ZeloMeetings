@@ -18,10 +18,12 @@ const Report = () => {
   const [locations, setLocations] = useState([{ value: null, label: "Select Location" }]);
   const [selectedLocation, setSelectedLocation] = useState();
 
+  const defaultBuilding= { value: null, label: "Select Bulding" };
   const [building, setBuilding] = useState([]);
   const [selectedBuilding, setSelectedBuilding] = useState();
 
-  const [floor, setFloor] = useState([]);
+  const defaultFloor= { value: null, label: "Select Bulding" };
+  const [floor, setFloor] = useState([defaultFloor]);
   const [selectedFloor, setSelectedFloor] = useState();
 
   const [rooms, setRooms] = useState([]);
@@ -61,9 +63,9 @@ const Report = () => {
     setLoading(true);
     findBuildingListBasedonLocationId(location).then((res) => {
       if (res.status) {
-        setBuilding(res.buildings?.map(item => ({ label: item.name, value: item.id })));
+        setBuilding([defaultBuilding,...res.buildings?.map(item => ({ label: item.name, value: item.id }))]);
       } else {
-        setBuilding([]);
+        setBuilding([defaultBuilding]);
       }
     }).catch((error) => {
       console.log("getBuildingList", error);
@@ -104,9 +106,9 @@ const Report = () => {
     setLoading(true);
     findFloorsListBasedonBuildingId(buildingID).then((res) => {
       if (res.status) {
-        setFloor(res?.floors?.map(item => ({ label: item.name, value: item.id })));
+        setFloor([defaultFloor,...res?.floors?.map(item => ({ label: item.name, value: item.id }))]);
       } else {
-        setFloor([]);
+        setFloor([defaultFloor]);
       }
     }).catch((error) => {
       console.log("floor list", error);
@@ -139,25 +141,29 @@ const Report = () => {
     setSelectedBuilding();
     setSelectedFloor();
     setSelectedRoom();
-    setFloor([]);
+    setFloor([defaultFloor]);
     setEquipments([]);
   }
   // Handle building change event
   const handleChangeBuilding = ({ value }) => {
     setSelectedBuilding(value);
-    getFloorByBuilding(value);
-    getMeetingRoomByBuilding(value);
-
+    if(value){
+      getFloorByBuilding(value);
+      getMeetingRoomByBuilding(value);
+    }else{
+      getBuildingList(selectedLocation);
+      getMeetingRooms(selectedLocation);
+    }
     // clear previous data
     setSelectedFloor();
     setSelectedRoom();
     setEquipments([]);
+    setFloor([defaultFloor]);
   }
   // Handle floor change event
   const handleChangeFloor = ({ value }) => {
     setSelectedFloor(value);
     getMeetingRoomByBuilding(selectedBuilding, value);
-
     // clear previous data
     setSelectedRoom();
     setEquipments([]);
@@ -241,32 +247,9 @@ const Report = () => {
 
   };
 
-  // const renderDropdownRightIcon = (item) => {
-  //   return (
-  //     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-  //       {selectedBuilding &&
-  //         <Text onPress={() => { setSelectedBuilding() }} style={{ marginRight: 6 }}>
-  //           <Icon
-  //             name='close'
-  //             type='material-community'
-  //             color='#979797'
-  //             size={18}
-  //           />
-  //         </Text>}
-  //       <Text onPress={() => { console.log("clickdown", item)}} style={{ zIndex: -11 }}>
-  //         <Icon
-  //           name='chevron-down'
-  //           type='material-community'
-  //           color='#979797'
-  //         />
-  //       </Text>
-  //     </View>
-  //   )
-  // }
-
   const renderEquipment = ({ item }) => {
     return (
-      <TouchableOpacity style={styles.cardItems} onPress={() => handleEquipmentclick(item?.customerEquipment?.id, item?.status)}>
+      <TouchableOpacity style={{...styles.cardItems, ...styles.card}} onPress={() => handleEquipmentclick(item?.customerEquipment?.id, item?.status)}>
           <Image
             source={{ uri: item?.customerEquipment?.equipmentIcon?.equipmentIconPath }}
             style={{ ...styles.cardImg, backgroundColor: item?.status ? 'green' : 'red' }}
@@ -402,36 +385,31 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 5,
-    borderWidth: 0.2,
     shadowColor: '#8a8a8a',
-    elevation: 4,
+    elevation: 3,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
+    margin: 3,
+    marginTop: 15
   },
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
+    marginTop: 5,
     marginVertical: 10
   },
   cardItems: {
     flex: 1,
-    width: 150,
-    height: 150,
-    // borderRadius: 3,
+    width: 130,
+    height: 130,
+    backgroundColor: '#fff',
     margin: 5,
     marginTop: 10,
     alignItems: 'center',
     justifyContent: 'center',
-
-    shadowColor: '#8a8a8a',
-    elevation: 5,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.7,
-    shadowRadius: 1,
-    backgroundColor: '#fff'
-  },
+    },
   cardImg: {
     width: 70,
     height: 70,
