@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, View, LayoutAnimation, TouchableOpacity, ScrollView, Platform ,TextInput,Switch} from 'react-native';
 import { Button, useTheme } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -8,15 +8,18 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { addBookingApi, findBookingById, findBuildingListBasedonLocationId, findCapacityBuildingBased, findCapacityLocationBased, findCateringListBasedonBuildingId, findCateringListBasedonCustomerLocationId, findCateringStatusBasedonBasedonBuildingId, findCateringStatusBasedonCustomerLocationId, findCustomerCleaningSattusBasedonBuildingId, findCustomerCleaningStatusBasedonCustomerLocationId, findCustomeritsupportsettingListBasedonBuildingId, findCustomeritsupportsettingListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonBuildingId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerMobileEquipmentStatusBasedonBuildingId, findCustomerMobileEquipmentStatusBasedonCustomerLocationId, findCustomerSpecialSettingBasedonBuildingId, findCustomerSpecialSettingBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonBuildingId, findCustomerSpecialSettingListBasedonCustomerLocationId, findEquipmentsListBasedonBuildingId, findEquipmentsListBasedonCustomerLocationId, findFloorsListBasedonBuildingId, findITSupporttBasedonBuildingId, findITSupporttBasedonCustomerLocationId, findMobileEquipmentsBasedonCustomerLocationId, getDeskList, getEditDeskList, getEditMeetingRoomList, getEditMeetingRoomListForEquipmentAndCapacity, getEditParkingSeatList, getEndUserList, getLocationlist, getMeetingRoomList, getMeetingRoomListForEquipmentAndCapacity, getParkingSeatList, getVisitorList, loginHomeAccess, visitorCreateAndUpdate } from '../../apiservices/Apiservices';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-
+import { context } from '../../navigation/Appnav';
+import Toast from 'react-native-simple-toast';
+import { ToastColor } from '../utils/ToastColors';
 // create a component
 const EditBooking = ({ route }) => {
     const params = route.params;
     // console.log("params ",params?.id);
     const navigation = useNavigation();
+    const props = useContext(context);
     const { colors } = useTheme();
     const isFocus = useIsFocused();
- 
+    const [rights, setRights] = useState();
     const [bookingResponse,setBookingResponse] = useState({});
      const [itemsLocations, setItemsLocations] = useState([]);
      const [selectedLocation, setSelectedLocation] = useState(null);
@@ -162,8 +165,10 @@ const EditBooking = ({ route }) => {
 
 
      const getBookingDetails =(bookingId) => {
+        props?.setLoading(true)
         findBookingById(bookingId).then((res) => {
             // console.log("find by booking id ", res);
+          
             if(res?.status){
                 // console.log("find by booking id ", res);
                 setBookingResponse(res?.booking);
@@ -222,6 +227,8 @@ const EditBooking = ({ route }) => {
                 
             }
             
+        }).finally(() => {
+            props?.setLoading(false)
         })
      }
      const onChange = (event, selectedDate) => {
@@ -341,7 +348,10 @@ const EditBooking = ({ route }) => {
      },[loginUser])
  
      const getLoginUser = async () => {
+        props?.setLoading(true)
          const userId =await AsyncStorage.getItem('userId');
+         let Userrights= await AsyncStorage.getItem('rights');
+         setRights(Userrights);
           if(userId){
              loginHomeAccess(userId).then((res) => {
                  if(res.status){
@@ -351,7 +361,9 @@ const EditBooking = ({ route }) => {
                  }
                  // console.log("locationId ",userDetails);
                  // console.log("location ",res.customerDetails.location.location);
-             })
+             }).finally(() => {
+                props?.setLoading(false)
+            })
           } 
      }
  
@@ -1422,36 +1434,55 @@ const bookingId = bookingResponse?.id;
  
      })
  }
+   
      useEffect(() => {
-         const backendResponse = [
-             { id: "meetingRoom", resource: "Meeting Room" },
-             { id: "desk", resource: "Desk" },
-             { id: "parkingSeat", resource: "Parking seat" },
-         ];
- 
-         const resourceOptions = backendResponse.map(item => ({
-             label: item.resource,
-             value: item.id
-         }));
- 
-         setItemsResources(resourceOptions);
-         
-        //  console.log("bookingResponse ",bookingResponse.bookingType);
+        // const backendResponse = [
+        //     { id: "meetingRoom", resource: "Meeting Room" },
+        //     { id: "desk", resource: "Desk" },
+        //     { id: "parkingSeat", resource: "Parking seat" },
+        // ];
+        // console.log("rights ",rights);
+        let enableRooms=false;
+        let enableDesks=false;
+        let enableParkingSeats=false;
 
-         if(selectedResource === null){
-           
+          const backendResponse = [];
+          enableRooms= rights?.includes('BOOK A ROOM');
+          enableDesks= rights?.includes('BOOK A DESK');
+          enableParkingSeats= rights?.includes('BOOK A PARKING SEAT');
+        //   console.log("enableRooms ",enableRooms, rights?.includes('BOOK A ROOM')," enableDesks",enableDesks,rights?.includes('BOOK A DESK')," enableParkingSeats",enableParkingSeats ,rights?.includes('BOOK A PARKING SEAT'));
+        if (enableRooms) {
+            backendResponse.push({ id: "meetingRoom", resource: "Meeting Room" });
+        }
+        if (enableDesks) {
+            backendResponse.push({ id: "desk", resource: "Desk" });
+        }
+        if (enableParkingSeats) {
+            backendResponse.push({ id: "parkingSeat", resource: "Parking seat" });
+        }
+
+
+        // console.log("backendResponse ",backendResponse);
+
+
+        const resourceOptions = backendResponse?.map(item => ({
+            label: item.resource,
+            value: item.id
+        }));
+
+        setItemsResources(resourceOptions);
+        if(resourceOptions?.length > 0){
             resourceOptions?.map((item)=>{
-                    // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
-                    if(item.value ===bookingResponse.bookingType){
-                        // console.log("contions");
-                        setSelectedResource(item.value);
-                    }
-                   
-                })
-             
-         }
-        
-     }, []);
+                if(item.value ===bookingResponse.bookingType){
+                    // console.log("contions");
+                    setSelectedResource(item.value);
+                }
+            })
+          
+        }
+     
+
+    }, [rights]);
     
     
  
@@ -1557,6 +1588,7 @@ const bookingId = bookingResponse?.id;
  
     const handleClickSubmit = () => {
   // Get an array of equipment IDs where the value is true
+  props?.setLoading(true);
  const equipmentIds = Object.keys(checkedEquipments).filter(key => checkedEquipments[key] === true);
  const mobileEquipmentIds = Object.keys(checkedMobileEquipment).filter(key => checkedMobileEquipment[key] === true);
  const itSupportIds = Object.keys(checkedItSupport).filter(key => checkedItSupport[key] === true);
@@ -1639,17 +1671,26 @@ const bookingId = bookingResponse?.id;
        
         addBookingApi(datas).then((res) => {
         //  console.log("add booking  outer", res);
+
+        Toast.showWithGravity(
+            res?.information?.description,
+            Toast.SHORT,
+            Toast.BOTTOM,
+            ToastColor.ERROR
+        );
             if(res.status){
                 // console.log("add booking  success", res);
                 navigation.navigate('CalendarScreen')
             }
+        }).finally(() => {
+            props?.setLoading(false);
         })
         
  //    } 
  } 
  
  
- // console.log(selectedLocation, itemsLocations);
+
 
 
 

@@ -626,7 +626,7 @@ const CalendarView = () => {
         <Text style={styles.heading}>Bookings</Text>
         <ScrollView>{renderEventDetails(selectedDate)}</ScrollView>
         <View style={styles.addButtonContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate('AddBooking')}>
+          <TouchableOpacity onPress={() => navigation.navigate('AddBooking',{resource:selectResource})}>
             <Icon name="plus-circle" size={30} color="#007bff" />
           </TouchableOpacity>
         </View>

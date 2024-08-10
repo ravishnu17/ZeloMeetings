@@ -17,7 +17,7 @@ const AddBooking = ({ route }) => {
     const props = useContext(context);
     const navigation = useNavigation();
     const { colors } = useTheme();
-
+    const [rights, setRights] = useState();
     const [itemsLocations, setItemsLocations] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState(null);
 
@@ -272,6 +272,8 @@ const AddBooking = ({ route }) => {
 
     const getLoginUser = async () => {
         props?.setLoading(true)
+        let Userrights= await AsyncStorage.getItem('rights');
+        setRights(Userrights);
         const userId = await AsyncStorage.getItem('userId');
         if (userId) {
             loginHomeAccess(userId).then((res) => {
@@ -1063,24 +1065,50 @@ const AddBooking = ({ route }) => {
         })
     }
     useEffect(() => {
-        const backendResponse = [
-            { id: "meetingRoom", resource: "Meeting Room" },
-            { id: "desk", resource: "Desk" },
-            { id: "parkingSeat", resource: "Parking seat" },
-        ];
+        // const backendResponse = [
+        //     { id: "meetingRoom", resource: "Meeting Room" },
+        //     { id: "desk", resource: "Desk" },
+        //     { id: "parkingSeat", resource: "Parking seat" },
+        // ];
+        // console.log("rights ",rights);
+        let enableRooms=false;
+        let enableDesks=false;
+        let enableParkingSeats=false;
 
-        const resourceOptions = backendResponse.map(item => ({
+          const backendResponse = [];
+          enableRooms= rights?.includes('BOOK A ROOM');
+          enableDesks= rights?.includes('BOOK A DESK');
+          enableParkingSeats= rights?.includes('BOOK A PARKING SEAT');
+        //   console.log("enableRooms ",enableRooms, rights?.includes('BOOK A ROOM')," enableDesks",enableDesks,rights?.includes('BOOK A DESK')," enableParkingSeats",enableParkingSeats ,rights?.includes('BOOK A PARKING SEAT'));
+        if (enableRooms) {
+            backendResponse.push({ id: "meetingRoom", resource: "Meeting Room" });
+        }
+        if (enableDesks) {
+            backendResponse.push({ id: "desk", resource: "Desk" });
+        }
+        if (enableParkingSeats) {
+            backendResponse.push({ id: "parkingSeat", resource: "Parking seat" });
+        }
+
+
+        // console.log("backendResponse ",backendResponse);
+
+
+        const resourceOptions = backendResponse?.map(item => ({
             label: item.resource,
             value: item.id
         }));
 
         setItemsResources(resourceOptions);
-        if (selectedResource === null && !params?.resource) {
-            setSelectedResource(resourceOptions[0].value);
-
+        if(resourceOptions?.length > 0){
+            if (selectedResource === null && !params?.resource) {
+                setSelectedResource(resourceOptions[0].value);
+    
+            }
         }
+     
 
-    }, []);
+    }, [rights]);
 
 
 
@@ -1257,7 +1285,7 @@ const AddBooking = ({ route }) => {
             visitorIds: visitorId,
             floorIds: floorIds
         }
-        console.log("submit data", datas);
+        // console.log("submit data", datas);
         addBookingApi(datas).then((res) => {
             Toast.showWithGravity(
                 res?.information?.description,
