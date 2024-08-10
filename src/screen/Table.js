@@ -8,7 +8,7 @@ const Table = ({ cols, rows, handleCancelAcceptClick, handleEdit, menuIndex, set
       {/* Table Header */}
       <View style={styles.row}>
         {cols.map((col, index) =>
-          <Text style={{ ...styles.cell, ...styles.rowContainer, fontSize: 13, fontWeight: 'bold', marginRight: cols.length - 1 === index ? 10 : 0 }} key={index}>{col}</Text>)}
+          <Text style={{ ...styles.cell, ...styles.rowContainer, alignSelf: 'flex-end', fontSize: 13, fontWeight: 'bold', marginRight: cols.length - 1 === index ? 10 : 0 }} key={index}>{col}</Text>)}
       </View>
 
       {/* Table Rows */}
@@ -66,9 +66,10 @@ const styles = StyleSheet.create({
   },
   cell: {
     flex: 1,
-    padding: 0,
+    padding: 4,
     marginTop: 12,
     textAlign: 'center',
+    alignSelf:'center',
     marginBottom: 3
   },
   menuText: {
