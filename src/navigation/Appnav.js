@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Dashboard from '../screen/dashboard/Dashboard';
 import CalendarView from '../screen/dashboard/CalendarVIew';
@@ -15,6 +15,7 @@ import ContactUs from '../screen/dashboard/ContactUs';
 import Feedback from '../screen/dashboard/Feedback';
 import LoadingIndicator from '../screen/LoadingIndicator';
 import EditBooking from '../screen/dashboard/EditBooking';
+import { translation } from '../Languages/translate';
 
 const Stack = createNativeStackNavigator();
 export const context = createContext();
@@ -24,10 +25,20 @@ const Appnav = () => {
   const [pre, setPre] = useState();
   const [headerProps, setHeaderProps] = useState(); // used for room filters & update language 
   const [loading, setLoading] = useState(false);
+  const [language, setLanguage] = useState();
+  
+  const getTranslation = async () => {
+    setLanguage((await translation()).data);
+  }
+
+  useEffect(() => {
+    getTranslation();
+  }, [headerProps?.language])
+
   return (
     <View style={styles.container}>
       {loading && <LoadingIndicator />}
-      <context.Provider value={{ active, setActive, pre, setPre, headerProps, setHeaderProps, loading, setLoading }}>
+      <context.Provider value={{ active, setActive, pre, setPre, headerProps, setHeaderProps, loading, setLoading, language}}>
         <HeadBar />
         <View style={styles.content}>
           <Stack.Navigator screenOptions={{ headerShown: false }} >
@@ -42,7 +53,6 @@ const Appnav = () => {
             <Stack.Screen name="ContactUs" component={ContactUs} />
             <Stack.Screen name="Feedback" component={Feedback} />
             <Stack.Screen name="EditBooking" component={EditBooking} />
-
           </Stack.Navigator>
         </View>
         <Footer />

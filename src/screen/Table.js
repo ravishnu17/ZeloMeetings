@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
 
-const Table = ({ cols, rows, handleCancelAcceptClick, handleEdit, menuIndex, setMenuIndex, loading }) => {
+const Table = ({ cols, rows, handleCancelAcceptClick, handleEdit, menuIndex, setMenuIndex, loading, noDataText, editText, cancelText, acceptText }) => {
   return (
     <>
       {/* Table Header */}
@@ -28,17 +28,17 @@ const Table = ({ cols, rows, handleCancelAcceptClick, handleEdit, menuIndex, set
               {
                 menuIndex === index &&
                 <View style={{ padding: 10, flexDirection: 'row', justifyContent: 'flex-end', columnGap: 10 }}>
-                  <Button title='Edit'
+                  <Button title={editText}
                     buttonStyle={{ backgroundColor: '#1cbdfd' }}
                     titleStyle={styles.menuText}
                     onPress={() => { handleEdit(row?.id) }}
                   />
-                  <Button title='Cancel'
+                  <Button title={cancelText}
                     buttonStyle={{ backgroundColor: '#fd1c4d' }}
                     titleStyle={styles.menuText}
                     onPress={() => { handleCancelAcceptClick(row?.id, false) }}
                   />
-                  <Button title='Accept'
+                  <Button title={acceptText}
                     buttonStyle={{ backgroundColor: 'green' }}
                     titleStyle={styles.menuText}
                     onPress={() => { handleCancelAcceptClick(row?.id, true) }}
@@ -50,7 +50,7 @@ const Table = ({ cols, rows, handleCancelAcceptClick, handleEdit, menuIndex, set
               }
             </View>)
           :
-          <Text style={styles.nodata}>{loading ? '' : 'Data Not Found!'}</Text>
+          <Text style={styles.nodata}>{loading ? '' : noDataText}</Text>
       }
     </>
   );

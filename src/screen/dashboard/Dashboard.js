@@ -14,6 +14,7 @@ const Dashboard = () => {
 
     const props = useContext(context);
     const setLoading = props?.setLoading;
+    const translate= props?.language;
     const cols = ['Type', 'Room / Desk', 'Requester', 'Start Time', 'End Time'];
     const tableDisplayResource= ['meetingRoom', 'desk'];
     const isFocus = useIsFocused();
@@ -53,15 +54,15 @@ const Dashboard = () => {
     const updateRequest = (id, status) => {
         Alert.alert(
             "Alert",
-            `Are you sure you want to ${status ? 'accept' : 'cancel'}?`,
+            status ? translate?.ROOMBOOKING?.ALLOWBOOKING : translate?.ROOMBOOKING?.DENYBOOKING,
             [
                 {
-                    text: "Cancel",
+                    text: translate?.ROOMBOOKING?.CANCEL,
                     onPress: () => console.log("Cancel Pressed in update request"),
                     style: "cancel"
                 },
                 {
-                    text: "Confirm",
+                    text: translate?.REPORT?.CONFIRM,
                     onPress: () => {
                         setLoading(true);
                         updateBookingRequest(id, status).then((res) => {
@@ -93,7 +94,9 @@ const Dashboard = () => {
     }
 
     const handleEdit = (id) =>{
-        navigate.navigate('EditBooking', { id: id, from : 'DashboardScreen'});    }
+        navigate.navigate('EditBooking', { id: id, from : 'DashboardScreen'}); }
+
+        console.log("language", translate?.ENDUSERDASHBOARD?.ROOMS);
 
     useEffect(() => {
         if (isFocus) {
@@ -109,22 +112,19 @@ const Dashboard = () => {
             <View style={styles.row}>
                 {/* Room */}
                 <View style={{ flex: 1 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }} >
-                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>Rooms ({dashboard?.percentageOfRoomsBooked}%)</Text>
+                    <View style={styles?.progressText} >
+                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.ROOMS} ({dashboard?.percentageOfRoomsBooked}%)</Text>
                         <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.availableRooms}/{dashboard?.engagedRooms}</Text>
                     </View>
                     <View style={styles.progressContainer}>
                         <View style={[styles.filler, { width: `${dashboard?.percentageOfRoomsBooked ? dashboard?.percentageOfRoomsBooked : 0}%` }]} />
                     </View>
-                    {/* <View style={{ position: 'absolute', top: '50%', alignSelf: 'center' }}>
-                        <Text style={{ color: '#fff', fontWeight: 'bold' }}>{dashboard?.noOfRooms}</Text>
-                    </View> */}
                 </View>
 
                 {/* Desk */}
                 <View style={{ flex: 1 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }} >
-                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>Desks ({dashboard?.percentageOfDesksBooked}%)</Text>
+                    <View style={styles?.progressText} >
+                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.DESKS} ({dashboard?.percentageOfDesksBooked}%)</Text>
                         <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.availableDesks}/{dashboard?.engagedDesks}</Text>
                     </View>
                     <View style={styles.progressContainer}>
@@ -134,8 +134,8 @@ const Dashboard = () => {
 
                 {/* Parking */}
                 <View style={{ flex: 1 }}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 }} >
-                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>Parking ({dashboard?.percentageOfParkingSeatsBooked}%)</Text>
+                    <View style={styles?.progressText} >
+                        <Text style={{ fontSize: 11, fontWeight: 'bold', marginRight:20}}>{translate?.ENDUSERDASHBOARD?.PARKINGSEATS} ({dashboard?.percentageOfParkingSeatsBooked}%)</Text>
                         <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.availableParkingSeats}/{dashboard?.engagedParkingSeats}</Text>
                     </View>
                     <View style={styles.progressContainer}>
@@ -146,22 +146,32 @@ const Dashboard = () => {
 
             <View style={{ ...styles.row, marginTop: 15, alignItems: 'center' }}>
                 <View style={{ width: 25, height: 25, backgroundColor: 'green' }} />
-                <Text>Available</Text>
+                <Text>{translate?.ROOMS?.AVILABLE}</Text>
 
                 <View style={{ width: 25, height: 25, backgroundColor: '#c40404' }} />
-                <Text>Full</Text>
+                <Text>{translate?.ROOMS?.FULL}</Text>
             </View>
 
             <View style={{ marginTop: 25 }}>
-                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>Room / Desk booking requests</Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.ROOMS} / {translate?.ENDUSERDASHBOARD?.DESKS} {translate?.ENDUSERDASHBOARD?.ROOMDESKBOOKINGREQUESTS}</Text>
                 <Table
-                    cols={cols}
+                    cols={[translate?.ENDUSERDASHBOARD?.TYPE,
+                        translate?.ENDUSERDASHBOARD?.RESOURCE,
+                        translate?.ENDUSERDASHBOARD?.REQUESTERNAME,
+                        translate?.ENDUSERDASHBOARD?.STARTTIME,
+                        translate?.ENDUSERDASHBOARD?.ENDTIME
+                    ]}
                     rows={dashboard?.bookingList ? dashboard?.bookingList?.filter(item => tableDisplayResource.includes(item?.bookingType)).map((item) => getDetails(item)).filter((item) => item.isEnded === false) : []}
                     handleCancelAcceptClick={updateRequest}
                     handleEdit={handleEdit}
                     menuIndex={menuIndex}
                     setMenuIndex={setMenuIndex}
                     loading={props?.loading}
+                    noDataText= {translate?.USERSETTINGS?.NODATAFOUND}
+                    editText={translate?.USERSETTINGS?.EDIT}
+                    cancelText={translate?.ROOMS?.CANCEL}
+                    acceptText={translate?.ENDUSERDASHBOARD?.ACCEPT}
+
                 />
             </View>
         </ScrollView>
@@ -177,6 +187,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         columnGap: 15,
         marginTop: 15,
+        alignItems: 'flex-end'
     },
     progressContainer: {
         height: 50,
@@ -184,6 +195,12 @@ const styles = StyleSheet.create({
         backgroundColor: 'green',
         borderRadius: 5,
         overflow: 'hidden',
+    },
+    progressText:{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 5,
+        alignItems:'flex-end',
     },
     filler: {
         height: '100%',
