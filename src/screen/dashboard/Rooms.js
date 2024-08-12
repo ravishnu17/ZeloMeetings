@@ -55,13 +55,14 @@ const Rooms = () => {
   const props = useContext(context);
   const loading = props?.loading;
   const setLoading = props?.setLoading;
+  const translate= props?.language;
 
   const isFocus = useIsFocused();
   const resources = [
-    { label: 'All', value: 'All' },
-    { label: 'Meeting Room', value: 'meetingRoom' },
-    { label: 'Desk', value: 'desk' },
-    { label: 'Parking Seat', value: 'parkingSeat' }
+    { label: translate?.ROOMS?.ALL, value: 'All' },
+    { label: translate?.ROOMS?.MEETINGROOM, value: 'meetingRoom' },
+    { label: translate?.ROOMS?.DESK, value: 'desk' },
+    { label: translate?.DISPLAYMODALFORM?.PARKINGSEAT, value: 'parkingSeat' }
   ]
 
   const viewPlant = () => {
@@ -292,16 +293,16 @@ const Rooms = () => {
               )));
               setShowModel(true);
             }}>
-              <Text style={styles.menuText}>Service</Text>
+              <Text style={styles.menuText}>{translate?.ROOMS?.SERVICE}</Text>
             </TouchableOpacity>
           }
 
           <TouchableOpacity style={styles.menuItem} onPress={viewPlant}>
-            <Text style={styles.menuText}>View Plant</Text>
+            <Text style={styles.menuText}>View {translate?.ROOMS?.PLANT}</Text>
           </TouchableOpacity>
 
           {enableBooking && <TouchableOpacity style={styles.menuItem} onPress={()=>BookResource(type, item?.id)} >
-            <Text style={styles.menuText}>Book</Text>
+            <Text style={styles.menuText}>{translate?.ROOMS?.BOOK}</Text>
           </TouchableOpacity>}
         </View>
       </View>
@@ -561,17 +562,17 @@ const Rooms = () => {
             }
             {/* Empty msg */}
             {
-              selectedResource === 'meetingRoom' && meetingRooms?.length === 0 && <Text style={styles.noData}>No Data found!</Text>
+              selectedResource === 'meetingRoom' && meetingRooms?.length === 0 && <Text style={styles.noData}>{translate?.USERSETTINGS?.NODATAFOUND}!</Text>
             }
             {
-              selectedResource === 'desk' && desks?.length === 0 && <Text style={styles.noData}>No Data found!</Text>
+              selectedResource === 'desk' && desks?.length === 0 && <Text style={styles.noData}>{translate?.USERSETTINGS?.NODATAFOUND}!</Text>
             }
             {
-              selectedResource === 'parkingSeat' && parkingSeats?.length === 0 && <Text style={styles.noData}>No Data found!</Text>
+              selectedResource === 'parkingSeat' && parkingSeats?.length === 0 && <Text style={styles.noData}>{translate?.USERSETTINGS?.NODATAFOUND}!</Text>
             }
           </>
             :
-            <Text style={styles.noData}>{loading ? '' : 'No Data found!'}</Text>
+            <Text style={styles.noData}>{loading ? '' : translate?.USERSETTINGS?.NODATAFOUND}</Text>
         }
 
       </ScrollView>
@@ -584,7 +585,7 @@ const Rooms = () => {
             {loading && <LoadingIndicator />}
             {/* Header */}
             <View style={{ borderBottomWidth: 1, borderBottomColor: '#ccc', padding: 8, marginBottom: 5 }}>
-              <Text style={{ fontWeight: 'bold', fontSize: 18, textAlign: 'center' }}>Services</Text>
+              <Text style={{ fontWeight: 'bold', fontSize: 18, textAlign: 'center' }}>{translate?.ROOMS?.SERVICE}</Text>
             </View>
             {/* Body content */}
             <ScrollView style={{ padding: 10, marginBottom: 15 }}>
@@ -592,7 +593,7 @@ const Rooms = () => {
               {
                 services?.equipment?.length > 0 &&
                 <>
-                  <Text style={styles.modelTitle}>Equipment</Text>
+                  <Text style={styles.modelTitle}>{translate?.ROOMS?.EQUIPMENTS}</Text>
                   {
                     services?.equipment?.map((item, index) => (
                       <View style={styles.modelitem} key={index}>
@@ -610,7 +611,7 @@ const Rooms = () => {
               {
                 services?.catering?.length > 0 &&
                 <>
-                  <Text style={styles.modelTitle}>catering</Text>
+                  <Text style={styles.modelTitle}>{translate?.ROOMS?.CATERING}</Text>
                   {
                     services?.catering?.map((item, index) => (
                       <View style={styles.modelitem} key={index}>
@@ -629,7 +630,7 @@ const Rooms = () => {
               {
                 services?.IT_support?.length > 0 &&
                 <>
-                  <Text style={styles.modelTitle}>IT Support</Text>
+                  <Text style={styles.modelTitle}>{translate?.ROOMS?.ITSUPPORT}</Text>
                   {
                     services?.IT_support?.map((item, index) => (
                       <View style={styles.modelitem} key={index}>
@@ -648,7 +649,7 @@ const Rooms = () => {
               {
                 services?.mobileEquip?.length > 0 &&
                 <>
-                  <Text style={styles.modelTitle}>mobile Equipments</Text>
+                  <Text style={styles.modelTitle}>{translate?.ROOMS?.MOBILEEQUIPMENT}</Text>
                   {
                     services?.mobileEquip?.map((item, index) => (
                       <View style={styles.modelitem} key={index}>
@@ -667,7 +668,7 @@ const Rooms = () => {
                 services?.Special?.length > 0 &&
                 <>
 
-                  <Text style={styles.modelTitle}>Special Services</Text>
+                  <Text style={styles.modelTitle}>{translate?.ROOMS?.SPECIAL}</Text>
                   {
                     services?.Special?.map((item, index) => (
                       <View style={styles.modelitem} key={index}>
@@ -684,7 +685,7 @@ const Rooms = () => {
               }
               {
                 (loading===false && services?.equipment?.length === 0 && services?.catering?.length === 0 && services?.IT_support?.length === 0 && services?.mobileEquip?.length === 0 && services?.Special?.length === 0) &&
-                <Text style={styles.noData}>Services not available!</Text>
+                <Text style={styles.noData}>{translate?.REPORT?.NOSERVICEDATAAVAILABLE}!</Text>
               }
             </ScrollView>
 
@@ -692,7 +693,7 @@ const Rooms = () => {
               setShowModel(false);
               setServices(serviceItems);
             }}>
-              <Text style={{ color: '#fff', fontSize: 14, textAlign: 'center' }}>OK</Text>
+              <Text style={{ color: '#fff', fontSize: 14, textAlign: 'center' }}>{translate?.ROOMBOOKING?.CLOSE}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -710,28 +711,28 @@ const Rooms = () => {
                 <View style={{ padding: 10 }}>
                   <View style={styles.filterView}>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>Location </Text>
+                      <Text style={styles.headText}>{translate?.ROOMS?.LOCATION} </Text>
                       <Dropdown
                         data={locations}
                         value={selectedLocation}
                         onChange={changeLocation}
                         labelField="label"
                         valueField="value"
-                        placeholder='Select location'
+                        placeholder={translate?.ROOMBOOKING?.SELECTLOCATION}
                         style={styles.dropdown}
                         placeholderStyle={{ ...styles.dropItem, color: '#a8a8a8' }}
                         selectedTextStyle={styles.dropItem}
                       />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>Resources </Text>
+                      <Text style={styles.headText}>{translate?.ROOMS?.RESOURCES} </Text>
                       <Dropdown
                         data={resources}
                         value={selectedResource}
                         onChange={({ value }) => setSelectedResource(value)}
                         labelField="label"
                         valueField="value"
-                        placeholder='Select Resource'
+                        placeholder={translate?.ROOMBOOKING?.SELCETRESOURCE}
                         style={styles.dropdown}
                         placeholderStyle={{ ...styles.dropItem, color: '#a8a8a8' }}
                         selectedTextStyle={styles.dropItem}
@@ -740,7 +741,7 @@ const Rooms = () => {
                   </View>
                   <View style={styles.filterView}>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>Building </Text>
+                      <Text style={styles.headText}>{translate?.ROOMS?.BUILDING} </Text>
                       <Dropdown
                         data={building}
                         value={selectedBuilding}
@@ -750,21 +751,21 @@ const Rooms = () => {
                         }}
                         labelField="label"
                         valueField="value"
-                        placeholder='Select building'
+                        placeholder={translate?.ROOMBOOKING?.SELECTBUILDING}
                         style={styles.dropdown}
                         placeholderStyle={{ ...styles.dropItem, color: '#a8a8a8' }}
                         selectedTextStyle={styles.dropItem}
                       />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>Floor </Text>
+                      <Text style={styles.headText}>{translate?.ROOMS?.FLOOR} </Text>
                       <Dropdown
                         data={floor}
                         value={selectedFloor}
                         onChange={({ value }) => setSelectedFloor(value)}
                         labelField="label"
                         valueField="value"
-                        placeholder='Select Floor'
+                        placeholder={translate?.ROOMBOOKING?.SELECTFLOOR}
                         style={styles.dropdown}
                         placeholderStyle={{ ...styles.dropItem, color: '#a8a8a8' }}
                         selectedTextStyle={styles.dropItem}
@@ -772,7 +773,7 @@ const Rooms = () => {
                     </View>
                   </View>
                   {selectedResource !== 'desk' && <View style={{ marginTop: 15 }}>
-                    <Text style={styles.headText}>Equipments</Text>
+                    <Text style={styles.headText}>{translate?.ROOMS?.EQUIPMENTS}</Text>
                     <MultiSelect
                       data={equipmentList}
                       renderItem={renderEquipment}
@@ -790,7 +791,7 @@ const Rooms = () => {
                   </View>}
                   <View style={styles.filterView}>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>Start Date </Text>
+                      <Text style={styles.headText}>{translate?.ROOMS?.STARTDATE} </Text>
                       <TouchableOpacity style={styles.datetime} onPress={() => showDatePicker('start')} >
                         <Text style={{ color: '#000000' }}>{dateFormat(startDateTime)}</Text>
                         <Text style={styles.icon}> <Icon source='calendar' size={25} color="#000000" /> </Text>
@@ -808,7 +809,7 @@ const Rooms = () => {
                     </View>
 
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>Start Time </Text>
+                      <Text style={styles.headText}>{translate?.ROOMS?.STARTTIME} </Text>
                       <TouchableOpacity style={styles.datetime} onPress={() => showTimepicker('start')} >
                         <Text style={{ color: '#000000' }}>{timeFormat(startDateTime)}</Text>
                         <Text style={styles.icon} > <Icon source='clock-outline' size={25} color="#000000" /> </Text>
@@ -828,7 +829,7 @@ const Rooms = () => {
                   </View>
                   <View style={styles.filterView}>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>End Date </Text>
+                      <Text style={styles.headText}>{translate?.ROOMS?.ENDDATE} </Text>
                       <TouchableOpacity style={styles.datetime} onPress={() => showDatePicker('end')} >
                         <Text style={{ color: endDateTime ? '#000000' : '#8a8a8a' }}>{endDateTime ? dateFormat(endDateTime) : 'YYYY-MM-DD'}</Text>
                         <Text style={styles.icon} > <Icon source='calendar' size={25} color="#000000" /> </Text>
@@ -846,7 +847,7 @@ const Rooms = () => {
                       )}
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>End Time </Text>
+                      <Text style={styles.headText}>{translate?.ROOMS?.ENDTIME} </Text>
                       <TouchableOpacity style={styles.datetime} onPress={() => showTimepicker('end')} >
                         <Text style={{ color: endDateTime ? '#000000' : '#8a8a8a' }}>{endDateTime ? timeFormat(endDateTime) : 'HH:MM'}</Text>
                         <Text style={styles.icon} > <Icon source='clock-outline' size={25} color="#000000" /> </Text>
@@ -867,7 +868,7 @@ const Rooms = () => {
                     </View>
                   </View>
                   <View style={{ marginTop: 15 }}>
-                    <Text style={styles.headText}>Time Duration</Text>
+                    <Text style={styles.headText}>{translate?.ROOMS?.TIMEDURATION}</Text>
                     <Dropdown
                       data={timeDuration}
                       mode='modal'
@@ -875,7 +876,7 @@ const Rooms = () => {
                       onChange={changeDuration}
                       labelField="label"
                       valueField="value"
-                      placeholder='Select Duration'
+                      placeholder={translate?.ROOMBOOKING?.SELECTTIMEDURATION}
                       style={styles.dropdown}
                       placeholderStyle={{ ...styles.dropItem, color: '#a8a8a8' }}
                       selectedTextStyle={styles.dropItem}

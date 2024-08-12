@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { SafeAreaView, StyleSheet, Text, View, ScrollView } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { TouchableOpacity } from 'react-native-gesture-handler';
@@ -11,9 +11,11 @@ import { context } from '../../navigation/Appnav';
 
 const CalendarView = () => {
   const props = useContext(context);
+  const translate = props?.language;
   const setLoading = props?.setLoading;
   const isFocus = useIsFocused();
   const navigation = useNavigation();
+  const scrollRef= useRef(null);
   const [events, setEvents] = useState({});
 
   const [selectedDate, setSelectedDate] = useState(); // Default selected date
@@ -44,12 +46,11 @@ const CalendarView = () => {
 
   useEffect(() => {
     if (isFocus) {
+      scrollRef.current?.scrollTo({x: 0, y: 0, animated: true});
       props?.setPre();
       getLoginUser();
       const today = new Date().toISOString().split('T')[0];
       setSelectedDate(today);
-
-
 
       const today1 = new Date();
       const year = today1.getFullYear();
@@ -165,16 +166,16 @@ const CalendarView = () => {
 
 
 
-   if (isFocus)
-   { if (selectedMeetingRoom !== null || selectedDesk !== null || selectedParkingSeat !== null) {
+    if (isFocus) {
+      if (selectedMeetingRoom !== null || selectedDesk !== null || selectedParkingSeat !== null) {
 
-      resourcedateBasedBooking(selectedLocation, selectResource, selectedMeetingRoom, selectedDesk, selectedParkingSeat, monthStartDate, monthEndDate);
-      // console.log("resource based");
+        resourcedateBasedBooking(selectedLocation, selectResource, selectedMeetingRoom, selectedDesk, selectedParkingSeat, monthStartDate, monthEndDate);
+        // console.log("resource based");
 
-    } else {
-      calenderApi(selectedLocation, selectedBuilding, selectFloors, selectResource, monthStartDate, monthEndDate);
+      } else {
+        calenderApi(selectedLocation, selectedBuilding, selectFloors, selectResource, monthStartDate, monthEndDate);
+      }
     }
-  }
 
 
   }, [isFocus, selectedLocation, selectedBuilding, selectFloors, selectResource, monthStartDate, monthEndDate, selectedMeetingRoom, selectedDesk, selectedParkingSeat]);
@@ -194,8 +195,9 @@ const CalendarView = () => {
           }
           return acc;
         }, {});
-        setEvents(eventMarks);}
-    }).finally(() =>setLoading(false));
+        setEvents(eventMarks);
+      }
+    }).finally(() => setLoading(false));
   };
 
   const resourcedateBasedBooking = (locationId, resource, meetingRoom, desk, parkingSeat, monthStartDate, monthEndDate) => {
@@ -229,7 +231,7 @@ const CalendarView = () => {
         }, {});
         setEvents(eventMarks);
       }
-    }).finally(() =>setLoading(false));
+    }).finally(() => setLoading(false));
   };
 
   const getLoginUser = async () => {
@@ -458,7 +460,7 @@ const CalendarView = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={{padding: 6}}>
+      <ScrollView style={{ padding: 6 }} ref={scrollRef}>
         <Calendar
           current={selectedDate}
           onDayPress={(day) => {
@@ -469,7 +471,7 @@ const CalendarView = () => {
         />
         <View style={styles.pickerContainer}>
           <View style={styles.locationview}>
-            <Text>Location</Text>
+            <Text>{translate?.ROOMBOOKING?.LOCATIONS}</Text>
             <Dropdown
               style={styles.dropdown}
               placeholderStyle={styles.placeholderStyle}
@@ -478,13 +480,13 @@ const CalendarView = () => {
               data={itemsLocations}
               labelField="label"
               valueField="value"
-              placeholder="Select Location"
+              placeholder={translate?.ROOMBOOKING?.SELECTLOCATION}
               value={selectedLocation}
               onChange={(item) => setSelectedLocation(item.value)}
             />
           </View>
           <View style={styles.locationview}>
-            <Text>Building</Text>
+            <Text>{translate?.ROOMBOOKING?.BUILDING}</Text>
             <Dropdown
               style={styles.dropdown}
               placeholderStyle={styles.placeholderStyle}
@@ -493,7 +495,7 @@ const CalendarView = () => {
               data={itemsBuildings}
               labelField="label"
               valueField="value"
-              placeholder="Select Building"
+              placeholder={translate?.ROOMBOOKING?.SELECTBUILDING}
               value={selectedBuilding}
               onChange={(item) => setSelectedBuilding(item.value)}
             />
@@ -502,7 +504,7 @@ const CalendarView = () => {
         </View>
         <View style={styles.pickerContainer}>
           <View style={styles.locationview}>
-            <Text>Floor</Text>
+            <Text>{translate?.ROOMBOOKING?.FLOOR}</Text>
             <Dropdown
               style={styles.dropdown}
               placeholderStyle={styles.placeholderStyle}
@@ -511,7 +513,7 @@ const CalendarView = () => {
               data={itemsFloors}
               labelField="label"
               valueField="value"
-              placeholder="Select Floor"
+              placeholder={translate?.ROOMBOOKING?.SELECTFLOOR}
               value={selectFloors}
               onChange={(item) => setSelectFloors(item.value)}
             />
@@ -519,7 +521,7 @@ const CalendarView = () => {
           {
             selectResource === 'meetingRoom' &&
             <View style={styles.locationview}>
-              <Text>Meeting Room</Text>
+              <Text>{translate?.ROOMS?.MEETINGROOM}</Text>
               <Dropdown
                 style={styles.dropdown}
                 placeholderStyle={styles.placeholderStyle}
@@ -528,7 +530,7 @@ const CalendarView = () => {
                 data={meetingRoom}
                 labelField="label"
                 valueField="value"
-                placeholder="Select Meeting Room"
+                placeholder={translate?.DISPLAYMODALFORM?.SELECTMEETINGROOM}
                 value={selectedMeetingRoom}
                 onChange={(item) => setSelectedMeetingRoom(item.value)}
               />
@@ -538,7 +540,7 @@ const CalendarView = () => {
           {
             selectResource === 'desk' &&
             <View style={styles.locationview}>
-              <Text>Desk</Text>
+              <Text>{translate?.ROOMS?.DESK}</Text>
               <Dropdown
                 style={styles.dropdown}
                 placeholderStyle={styles.placeholderStyle}
@@ -547,7 +549,7 @@ const CalendarView = () => {
                 data={desk}
                 labelField="label"
                 valueField="value"
-                placeholder="Select Desk"
+                placeholder={translate?.DISPLAYMODALFORM?.SELECTDESK}
                 value={selectedDesk}
                 onChange={(item) => setSelectedDesk(item.value)}
               />
@@ -556,7 +558,7 @@ const CalendarView = () => {
           {
             selectResource === 'parkingSeat' &&
             <View style={styles.locationview}>
-              <Text>Parking Seat</Text>
+              <Text>{translate?.ROOMS?.PARKINGSEATS}</Text>
               <Dropdown
                 style={styles.dropdown}
                 placeholderStyle={styles.placeholderStyle}
@@ -565,7 +567,7 @@ const CalendarView = () => {
                 data={parkingSeat}
                 labelField="label"
                 valueField="value"
-                placeholder="Select Parking Seat"
+                placeholder={translate?.DISPLAYMODALFORM?.SELECTPARKINGSEAT}
                 value={selectedParkingSeat}
                 onChange={(item) => setSelectedParkingSeat(item.value)}
               />
@@ -576,57 +578,60 @@ const CalendarView = () => {
         </View>
 
         <View style={styles.buttonsContainer}>
-          {
-            selectResource === 'meetingRoom' ? (
+          <View style={{ flex: 1 }}>
+            {
+              selectResource === 'meetingRoom' ? (
 
-              <TouchableOpacity style={styles.selectRoomButton} onPress={() => setSelectResource('meetingRoom')}>
-                <Text style={styles.buttonText} >Meeting Rooms</Text>
-              </TouchableOpacity>
-
-
-            ) : (
-              <TouchableOpacity style={styles.roombutton} onPress={() => setSelectResource('meetingRoom')}>
-                <Text style={styles.buttonText} >Meeting Rooms</Text>
-              </TouchableOpacity>
-            )
-          }
-
-          {
-            selectResource === 'desk' ? (
-
-              <TouchableOpacity style={styles.selectDeskButton} onPress={() => setSelectResource('desk')}>
-                <Text style={styles.buttonText} >Desks</Text>
-              </TouchableOpacity>
+                <TouchableOpacity style={styles.selectRoomButton} onPress={() => setSelectResource('meetingRoom')}>
+                  <Text style={styles.buttonText} >{translate?.DISPLAYMODALFORM?.MEETINGROOM}</Text>
+                </TouchableOpacity>
 
 
-            ) : (
-              <TouchableOpacity style={styles.deskbutton} onPress={() => setSelectResource('desk')}>
-                <Text style={styles.buttonText} >Desks</Text>
-              </TouchableOpacity>
-            )
-          }
-          {
-            selectResource === 'parkingSeat' ? (
+              ) : (
+                <TouchableOpacity style={styles.roombutton} onPress={() => setSelectResource('meetingRoom')}>
+                  <Text style={styles.buttonText} >{translate?.DISPLAYMODALFORM?.MEETINGROOM}</Text>
+                </TouchableOpacity>
+              )
+            }
+          </View>
+          <View style={{ flex: 1 }}>
+            {
+              selectResource === 'desk' ? (
 
-              <TouchableOpacity style={styles.selectParkingseatButton} onPress={() => setSelectResource('parkingSeat')}>
-                <Text style={styles.buttonText} >Parking Seats</Text>
-              </TouchableOpacity>
-
-
-            ) : (
-              <TouchableOpacity style={styles.parkingseatbutton} onPress={() => setSelectResource('parkingSeat')}>
-                <Text style={styles.buttonText} >Parking Seats</Text>
-              </TouchableOpacity>
-            )
-          }
+                <TouchableOpacity style={styles.selectDeskButton} onPress={() => setSelectResource('desk')}>
+                  <Text style={styles.buttonText} >{translate?.DISPLAYMODALFORM?.DESK}</Text>
+                </TouchableOpacity>
 
 
+              ) : (
+                <TouchableOpacity style={styles.deskbutton} onPress={() => setSelectResource('desk')}>
+                  <Text style={styles.buttonText} >{translate?.DISPLAYMODALFORM?.DESK}</Text>
+                </TouchableOpacity>
+              )
+            }
+          </View>
+          <View style={{ flex: 1 }}>
+            {
+              selectResource === 'parkingSeat' ? (
+
+                <TouchableOpacity style={styles.selectParkingseatButton} onPress={() => setSelectResource('parkingSeat')}>
+                  <Text style={styles.buttonText} >{translate?.DISPLAYMODALFORM?.PARKINGSEAT}</Text>
+                </TouchableOpacity>
+
+
+              ) : (
+                <TouchableOpacity style={styles.parkingseatbutton} onPress={() => setSelectResource('parkingSeat')}>
+                  <Text style={styles.buttonText} >{translate?.DISPLAYMODALFORM?.PARKINGSEAT}</Text>
+                </TouchableOpacity>
+              )
+            }
+          </View>
         </View>
 
-        <Text style={styles.heading}>Bookings</Text>
+        <Text style={styles.heading}>{translate?.MENU?.BOOKING}</Text>
         <ScrollView>{renderEventDetails(selectedDate)}</ScrollView>
         <View style={styles.addButtonContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate('AddBooking',{resource:selectResource})}>
+          <TouchableOpacity onPress={() => navigation.navigate('AddBooking', { resource: selectResource })}>
             <Icon name="plus-circle" size={30} color="#007bff" />
           </TouchableOpacity>
         </View>
@@ -689,8 +694,8 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginVertical: 20,
+    columnGap: 10,
+    alignItems:'center'
   },
   roombutton: {
     padding: 10,

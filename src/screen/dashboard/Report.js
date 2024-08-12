@@ -13,6 +13,7 @@ const Report = () => {
   const isFocus = useIsFocused();
   const props = useContext(context);
   const setLoading = props?.setLoading;
+  const translate= props?.language;
 
   // use states
   const [locations, setLocations] = useState([{ value: null, label: "Select Location" }]);
@@ -184,14 +185,14 @@ const Report = () => {
     }
 
     if (status) {
-      Alert.alert('Alert', 'Are you sure the equipment is damaged? ', [
+      Alert.alert('Alert', translate?.REPORT?.DAMAGED, [
         {
-          text: 'Cancel',
+          text: translate?.ROOMS?.CANCEL,
           onPress: () => console.log('Cancel Pressed'),
           style: 'cancel',
         },
         {
-          text: 'OK', onPress: () => {
+          text: translate?.REPORT?.CONFIRM, onPress: () => {
             reportEquipment(data).then(res => {
               if (res.status) {
                 getEquipmentList(selectedRoom);
@@ -214,14 +215,14 @@ const Report = () => {
         },
       ]);
     } else {
-      Alert.alert('Alert', 'Do you want to fix this equipment? ', [
+      Alert.alert('Alert', translate?.REPORT?.FIX, [
         {
-          text: 'Cancel',
+          text: translate?.ROOMS?.CANCEL,
           onPress: () => console.log('Cancel Pressed'),
           style: 'cancel',
         },
         {
-          text: 'OK', onPress: () => {
+          text: translate?.REPORT?.CONFIRM, onPress: () => {
             ResolveEquipmentReport(data).then(res => {
               if (res.status) {
                 getEquipmentList(selectedRoom);
@@ -279,16 +280,16 @@ const Report = () => {
   }, [isFocus]);
   return (
     <View style={styles.container} >
-      <View style={{ flexDirection: 'row', columnGap: 10, marginTop: 10 }}>
+      <View style={styles?.row}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headText}>Location <Text style={{ color: 'red' }}>*</Text></Text>
+          <Text style={styles.headText}>{translate?.REPORT?.LOCATION} <Text style={{ color: 'red' }}>*</Text></Text>
           <Dropdown
             data={locations}
             value={selectedLocation}
             onChange={handleChangeLocation}
             labelField="label"
             valueField="value"
-            placeholder='Select location'
+            placeholder={translate?.VISITSETTING?.VISIT?.PLACEHOLDER?.SELECTLOCATION}
             style={styles.dropdown}
             placeholderStyle={{ ...styles.dropItem, color: '#a8a8a8' }}
             selectedTextStyle={styles.dropItem}
@@ -296,14 +297,14 @@ const Report = () => {
           />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headText}>Building</Text>
+          <Text style={styles.headText}>{translate?.REPORT?.BUILDING}</Text>
           <Dropdown
             data={building}
             value={selectedBuilding}
             onChange={handleChangeBuilding}
             labelField="label"
             valueField="value"
-            placeholder='Select building'
+            placeholder={translate?.REPORT?.SELECTBUILDING}
             style={styles.dropdown}
             placeholderStyle={{ ...styles.dropItem, color: '#a8a8a8' }}
             selectedTextStyle={styles.dropItem}
@@ -313,16 +314,16 @@ const Report = () => {
         </View>
       </View>
 
-      <View style={{ flexDirection: 'row', columnGap: 10, marginTop: 15, marginBottom: 10 }}>
+      <View style={styles?.row}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headText}>Floor</Text>
+          <Text style={styles.headText}>{translate?.REPORT?.FLOOR}</Text>
           <Dropdown
             data={floor}
             value={selectedFloor}
             onChange={handleChangeFloor}
             labelField="label"
             valueField="value"
-            placeholder='Select floor'
+            placeholder={translate?.REPORT?.SELECTFLOOR}
             style={styles.dropdown}
             placeholderStyle={{ ...styles.dropItem, color: '#a8a8a8' }}
             selectedTextStyle={styles.dropItem}
@@ -330,14 +331,14 @@ const Report = () => {
           />
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={styles.headText}>Rooms <Text style={{ color: 'red' }}>*</Text></Text>
+          <Text style={styles.headText}>{translate?.REPORT?.ROOMS} <Text style={{ color: 'red' }}>*</Text></Text>
           <Dropdown
             data={rooms}
             value={selectedRoom}
             onChange={handleChangeRoom}
             labelField="label"
             valueField="value"
-            placeholder='Select room'
+            placeholder={translate?.DISPLAYMODALFORM?.SELECTMEETINGROOM}
             style={styles.dropdown}
             placeholderStyle={{ ...styles.dropItem, color: '#a8a8a8' }}
             selectedTextStyle={styles.dropItem}
@@ -347,7 +348,7 @@ const Report = () => {
       </View>
 
       <Card containerStyle={styles.card}>
-        <Text style={styles.cardTitle}> Equipments</Text>
+        <Text style={styles.cardTitle}> {translate?.ROOMS?.EQUIPMENTS}</Text>
         {
           equipments?.length > 0 ?
             <FlatList
@@ -356,7 +357,7 @@ const Report = () => {
               renderItem={renderEquipment}
             />
             :
-            <Text style={styles.noData}>No service data available!</Text>
+            <Text style={styles.noData}>{translate?.REPORT?.NOSERVICEDATAAVAILABLE}!</Text>
         }
       </Card>
     </View>
@@ -373,10 +374,16 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: 'bold'
   },
+  row:{ 
+    flexDirection: 'row',
+    columnGap: 10,
+    marginTop: 10,
+    marginBottom: 10,
+    alignItems:'flex-end' },
   dropdown: {
     borderBottomColor: '#d4d4d4',
     borderBottomWidth: 1,
-    marginTop: 10
+    marginTop: 8
   },
   dropItem: {
     padding: 2,

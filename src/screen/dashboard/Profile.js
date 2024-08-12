@@ -15,10 +15,11 @@ function Profile() {
     const props = useContext(context);
     const setLoading = props?.setLoading;
     const navigate = useNavigation();
+    const translate= props?.language;
 
     const schema = yup.object().shape({
-        contactName: yup.string().required('Name is required'),
-        email: yup.string().required('Email is required').email('Invalid email'),
+        contactName: yup.string().required(translate?.USERSETTINGS?.NAMEISREQUIRED),
+        email: yup.string().required(translate?.LOGINGPAGE?.EMAILISREQUIRED).email(translate?.LOGINGPAGE?.INVALIDEMAILID),
     })
 
     // use states
@@ -26,7 +27,7 @@ function Profile() {
     const [countryList, setCountryList] = useState([]);
     const [locations, setLocations] = useState([]);
     const [buildings, setBuildings] = useState([]);
-    const [floors, setFloors] = useState([{ label: '-- Select Floor --', value: null }]);
+    const [floors, setFloors] = useState([{ label: translate?.REPORT?.SELECTFLOOR, value: null }]);
     const language = [
         {
             label: 'English',
@@ -110,7 +111,7 @@ function Profile() {
         setLoading(true);
         findBuildingListBasedonLocationId(location).then(res => {
             if (res?.status) {
-                setBuildings([{ label: '-- Select Building --', value: null }, ...res.buildings.map(item => ({
+                setBuildings([{ label: translate?.ROOMBOOKING?.SELECTBUILDING, value: null }, ...res.buildings.map(item => ({
                     label: item.name,
                     value: item.id
                 }))]
@@ -130,7 +131,7 @@ function Profile() {
         setLoading(true);
         floorListbyBuildingId(building).then(res => {
             if (res?.status) {
-                setFloors([{ label: '-- Select Floor --', value: null }, ...res?.floors.map(item => ({ label: item?.name, value: item?.id }))])
+                setFloors([{ label: translate?.REPORT?.SELECTFLOOR, value: null }, ...res?.floors.map(item => ({ label: item?.name, value: item?.id }))])
             } else {
                 console.log("Error floor data", res);
                 setFloors([]);
@@ -206,14 +207,14 @@ function Profile() {
                 <Text>{userData?.user?.role?.role}</Text>
             </View>
             <View style={styles.row}>
-                <Text style={styles.label}>Name <Text style={styles.error}>*</Text></Text>
+                <Text style={styles.label}>{translate?.MYPROFILE?.NAME} <Text style={styles.error}>*</Text></Text>
                 <Controller
                     name='contactName'
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                         <TextInput
                             style={styles.input}
-                            placeholder='Enter Name'
+                            placeholder={translate?.VISITSETTING?.VISITOR?.PLACEHOLDER?.ENTERNAME}
                             onBlur={onBlur}
                             onChangeText={onChange}
                             value={value}
@@ -223,14 +224,14 @@ function Profile() {
                 {errors?.contactName && <Text style={styles.error}>{errors.contactName?.message}</Text>}
             </View>
             <View style={styles.row}>
-                <Text style={styles.label}>Email <Text style={styles.error}>*</Text></Text>
+                <Text style={styles.label}>{translate?.MYPROFILE?.EMAIL} <Text style={styles.error}>*</Text></Text>
                 <Controller
                     name='email'
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
                         <TextInput
                             style={styles.input}
-                            placeholder='Enter Email'
+                            placeholder={translate?.VISITSETTING?.VISITOR?.PLACEHOLDER?.ENTEREMAIL}
                             onBlur={onBlur}
                             onChangeText={onChange}
                             value={value}
@@ -239,13 +240,9 @@ function Profile() {
                 />
                 {errors?.email && <Text style={styles.error}>{errors.email?.message}</Text>}
             </View>
-            {/* <View style={styles.row}>
-                <Text style={styles.label}>User Role</Text>
-                <TextInput style={styles.input} value={userData?.customerDetails?.user?.role?.role} readOnly />
-            </View> */}
             <View style={styles.rowcontainer}>
                 {userData?.user?.role?.role !== 'USER' && <View style={{ flex: 1 }}>
-                    <Text style={styles.label}>Country</Text>
+                    <Text style={styles.label}>{translate?.MYPROFILE?.COUNTRY}</Text>
                     <Controller
                         name='countryId'
                         control={control}
@@ -267,7 +264,7 @@ function Profile() {
                     />
                 </View>}
                 <View style={{ flex: 1 }}>
-                    <Text style={styles.label}>Location</Text>
+                    <Text style={styles.label}>{translate?.MYPROFILE?.LOCATION}</Text>
                     <Controller
                         name='locationId'
                         control={control}
@@ -289,7 +286,7 @@ function Profile() {
 
             <View style={styles.rowcontainer}>
                 <View style={{ flex: 1 }}>
-                    <Text style={styles.label}>Building</Text>
+                    <Text style={styles.label}>{translate?.MYPROFILE?.BUILDING}</Text>
                     <Controller
                         name='buildingId'
                         control={control}
@@ -302,14 +299,14 @@ function Profile() {
                                 onChange={(event) => { onChange(event?.value); event?.value ? getFloors(event?.value) : setFloors([]) }}
                                 onBlur={onBlur}
                                 value={value}
-                                placeholder='Select Building'
+                                placeholder={translate?.ROOMBOOKING?.SELECTBUILDING}
                                 selectedTextStyle={{ color: 'black' }}
                             />
                         )}
                     />
                 </View>
                 <View style={{ flex: 1 }}>
-                    <Text style={styles.label}>Floor</Text>
+                    <Text style={styles.label}>{translate?.MYPROFILE?.FLOOR}</Text>
                     <Controller
                         name='floorId'
                         control={control}
@@ -322,7 +319,7 @@ function Profile() {
                                 onChange={(event) => onChange(event?.value)}
                                 onBlur={onBlur}
                                 value={value}
-                                placeholder='Select Floor'
+                                placeholder={translate?.REPORTS?.SELECTFLOOR}
                                 selectedTextStyle={{ color: 'black' }}
                             />
                         )}
@@ -331,7 +328,7 @@ function Profile() {
             </View>
 
             <View style={styles.row}>
-                <Text style={styles.label}>Language</Text>
+                <Text style={styles.label}>{translate?.MYPROFILE?.LANGUAGE}</Text>
                 <Controller
                     name='language'
                     control={control}
@@ -344,6 +341,7 @@ function Profile() {
                             onChange={(event) => onChange(event?.value)}
                             onBlur={onBlur}
                             value={value}
+                            placeholder='Select language'
                             selectedTextStyle={{ color: 'black' }}
                         />
                     )}
@@ -351,7 +349,7 @@ function Profile() {
             </View>
 
             <TouchableOpacity style={styles.button} onPress={handleSubmit(updateProfile)}>
-                <Text style={styles.buttonText}>Update</Text>
+                <Text style={styles.buttonText}>{translate?.MYPROFILE?.SAVECHANGES}</Text>
             </TouchableOpacity>
         </ScrollView>
     )

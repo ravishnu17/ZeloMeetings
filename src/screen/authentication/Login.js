@@ -13,13 +13,14 @@ import m_logo from '../../assets/M_logo.png';
 import g_logo from '../../assets/google_logo.png';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { translation } from '../../Languages/translate';
+
 const Login = () => {
     const navigation = useNavigation();
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [loading, setLoading] = useState(false);
-
-    const microsoftLoginUrl = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?scope=service%3A%3Aaccount.microsoft.com%3A%3AMBI_SSL+openid+profile+offline_access&response_type=code&client_id=81feaced-5ddd-41e7-8bef-3e20a2689bb7&redirect_uri=https%3A%2F%2Faccount.microsoft.com%2Fauth%2Fcomplete-signin-oauth&client-request-id=2a6c9fa8-ca32-4061-a5c3-d28ec17177d3&x-client-SKU=MSAL.Desktop&x-client-Ver=4.61.3.0&x-client-OS=Windows+Server+2019+Datacenter&prompt=login&client_info=1&state=H4sIAAAAAAAEAAXBy6JCQAAA0H9pa4FkmEULlAnJzSvsyMxg8iiv8vX3nJ2F1PmnVFmwgHvOJ_Xh2UUc_4l7ODgLo4sFC4GWZEOqX8xrPAme8s0_LAaUYWexfsMMZDKQBOBX0bAQf-cB5NLhMXYxT2UAfBFXqjkKlKHlnHmjkOp9deVgZD_sv7RMulif_RRS6MzCVqZSPxRYD4zX5JBa23Tea5s6SiqOJ_RlIjH_Jf5ACOspuRjrxuZEbmpDy0au23CvFoul8Gi19p4pRZ4JBXVfgxs60xTXT1scDYYyk7Sl2FSoKnCbCHrO8Yhjxkl-XgO3zG9UnJTbtFlhSqThLbYs1C58GqubroWnzcQItu4yQrcmH_1h3x0gL1CurPeK7MAmZV6Urbsej7t_B3E1NVoBAAA&msaoauth2=true&lc=2057';
-
+    const [translate, setTranslate]= useState();
+  
     const {
         control,
         clearErrors,
@@ -28,20 +29,11 @@ const Login = () => {
         formState: { errors },
     } = useForm();
 
-    useEffect(() => {
-        clearErrors();
-        reset();
-    }, [clearErrors, reset]);
+    const getTranslate = async () =>{
+        setTranslate((await translation()).data);
+    }
 
-    // // check async storage for user token if exist move to home screen
-    // useEffect(() => {
-    //     AsyncStorage.getItem('user_token').then((value) => {
-    //         if (value) {
-    //             navigation?.navigate('HomeScreen');
-    //         }
-    //     });
-    // }, []);
-
+    const microsoftLoginUrl = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?scope=service%3A%3Aaccount.microsoft.com%3A%3AMBI_SSL+openid+profile+offline_access&response_type=code&client_id=81feaced-5ddd-41e7-8bef-3e20a2689bb7&redirect_uri=https%3A%2F%2Faccount.microsoft.com%2Fauth%2Fcomplete-signin-oauth&client-request-id=2a6c9fa8-ca32-4061-a5c3-d28ec17177d3&x-client-SKU=MSAL.Desktop&x-client-Ver=4.61.3.0&x-client-OS=Windows+Server+2019+Datacenter&prompt=login&client_info=1&state=H4sIAAAAAAAEAAXBy6JCQAAA0H9pa4FkmEULlAnJzSvsyMxg8iiv8vX3nJ2F1PmnVFmwgHvOJ_Xh2UUc_4l7ODgLo4sFC4GWZEOqX8xrPAme8s0_LAaUYWexfsMMZDKQBOBX0bAQf-cB5NLhMXYxT2UAfBFXqjkKlKHlnHmjkOp9deVgZD_sv7RMulif_RRS6MzCVqZSPxRYD4zX5JBa23Tea5s6SiqOJ_RlIjH_Jf5ACOspuRjrxuZEbmpDy0au23CvFoul8Gi19p4pRZ4JBXVfgxs60xTXT1scDYYyk7Sl2FSoKnCbCHrO8Yhjxkl-XgO3zG9UnJTbtFlhSqThLbYs1C58GqubroWnzcQItu4yQrcmH_1h3x0gL1CurPeK7MAmZV6Urbsej7t_B3E1NVoBAAA&msaoauth2=true&lc=2057';
 
     const onPressMicrosoftLogin = () => {
         console.log("microsoft login url");
@@ -71,7 +63,7 @@ const Login = () => {
                 navigation?.navigate('HomeScreen');
             } else {
                 Toast.showWithGravity(
-                    'Check username and password',//result?.response?.error,
+                    translate?.LOGINGPAGE?.THELOGINDETAILSAREINCORRECT,
                     Toast.LONG,
                     Toast.BOTTOM,
                     ToastColor.ERROR
@@ -84,6 +76,24 @@ const Login = () => {
         }
         setLoading(false);
     };
+
+    useEffect(() => {
+        clearErrors();
+        reset();
+    }, [clearErrors, reset]);
+
+    useEffect(() => {
+        getTranslate();
+    }, []);
+
+    // // check async storage for user token if exist move to home screen
+    // useEffect(() => {
+    //     AsyncStorage.getItem('user_token').then((value) => {
+    //         if (value) {
+    //             navigation?.navigate('HomeScreen');
+    //         }
+    //     });
+    // }, []);
 
     return (
 
@@ -104,7 +114,7 @@ const Login = () => {
                     control={control}
                     render={({ field }) => (
                         <TextInput
-                            label="Username"
+                            label={translate?.LOGINGPAGE?.EMAIL}
                             mode="outlined"
                             style={styles.input}
                             onChangeText={field.onChange}
@@ -115,10 +125,10 @@ const Login = () => {
                     )}
                     name="username"
                     rules={{
-                        required: 'Username is required',
+                        required: translate?.LOGINGPAGE?.EMAILIDISREQUIRED ,
                         pattern: {
                             value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\s*$/i,
-                            message: 'Invalid username',
+                            message: translate?.LOGINGPAGE?.INVALIDEMAILID,
                         },
                     }}
                     defaultValue=""
@@ -130,7 +140,7 @@ const Login = () => {
                         control={control}
                         render={({ field }) => (
                             <TextInput
-                                label="Password"
+                                label={translate?.LOGINGPAGE?.PASSWORD}
                                 mode="outlined"
                                 secureTextEntry={!isPasswordVisible}
                                 style={styles.input}
@@ -143,7 +153,7 @@ const Login = () => {
                         )}
                         name="password"
                         rules={{
-                            required: 'Password is required',
+                            required: translate?.LOGINGPAGE?.PASSWORDISREQUIRED,
                         }}
                         defaultValue=""
                     />
@@ -159,7 +169,7 @@ const Login = () => {
         Forgot Password?
       </Text> */}
                 <Button mode="contained" onPress={handleSubmit(onSignInPress)} style={styles.button}>
-                    SIGN-IN
+                   {translate?.LOGINGPAGE?.SIGNIN}
                 </Button>
 
 

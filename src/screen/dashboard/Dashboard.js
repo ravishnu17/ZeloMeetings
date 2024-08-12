@@ -15,7 +15,6 @@ const Dashboard = () => {
     const props = useContext(context);
     const setLoading = props?.setLoading;
     const translate= props?.language;
-    const cols = ['Type', 'Room / Desk', 'Requester', 'Start Time', 'End Time'];
     const tableDisplayResource= ['meetingRoom', 'desk'];
     const isFocus = useIsFocused();
     const navigate= useNavigation();
@@ -95,8 +94,6 @@ const Dashboard = () => {
 
     const handleEdit = (id) =>{
         navigate.navigate('EditBooking', { id: id, from : 'DashboardScreen'}); }
-
-        console.log("language", translate?.ENDUSERDASHBOARD?.ROOMS);
 
     useEffect(() => {
         if (isFocus) {

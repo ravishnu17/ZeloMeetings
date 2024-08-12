@@ -5,6 +5,5 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export const translation = async () => {
     let lang = await AsyncStorage.getItem('language');
-    console.log("selected language ", lang);
     return lang == 'es' ? sp : lang == 'pt' ? pt : en
 }

@@ -13,6 +13,7 @@ const HeadBar = () => {
   const index = props?.active;
   const setActive = props?.setActive;
   const preState = props?.pre;
+  const translate= props?.language;
 
   const navigation = useNavigation();
   const [showModel, setShowModel] = useState(false);
@@ -29,7 +30,7 @@ const HeadBar = () => {
 
   const menuName = () => {
     if (index === 6)
-      return 'My Profile'
+      return translate?.MYPROFILE?.MYPROFILE
     else if (index === 7)
       return 'Privacy Policy'
     else if (index === 8)
@@ -130,7 +131,7 @@ const HeadBar = () => {
           <View style={styles.modal} >
             <TouchableWithoutFeedback>
               <View style={styles.modalContainer}>
-                <Text style={{ fontWeight: 'bold', fontSize: 18, textAlign: 'center', marginBottom: 20 }}>Language</Text>
+                <Text style={{ fontWeight: 'bold', fontSize: 18, textAlign: 'center', marginBottom: 20 }}>{translate?.MYPROFILE?.LANGUAGE}</Text>
                 <View style={styles.modelItem}>
                   <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('en')} onPress={() => ChangeLanguage('en')} />
                   <Image source={require('../assets/US.png')} style={styles.modelImg} />

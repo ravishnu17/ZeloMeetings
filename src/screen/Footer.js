@@ -8,30 +8,31 @@ const Footer = () => {
     const props= useContext(context);
     const active= props?.active;
     const setActive= props?.setActive;
+    const translate= props?.language;
     
     const navigation = useNavigation();
     const menu = [
         {
             id: 1,
-            name: 'Dashboard',
+            name: translate?.MENU?.DASHBOARD,
             icon: 'home',
             link: 'DashboardScreen'
         },
         {
             id: 2,
-            name: 'Calendar',
+            name: translate?.MENU?.CALENDAR,
             icon: 'calendar',
             link: 'CalendarScreen'
         },
         {
             id: 3,
-            name: 'Rooms',
+            name: translate?.MENU?.ROOMS,
             icon: 'door',
             link: 'RoomScreen'
         },
         {
             id: 4,
-            name: 'Report',
+            name: translate?.MENU?.REPORT,
             icon: 'alert',
             link: 'ReportScreen'
         },

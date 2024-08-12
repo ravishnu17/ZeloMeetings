@@ -12,6 +12,7 @@ const Menu = () => {
   const navigation = useNavigation();
   const props = useContext(context);
   const isFocus = useIsFocused();
+  const translate= props?.language;
 
   // Use states
   const [userData, setUserData]= useState();
@@ -103,7 +104,7 @@ const Menu = () => {
         <Text style={styles.title}>Feedback</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.card} onPress={logout}>
-        <Text style={styles.title}>Logout</Text>
+        <Text style={styles.title}>{translate?.MYPROFILE?.SIGNOUT}</Text>
       </TouchableOpacity>
     </ScrollView>
   )
