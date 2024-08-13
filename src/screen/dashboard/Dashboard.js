@@ -184,7 +184,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         columnGap: 15,
         marginTop: 15,
-        alignItems: 'flex-end'
+        alignItems: 'flex-end',
+        padding: 5,
+        zIndex: 1
     },
     progressContainer: {
         height: 50,

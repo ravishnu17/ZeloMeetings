@@ -1,7 +1,7 @@
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions, ActivityIndicator, Image, ScrollView, Linking } from 'react-native';
-import { TextInput, Button, Text } from 'react-native-paper';
+import { View, StyleSheet, Dimensions, ActivityIndicator, Image, ScrollView, Linking, Modal, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
+import { TextInput, Button, Text, RadioButton } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -11,7 +11,6 @@ import Toast from 'react-native-simple-toast';
 import { ToastColor } from '../utils/ToastColors';
 import m_logo from '../../assets/M_logo.png';
 import g_logo from '../../assets/google_logo.png';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { translation } from '../../Languages/translate';
 
@@ -19,8 +18,11 @@ const Login = () => {
     const navigation = useNavigation();
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [translate, setTranslate]= useState();
-  
+    const [translate, setTranslate] = useState();
+    const [language, setLanguage] = useState();
+    const [showModel, setShowModel] = useState(false);
+    const isFocus = useIsFocused();
+
     const {
         control,
         clearErrors,
@@ -29,7 +31,8 @@ const Login = () => {
         formState: { errors },
     } = useForm();
 
-    const getTranslate = async () =>{
+    const getTranslate = async () => {
+        setLanguage(await AsyncStorage.getItem('language') || 'en');
         setTranslate((await translation()).data);
     }
 
@@ -44,7 +47,6 @@ const Login = () => {
         console.log("google login url");
     };
 
-
     const onSignInPress = async (logindata) => {
         // AsyncStorage.removeItem('user_token');
         try {
@@ -57,7 +59,7 @@ const Login = () => {
             if (result?.response?.code === 200 && result?.response.role !== 'BACK OFFICE ADMIN') {
                 let rights = result?.response?.rights.toUpperCase()
                 AsyncStorage.setItem('user_token', result?.response?.Authorization);
-                AsyncStorage.setItem('language', 'en');
+                AsyncStorage.setItem('language', language);
                 AsyncStorage.setItem('rights', rights);
                 AsyncStorage.setItem('userId', result?.response?.id);
                 navigation?.navigate('HomeScreen');
@@ -77,14 +79,31 @@ const Login = () => {
         setLoading(false);
     };
 
+    const getChecked = (type) => {
+        if (language === type) {
+            return 'checked'
+        } else {
+            return 'unchecked'
+        }
+    }
+
+    const ChangeLanguage = (language) => {
+        setShowModel(!showModel);
+        setLanguage(language);
+        AsyncStorage.setItem('language', language);
+        getTranslate();
+    }
+
+
     useEffect(() => {
         clearErrors();
         reset();
     }, [clearErrors, reset]);
 
     useEffect(() => {
-        getTranslate();
-    }, []);
+        if (isFocus)
+            getTranslate();
+    }, [isFocus]);
 
     // // check async storage for user token if exist move to home screen
     // useEffect(() => {
@@ -96,116 +115,150 @@ const Login = () => {
     // }, []);
 
     return (
+        <View style={styles.container}>
 
-        <ScrollView style={styles.container}>
-            {/* Top Container with 50% border-radius */}
-            <View style={styles.topContainer}>
-                <View style={styles.welcomeContainer}>
-
-                    <Image source={LaiaLogo} style={styles.welcomeImage} />
+            <ScrollView>
+                {/* Top Container with 50% border-radius */}
+                <View style={styles.topContainer}>
+                    <TouchableOpacity onPress={() => setShowModel(!showModel)} style={{ position: 'absolute', alignSelf: 'flex-end', padding: 15 }}>
+                        <Image
+                            source={language === 'pt' ? require('../../assets/portugal.png') :
+                                language === 'es' ? require('../../assets/spain.png') :
+                                    require('../../assets/US.png')} style={{ width: 50, height: 30 }} />
+                    </TouchableOpacity>
+                    <View style={styles.welcomeContainer}>
+                        <Image source={LaiaLogo} style={styles.welcomeImage} />
+                    </View>
                 </View>
-            </View>
 
-            {/* Login Page */}
-            <View style={styles.loginContainer}>
-                {/* <Text style={styles.title}>Sign In</Text> */}
+                {/* Login Page */}
+                <View style={styles.loginContainer}>
+                    {/* <Text style={styles.title}>Sign In</Text> */}
 
-                <Controller
-                    control={control}
-                    render={({ field }) => (
-                        <TextInput
-                            label={translate?.LOGINGPAGE?.EMAIL}
-                            mode="outlined"
-                            style={styles.input}
-                            onChangeText={field.onChange}
-                            value={field.value}
-                            error={errors.username && errors.username.message}
-                            theme={{ roundness: 10 }} // Set roundness for rounded corners
-                        />
-                    )}
-                    name="username"
-                    rules={{
-                        required: translate?.LOGINGPAGE?.EMAILIDISREQUIRED ,
-                        pattern: {
-                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\s*$/i,
-                            message: translate?.LOGINGPAGE?.INVALIDEMAILID,
-                        },
-                    }}
-                    defaultValue=""
-                />
-                {errors.username && <Text style={styles.errorText}>{errors.username.message}</Text>}
-
-                <View>
                     <Controller
                         control={control}
                         render={({ field }) => (
                             <TextInput
-                                label={translate?.LOGINGPAGE?.PASSWORD}
+                                label={translate?.LOGINGPAGE?.EMAIL}
                                 mode="outlined"
-                                secureTextEntry={!isPasswordVisible}
                                 style={styles.input}
                                 onChangeText={field.onChange}
                                 value={field.value}
-                                error={errors.password && errors.password.message}
+                                error={errors.username && errors.username.message}
                                 theme={{ roundness: 10 }} // Set roundness for rounded corners
                             />
-
                         )}
-                        name="password"
+                        name="username"
                         rules={{
-                            required: translate?.LOGINGPAGE?.PASSWORDISREQUIRED,
+                            required: translate?.LOGINGPAGE?.EMAILIDISREQUIRED,
+                            pattern: {
+                                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\s*$/i,
+                                message: translate?.LOGINGPAGE?.INVALIDEMAILID,
+                            },
                         }}
                         defaultValue=""
                     />
-                    <Icon
-                        name={isPasswordVisible ? 'eye' : 'eye-slash'}
-                        size={22}
-                        style={styles.iconStyleList}
-                        onPress={() => setIsPasswordVisible(!isPasswordVisible)}
-                    />
-                    {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
-                </View>
-                {/* <Text style={styles.forgotPasswordText} onPress={onForgotPasswordPress}>
+                    {errors.username && <Text style={styles.errorText}>{errors.username.message}</Text>}
+
+                    <View>
+                        <Controller
+                            control={control}
+                            render={({ field }) => (
+                                <TextInput
+                                    label={translate?.LOGINGPAGE?.PASSWORD}
+                                    mode="outlined"
+                                    secureTextEntry={!isPasswordVisible}
+                                    style={styles.input}
+                                    onChangeText={field.onChange}
+                                    value={field.value}
+                                    error={errors.password && errors.password.message}
+                                    theme={{ roundness: 10 }} // Set roundness for rounded corners
+                                />
+
+                            )}
+                            name="password"
+                            rules={{
+                                required: translate?.LOGINGPAGE?.PASSWORDISREQUIRED,
+                            }}
+                            defaultValue=""
+                        />
+                        <Icon
+                            name={isPasswordVisible ? 'eye' : 'eye-slash'}
+                            size={22}
+                            style={styles.iconStyleList}
+                            onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+                        />
+                        {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
+                    </View>
+                    {/* <Text style={styles.forgotPasswordText} onPress={onForgotPasswordPress}>
         Forgot Password?
       </Text> */}
-                <Button mode="contained" onPress={handleSubmit(onSignInPress)} style={styles.button}>
-                   {translate?.LOGINGPAGE?.SIGNIN}
-                </Button>
+                    <Button mode="contained" onPress={handleSubmit(onSignInPress)} style={styles.button}>
+                        {translate?.LOGINGPAGE?.SIGNIN}
+                    </Button>
 
 
-                <View style={styles.imageContainer}>
+                    <View style={styles.imageContainer}>
 
-                    {/* <TouchableOpacity
+                        {/* <TouchableOpacity
                     style={styles.imageWrapper}
                     onPress={onPressMicrosoftLogin}>
                     <Image source={m_logo} style={styles.image} />
                     <Text style={styles.text}>Microsoft</Text>
                     </TouchableOpacity> */}
 
-                    <TouchableOpacity
-                        style={styles.imageWrapper}
-                        onPress={onPressMicrosoftLogin}>
-                        <Image source={m_logo} style={styles.image} />
-                        <Text style={styles.text}>Microsoft</Text>
-                    </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.imageWrapper}
+                            onPress={onPressMicrosoftLogin}>
+                            <Image source={m_logo} style={styles.image} />
+                            <Text style={styles.text}>Microsoft</Text>
+                        </TouchableOpacity>
 
 
-                    {/* <View style={styles.imageWrapper}>
+                        {/* <View style={styles.imageWrapper}>
                         <Image source={g_logo} style={styles.image} />
                         <Text style={styles.text}>Google</Text>
                     </View> */}
-                    <TouchableOpacity
-                        style={styles.imageWrapper}
-                        onPress={onPressGoogleLogin}>
-                        <Image source={g_logo} style={styles.image} />
-                        <Text style={styles.text}>Google</Text>
-                    </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.imageWrapper}
+                            onPress={onPressGoogleLogin}>
+                            <Image source={g_logo} style={styles.image} />
+                            <Text style={styles.text}>Google</Text>
+                        </TouchableOpacity>
 
+                    </View>
+
+                    {loading && <ActivityIndicator size="large" color="#3498db" />}
                 </View>
-
-                {loading && <ActivityIndicator size="large" color="#3498db" />}
-            </View>
-        </ScrollView>
+            </ScrollView>
+            <Modal animationType="fade" transparent={true} visible={showModel} onDismiss={() => setShowModel(false)}
+                onRequestClose={() => setShowModel(false)} >
+                <TouchableWithoutFeedback onPress={() => setShowModel(false)}>
+                    <View style={styles.modal} >
+                        <TouchableWithoutFeedback>
+                            <View style={styles.modalContainer}>
+                                <Text style={{ fontWeight: 'bold', fontSize: 18, textAlign: 'center', marginBottom: 20 }}>{translate?.MYPROFILE?.LANGUAGE}</Text>
+                                <TouchableOpacity style={styles.modelItem} onPress={() => ChangeLanguage('en')}>
+                                    <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('en')} />
+                                    <Image source={require('../../assets/US.png')} style={styles.modelImg} />
+                                    <Text>English</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.modelItem} onPress={() => ChangeLanguage('pt')} >
+                                    <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('pt')} />
+                                    <Image source={require('../../assets/portugal.png')} style={styles.modelImg} />
+                                    <Text>Portuguese</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.modelItem} onPress={() => ChangeLanguage('es')} >
+                                    <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('es')} />
+                                    <Image source={require('../../assets/spain.png')} style={styles.modelImg} />
+                                    <Text>Spanish</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </View>
+                </TouchableWithoutFeedback>
+            </Modal >
+        </View>
     );
 };
 
@@ -337,7 +390,29 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginRight: 10,
     },
-
+    modal: {
+        flex: 1,
+        justifyContent: 'center',
+        padding: 15,
+        backgroundColor: '#00000060',
+    },
+    modalContainer: {
+        // height: '100%',
+        backgroundColor: '#ffffff',
+        borderRadius: 3,
+        padding: 30
+    },
+    modelItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        columnGap: 10,
+        padding: 10,
+        marginBottom: 10,
+    },
+    modelImg: {
+        width: 70,
+        height: 40
+    }
 
 });
 

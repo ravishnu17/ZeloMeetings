@@ -28,17 +28,20 @@ const Menu = () => {
       "Are you sure you want to logout?",
       [
         {
-          text: "Cancel",
+          text: translate?.ROOMS?.CANCEL,
           onPress: () => console.log("Cancel Pressed"),
           style: "cancel"
         },
         {
-          text: "Confirm",
-          onPress: () => {
+          text: translate?.REPORT?.CONFIRM,
+          onPress: async() => {
+            let lang= await AsyncStorage.getItem('language');
+            AsyncStorage.clear();
+            AsyncStorage.setItem('language', lang);
+
+            navigation.navigate('LoginScreen');
             props?.setActive(1);
             props?.setHeaderProps({});
-            AsyncStorage.clear();
-            navigation.navigate('LoginScreen');
           }
         }
       ],
@@ -61,7 +64,7 @@ const Menu = () => {
           ToastColor.ERROR
         )
       }
-    }).finally(() => {
+    }).catch(error => console.log("Error user data", error)).finally(() => {
       props?.setLoading(false);
     })
   }
