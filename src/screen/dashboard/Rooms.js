@@ -537,6 +537,7 @@ const Rooms = () => {
   useEffect(() => {
     if (isFocus) {
       props?.setPre();
+      props?.setActive(3);
       setLoading(true);
       getUserLocation();
 

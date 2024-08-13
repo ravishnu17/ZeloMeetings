@@ -48,6 +48,7 @@ const CalendarView = () => {
     if (isFocus) {
       scrollRef.current?.scrollTo({x: 0, y: 0, animated: true});
       props?.setPre();
+      props?.setActive(2);
       getLoginUser();
       const today = new Date().toISOString().split('T')[0];
       setSelectedDate(today);
@@ -630,12 +631,12 @@ const CalendarView = () => {
 
         <Text style={styles.heading}>{translate?.MENU?.BOOKING}</Text>
         <ScrollView>{renderEventDetails(selectedDate)}</ScrollView>
-        <View style={styles.addButtonContainer}>
+      </ScrollView>
+      <View style={styles.addButtonContainer}>
           <TouchableOpacity onPress={() => navigation.navigate('AddBooking', { resource: selectResource })}>
             <Icon name="plus-circle" size={30} color="#007bff" />
           </TouchableOpacity>
         </View>
-      </ScrollView>
     </SafeAreaView>
   );
 };

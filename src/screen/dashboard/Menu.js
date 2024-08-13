@@ -69,6 +69,7 @@ const Menu = () => {
   useEffect(() => {
     if (isFocus) {
       props?.setPre();
+      props?.setActive(5);
       getUserData();
     }
   }, [isFocus, props?.headerProps?.language]);

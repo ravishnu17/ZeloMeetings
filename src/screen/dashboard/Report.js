@@ -271,6 +271,7 @@ const Report = () => {
   useEffect(() => {
     if (isFocus) {
       props?.setPre();
+      props?.setActive(4);
       getUserData();
 
       return () => {
@@ -392,11 +393,16 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 5,
-    shadowColor: '#8a8a8a',
-    elevation: 3,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    borderColor: '#e4e4e4b0',
+    borderWidth: 0.4,
+    shadowColor: "#303030",
+    shadowOffset: {
+      width: 1,
+      height: 1,
+    },
+    shadowOpacity: 0.22,
     shadowRadius: 3,
+    elevation: 2,
     margin: 3,
     marginTop: 15
   },
@@ -416,7 +422,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    },
+  },
   cardImg: {
     width: 70,
     height: 70,
