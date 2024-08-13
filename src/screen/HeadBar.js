@@ -132,21 +132,21 @@ const HeadBar = () => {
             <TouchableWithoutFeedback>
               <View style={styles.modalContainer}>
                 <Text style={{ fontWeight: 'bold', fontSize: 18, textAlign: 'center', marginBottom: 20 }}>{translate?.MYPROFILE?.LANGUAGE}</Text>
-                <View style={styles.modelItem}>
-                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('en')} onPress={() => ChangeLanguage('en')} />
+                <TouchableOpacity style={styles.modelItem} onPress={() => ChangeLanguage('en')}>
+                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('en')} />
                   <Image source={require('../assets/US.png')} style={styles.modelImg} />
                   <Text>English</Text>
-                </View>
-                <View style={styles.modelItem}>
-                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('pt')} onPress={() => ChangeLanguage('pt')} />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.modelItem} onPress={() => ChangeLanguage('pt')} >
+                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('pt')} />
                   <Image source={require('../assets/portugal.png')} style={styles.modelImg} />
                   <Text>Portuguese</Text>
-                </View>
-                <View style={styles.modelItem}>
-                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('es')} onPress={() => ChangeLanguage('es')} />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.modelItem} onPress={() => ChangeLanguage('es')} >
+                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('es')} />
                   <Image source={require('../assets/spain.png')} style={styles.modelImg} />
                   <Text>Spanish</Text>
-                </View>
+                </TouchableOpacity>
               </View>
             </TouchableWithoutFeedback>
           </View>

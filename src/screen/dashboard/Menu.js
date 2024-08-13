@@ -92,7 +92,7 @@ const Menu = () => {
         </View>
       </View>
       <TouchableOpacity style={styles.card} onPress={() => handleClick({ id: 6, name: 'Profile' })}>
-        <Text style={styles.title}>My Profile</Text>
+        <Text style={styles.title}>{translate?.MYPROFILE?.MYPROFILE}</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.card} onPress={() => handleClick({ id: 7, name: 'PrivacyPolicy' })}>
         <Text style={styles.title}>Privacy Policy</Text>

@@ -15,6 +15,7 @@ import { ToastColor } from '../utils/ToastColors';
 const AddBooking = ({ route }) => {
     const params = route.params;
     const props = useContext(context);
+    const translate= props?.language;
     const navigation = useNavigation();
     const { colors } = useTheme();
     const [rights, setRights] = useState();
@@ -1081,13 +1082,13 @@ const AddBooking = ({ route }) => {
           enableAll= rights?.includes('ALL');
         //   console.log("enableRooms ",enableRooms, rights?.includes('BOOK A ROOM')," enableDesks",enableDesks,rights?.includes('BOOK A DESK')," enableParkingSeats",enableParkingSeats ,rights?.includes('BOOK A PARKING SEAT'));
         if (enableRooms || enableAll) {
-            backendResponse.push({ id: "meetingRoom", resource: "Meeting Room" });
+            backendResponse.push({ id: "meetingRoom", resource: translate?.ROOMS?.MEETINGROOM });
         }
         if (enableDesks || enableAll) {
-            backendResponse.push({ id: "desk", resource: "Desk" });
+            backendResponse.push({ id: "desk", resource: translate?.ROOMS?.DESK });
         }
         if (enableParkingSeats || enableAll) {
-            backendResponse.push({ id: "parkingSeat", resource: "Parking seat" });
+            backendResponse.push({ id: "parkingSeat", resource: translate?.DISPLAYMODALFORM?.PARKINGSEAT });
         }
 
 
@@ -1305,10 +1306,10 @@ const AddBooking = ({ route }) => {
     
     return (
         <SafeAreaView style={styles.container}>
-            <Text style={styles.title}>Add Booking</Text>
+            <Text style={styles.title}>{translate?.ROOMBOOKING?.NEWBOOKING}</Text>
             <ScrollView>
                 <View style={styles.pickerContainer}>
-                    <Text>Location</Text>
+                    <Text>{translate?.ROOMBOOKING?.LOCATIONS}</Text>
                     <Dropdown
                         style={styles.dropdown}
                         placeholderStyle={styles.placeholderStyle}
@@ -1317,14 +1318,14 @@ const AddBooking = ({ route }) => {
                         data={itemsLocations}
                         labelField="label"
                         valueField="value"
-                        placeholder="Select Location"
+                        placeholder={translate?.ROOMBOOKING?.SELECTLOCATION}
                         value={selectedLocation}
                         onChange={item => setSelectedLocation(item.value)}
                     />
                 </View>
 
                 <View style={styles.pickerContainer}>
-                    <Text>Building</Text>
+                    <Text>{translate?.ROOMBOOKING?.BUILDING}</Text>
                     <Dropdown
                         style={styles.dropdown}
                         placeholderStyle={styles.placeholderStyle}
@@ -1333,20 +1334,20 @@ const AddBooking = ({ route }) => {
                         data={itemsBuildings}
                         labelField="label"
                         valueField="value"
-                        placeholder="Select Building"
+                        placeholder={translate?.ROOMBOOKING?.SELECTBUILDING}
                         value={selectedBuilding}
                         onChange={item => setSelectedBuilding(item.value)}
                     />
                 </View>
 
                 <View style={styles.pickerContainer}>
-                    <Text> Floor </Text>
+                    <Text> {translate?.ROOMBOOKING?.FLOOR} </Text>
                     <View style={styles.dropdownContainer}>
                         <TouchableOpacity onPress={handleFloorToggle} style={styles.dropdownHeader}>
                             {selectedFloorNames.length > 0 ? (
                                 <Text>{selectedFloorNames.join(', ')}</Text>
                             ) : (
-                                <Text style={styles.dropdownHeaderText}>Select Floor</Text>
+                                <Text style={styles.dropdownHeaderText}>{translate?.ROOMBOOKING?.SELECTFLOOR}</Text>
                             )}
                         </TouchableOpacity>
                         {isOpenFloor && (
@@ -1367,7 +1368,7 @@ const AddBooking = ({ route }) => {
                 </View>
 
                 <View style={styles.pickerContainer}>
-                    <Text>Resource</Text>
+                    <Text>{translate?.ROOMBOOKING?.RESOURCES}</Text>
                     <Dropdown
                         style={styles.dropdown}
                         placeholderStyle={styles.placeholderStyle}
@@ -1376,7 +1377,7 @@ const AddBooking = ({ route }) => {
                         data={itemsResources}
                         labelField="label"
                         valueField="value"
-                        placeholder="Select Resource"
+                        placeholder={translate?.ROOMBOOKING?.SELCETRESOURCE}
                         value={selectedResource}
                         onChange={item => resourceSelected(item)}
                     />
@@ -1384,7 +1385,7 @@ const AddBooking = ({ route }) => {
                 {
                     (selectedResource === 'meetingRoom' && equipmentData.length > 0) &&
                     <View style={styles.pickerContainer}>
-                        <Text>Equipments</Text>
+                        <Text>{translate?.ROOMBOOKING?.EQUIPMENT}</Text>
                         <View style={styles.dropdownContainer}>
                             <TouchableOpacity onPress={handleToggle} style={styles.dropdownHeader}>
                                 {selectedNames.length > 0 ? (
@@ -1417,7 +1418,7 @@ const AddBooking = ({ route }) => {
                 {
                     (selectedResource === 'meetingRoom' && itemsCapacity.length > 0) &&
                     <View style={styles.pickerContainer}>
-                        <Text>Capacity</Text>
+                        <Text>{translate?.ROOMBOOKING?.CAPACITY}</Text>
 
                         <Dropdown
                             style={styles.dropdown}
@@ -1439,12 +1440,9 @@ const AddBooking = ({ route }) => {
 
 
                 <View style={styles.pickerContainer}>
-                    <View style={styles.dateLabeles} >
-                        <Text >Start Date</Text>
-                        <Text >Start Time</Text>
-                    </View>
                     <View style={styles.dateTimeContainer}>
                         <View style={{flex: 1}}>
+                        <Text style={{marginBottom:5}} >{translate?.ROOMBOOKING?.STARTDATE}</Text>
                         <TouchableOpacity onPress={showDatepicker} style={styles.dateTimePicker}>
                             <Text style={styles.selectedText}>{date.toLocaleDateString()}</Text>
                             <Icon name="calendar" size={20} color="#000" style={styles.icon} />
@@ -1462,6 +1460,7 @@ const AddBooking = ({ route }) => {
                     )}
                         </View>
                         <View style={{flex: 1}}>
+                        <Text style={{marginBottom:5}} >{translate?.ROOMBOOKING?.STARTTIME}</Text>
                         <TouchableOpacity onPress={showTimepicker} style={styles.dateTimePicker}>
                             <Text style={styles.selectedText}>{date.toLocaleTimeString()}</Text>
                             <Icon name="clock-o" size={20} color="#000" style={styles.icon} />
@@ -1481,12 +1480,9 @@ const AddBooking = ({ route }) => {
                 </View>
 
                 <View style={styles.pickerContainer}>
-                    <View style={styles.dateLabeles}>
-                        <Text>End Date</Text>
-                        <Text>End Time</Text>
-                    </View>
                     <View style={styles.dateTimeContainer}>
                         <View style={{flex: 1}}>
+                        <Text style={{marginBottom:5}} >{translate?.ROOMBOOKING?.ENDDATE}</Text>
                         <TouchableOpacity onPress={endshowDatepicker} style={styles.dateTimePicker}>
                             <Text style={styles.selectedText}>
                                 {endDate ? endDate.toLocaleDateString() : 'Select End Date'}
@@ -1506,6 +1502,7 @@ const AddBooking = ({ route }) => {
                     )}
                         </View>
                         <View style={{flex: 1}}>
+                        <Text style={{marginBottom:5}}>{translate?.ROOMBOOKING?.ENDTIME}</Text>
                         <TouchableOpacity onPress={endShowTimepicker} style={styles.dateTimePicker}>
                             <Text style={styles.selectedText}>
                                 {endDate ? endDate.toLocaleTimeString() : 'Select End Time'}
@@ -1526,7 +1523,7 @@ const AddBooking = ({ route }) => {
                     </View>
                 </View>
                 <View style={styles.pickerContainer}>
-                    <Text>Duration</Text>
+                    <Text>{translate?.ROOMBOOKING?.TIMEDURATION}</Text>
                     <Dropdown
                         style={styles.dropdown}
                         placeholderStyle={styles.placeholderStyle}
@@ -1535,7 +1532,7 @@ const AddBooking = ({ route }) => {
                         data={duration}
                         labelField="label"
                         valueField="value"
-                        placeholder="Select Duration"
+                        placeholder={translate?.ROOMBOOKING?.SELECTTIMEDURATION}
                         value={durationValue}
                         onChange={item => setDurationValue(item.value)}
                     />
@@ -1543,7 +1540,7 @@ const AddBooking = ({ route }) => {
                 {
                     selectedResource === 'meetingRoom' &&
                     <View style={styles.pickerContainer}>
-                        <Text>Meeting Room</Text>
+                        <Text>{translate?.ROOMS?.MEETINGROOM}</Text>
                         <Dropdown
                             style={styles.dropdown}
                             placeholderStyle={styles.placeholderStyle}
@@ -1552,7 +1549,7 @@ const AddBooking = ({ route }) => {
                             data={meetingRoom}
                             labelField="label"
                             valueField="value"
-                            placeholder="Select Meeting Room"
+                            placeholder={translate?.ROOMBOOKING?.SELECTYOURROOM}
                             value={selectedMeetingRoom}
                             onChange={item => meetingroomChange(item)}
                         />
@@ -1563,7 +1560,7 @@ const AddBooking = ({ route }) => {
                 {
                     selectedResource === 'desk' &&
                     <View style={styles.pickerContainer}>
-                        <Text>Desk</Text>
+                        <Text>{translate?.ROOMS?.DESKS}</Text>
                         <Dropdown
                             style={styles.dropdown}
                             placeholderStyle={styles.placeholderStyle}
@@ -1572,7 +1569,7 @@ const AddBooking = ({ route }) => {
                             data={desk}
                             labelField="label"
                             valueField="value"
-                            placeholder="Select desk"
+                            placeholder={translate?.ROOMBOOKING?.SELECTYOURDESK}
                             value={selectedDesk}
                             onChange={item => deskChange(item)}
                         />
@@ -1582,7 +1579,7 @@ const AddBooking = ({ route }) => {
                 {
                     selectedResource === 'parkingSeat' &&
                     <View style={styles.pickerContainer}>
-                        <Text>Parking Seat</Text>
+                        <Text>{translate?.ROOMS?.PARKINGSEATS}</Text>
                         <Dropdown
                             style={styles.dropdown}
                             placeholderStyle={styles.placeholderStyle}
@@ -1591,7 +1588,7 @@ const AddBooking = ({ route }) => {
                             data={parkingseat}
                             labelField="label"
                             valueField="value"
-                            placeholder="Select Parking Seat"
+                            placeholder={translate.DISPLAYMODALFORM.SELECTPARKINGSEAT}
                             value={selectedParkingSeat}
                             onChange={item => parkingseatChange(item)}
                         />
@@ -1599,25 +1596,25 @@ const AddBooking = ({ route }) => {
                 }
 
                 <View style={styles.pickerContainer}>
-                    <Text>Requester Name</Text>
-                    <TextInput style={styles.textInput} placeholder="Requester Name" className="input" value={requesterName} onChangeText={text => setRequesterName(text)} />
+                    <Text>{translate?.ROOMBOOKING?.REQUESTORNAME}</Text>
+                    <TextInput style={styles.textInput} placeholder={translate?.ROOMBOOKING?.REQUESTORNAME} className="input" value={requesterName} onChangeText={text => setRequesterName(text)} />
 
                 </View>
                 <View style={styles.pickerContainer}>
-                    <Text>Requester Email</Text>
-                    <TextInput style={styles.textInput} placeholder="Requester Email" className="input" value={requesterEmail} onChangeText={text => setRequesterEmail(text)} />
+                    <Text>{translate?.ROOMBOOKING?.REQUESTOREMAIL}</Text>
+                    <TextInput style={styles.textInput} placeholder={translate?.ROOMBOOKING?.REQUESTOREMAIL} className="input" value={requesterEmail} onChangeText={text => setRequesterEmail(text)} />
 
                 </View>
                 <View style={styles.pickerContainer}>
-                    <Text>Subject *</Text>
-                    <TextInput style={styles.textInput} placeholder="Subject" className="input" value={subject} onChangeText={text => setSubject(text)} />
+                    <Text>{translate?.ROOMBOOKING?.SUBJECT} *</Text>
+                    <TextInput style={styles.textInput} placeholder={translate?.ROOMBOOKING?.SUBJECT} className="input" value={subject} onChangeText={text => setSubject(text)} />
 
                 </View>
                 <View style={styles.pickerContainer}>
-                    <Text>Description</Text>
+                    <Text>{translate?.ROOMBOOKING?.DESCRIPTION}</Text>
                     <TextInput
                         style={styles.textInputPragraph}
-                        placeholder="Enter description here..."
+                        placeholder={translate?.ROOMSETTINGSMEETINGROOMFORM?.ENTERDESCRIPTION}
                         multiline={true} // Allows multiple lines of text
                         numberOfLines={4} // Specifies the number of lines visible at once
                         value={description}
@@ -1627,7 +1624,7 @@ const AddBooking = ({ route }) => {
                 </View>
 
                 <View style={styles.pickerContainer}>
-                    <Text>Add User</Text>
+                    <Text>{translate?.ROOMS?.ADDUSER}</Text>
                     <View style={styles.dropdownContainer}>
                         <TouchableOpacity onPress={handleuserToggle} style={styles.dropdownHeader}>
                             {selectedUerNames.length > 0 ? (
@@ -1661,7 +1658,7 @@ const AddBooking = ({ route }) => {
 
                             {/* <TextInput style={styles.textInput} placeholder="" className="input" value={visitor} onChangeText={text => setVisitor(text)} /> */}
                             <View style={styles.visitorContainer}>
-                                <Text>Add Visitors </Text>
+                                <Text>{translate?.ROOMS?.ADDVISITORS} </Text>
                                 <View style={styles.dropdownContainer}>
                                     <TouchableOpacity onPress={handleVisitorToggle} style={styles.dropdownHeader}>
                                         {selectedVisitorNames.length > 0 ? (
@@ -1687,7 +1684,7 @@ const AddBooking = ({ route }) => {
                                 </View>
                             </View>
                             <View style={styles.vistorbuttonContainer}>
-                                <Button mode="contained" onPress={() => addVisitorFormStatus()} style={styles.button}>Add Visitor</Button>
+                                <Button mode="contained" onPress={() => addVisitorFormStatus()} style={styles.button}>{translate?.ROOMS?.ADDVISITORS}</Button>
                             </View>
 
 
@@ -1696,21 +1693,21 @@ const AddBooking = ({ route }) => {
                             visitorFormEnable &&
                             <View >
                                 <View style={styles.pickerContainer}>
-                                    <Text>Visitor Name *</Text>
-                                    <TextInput style={styles.textInput} placeholder="Visitor Name" className="input" value={vistorName} onChangeText={text => setVistorName(text)} />
+                                    <Text>{translate?.ROOMBOOKING?.VISITORNAME} *</Text>
+                                    <TextInput style={styles.textInput} placeholder={translate?.ROOMBOOKING?.VISITORNAME} className="input" value={vistorName} onChangeText={text => setVistorName(text)} />
                                 </View>
                                 <View style={styles.pickerContainer}>
-                                    <Text> Email *</Text>
-                                    <TextInput style={styles.textInput} placeholder=" Email" className="input" value={vistorEmail} onChangeText={text => setVistorEmail(text)} />
+                                    <Text>{translate?.USERSETTINGS?.EMAIL} *</Text>
+                                    <TextInput style={styles.textInput} placeholder={translate?.USERSETTINGS?.EMAIL} className="input" value={vistorEmail} onChangeText={text => setVistorEmail(text)} />
                                 </View>
 
                                 <View style={styles.pickerContainer}>
-                                    <Text> Company *</Text>
-                                    <TextInput style={styles.textInput} placeholder=" Email" className="input" value={visitorCompany} onChangeText={text => setVisitorCompany(text)} />
+                                    <Text>{translate?.ROOMBOOKING?.COMPANY} *</Text>
+                                    <TextInput style={styles.textInput} placeholder={translate?.ROOMBOOKING?.COMPANY} className="input" value={visitorCompany} onChangeText={text => setVisitorCompany(text)} />
                                 </View>
 
 
-                                <Button mode="contained-tonal" onPress={() => addVisitor()} style={styles.button}>Add Visitor</Button>
+                                <Button mode="contained-tonal" onPress={() => addVisitor()} style={styles.button}>{translate?.ROOMS?.ADDVISITORS}</Button>
                             </View>
                         }
                     </View>
@@ -1724,7 +1721,7 @@ const AddBooking = ({ route }) => {
                         {
                             cateringFormEnable &&
                             <View style={styles.pickerContainer}>
-                                <Text> Catering  </Text>
+                                <Text> {translate?.ROOMS?.CATERING}  </Text>
                                 <View style={styles.dropdownContainer}>
                                     <TouchableOpacity onPress={handleCateringToggle} style={styles.dropdownHeader}>
                                         {selectedCateringNames.length > 0 ? (
@@ -1755,7 +1752,7 @@ const AddBooking = ({ route }) => {
                             cleaningFormEnable &&
                             <View style={styles.pickerContainer}>
                                 <View style={styles.pickerContainer}>
-                                    <Text>Cleaning</Text>
+                                    <Text> {translate?.ROOMBOOKING?.CLEANING} </Text>
                                     <Switch
                                         onValueChange={toggleCleaningSwitch}
                                         value={isCleaning}
@@ -1765,10 +1762,10 @@ const AddBooking = ({ route }) => {
 
 
                                 <View style={styles.pickerContainer}>
-                                    <Text>Cleaning Description</Text>
+                                    <Text>{translate?.ROOMBOOKING?.CLEANINGDESCRIPTION}</Text>
                                     <TextInput
                                         style={styles.textInputPragraph}
-                                        placeholder="Enter description here..."
+                                        placeholder={translate?.ROOMSETTINGSMEETINGROOMFORM?.ENTERDESCRIPTION}
                                         multiline={true} // Allows multiple lines of text
                                         numberOfLines={4} // Specifies the number of lines visible at once
                                         value={cleaning}
@@ -1782,7 +1779,7 @@ const AddBooking = ({ route }) => {
                             mobileEquipmentFormEnable &&
                             <View >
                                 <View style={styles.pickerContainer}>
-                                    <Text> Mobile Equipments </Text>
+                                    <Text> {translate?.ROOMBOOKING?.MOBILEEQUIPMENT} </Text>
                                     <View style={styles.dropdownContainer}>
                                         <TouchableOpacity onPress={handleMobileEquipmentToggle} style={styles.dropdownHeader}>
                                             {selectedMobileEquipmentNames.length > 0 ? (
@@ -1808,11 +1805,11 @@ const AddBooking = ({ route }) => {
                                     </View>
                                 </View>
                                 <View style={styles.pickerContainer}>
-                                    <Text>Mobile Equipments Description</Text>
+                                    <Text>{translate?.ROOMBOOKING?.MOBILEEQUIPMENTDESCRIPTION}</Text>
 
                                     <TextInput
                                         style={styles.textInputPragraph}
-                                        placeholder="Enter description here..."
+                                        placeholder={translate?.ROOMSETTINGSMEETINGROOMFORM?.ENTERDESCRIPTION}
                                         multiline={true} // Allows multiple lines of text
                                         numberOfLines={4} // Specifies the number of lines visible at once
                                         value={mobileEquipmentDescription}
@@ -1827,7 +1824,7 @@ const AddBooking = ({ route }) => {
                             itSupportFormEnable &&
                             <View>
                                 <View style={styles.pickerContainer}>
-                                    <Text> Mobile Equipments </Text>
+                                    <Text> {translate?.ROOMBOOKING?.ITSUPPORT} </Text>
                                     <View style={styles.dropdownContainer}>
                                         <TouchableOpacity onPress={handleItSupportToggle} style={styles.dropdownHeader}>
                                             {selectedItSupportNames.length > 0 ? (
@@ -1853,10 +1850,10 @@ const AddBooking = ({ route }) => {
                                     </View>
                                 </View>
                                 <View style={styles.pickerContainer}>
-                                    <Text>IT Support Description</Text>
+                                    <Text> {translate?.ROOMBOOKING?.ITSUPPORTDESCRIPTION} </Text>
                                     <TextInput
                                         style={styles.textInputPragraph}
-                                        placeholder="Enter description here..."
+                                        placeholder={translate?.ROOMSETTINGSMEETINGROOMFORM?.ENTERDESCRIPTION}
                                         multiline={true} // Allows multiple lines of text
                                         numberOfLines={4} // Specifies the number of lines visible at once
                                         value={itSupportDescription}
@@ -1871,7 +1868,7 @@ const AddBooking = ({ route }) => {
                             <View>
 
                                 <View style={styles.pickerContainer}>
-                                    <Text> Special Service </Text>
+                                    <Text> {translate?.ROOMBOOKING?.SPECIALSERVICE} </Text>
                                     <View style={styles.dropdownContainer}>
                                         <TouchableOpacity onPress={handleSpecialServiceToggle} style={styles.dropdownHeader}>
                                             {selectedSpecialServiceNames.length > 0 ? (
@@ -1898,10 +1895,10 @@ const AddBooking = ({ route }) => {
                                 </View>
 
                                 <View style={styles.pickerContainer}>
-                                    <Text>Special Service Description</Text>
+                                    <Text> {translate?.ROOMBOOKING?.SPECIALSERVICEDESCRIPTION} </Text>
                                     <TextInput
                                         style={styles.textInputPragraph}
-                                        placeholder="Enter description here..."
+                                        placeholder={translate?.ROOMSETTINGSMEETINGROOMFORM?.ENTERDESCRIPTION}
                                         multiline={true} // Allows multiple lines of text
                                         numberOfLines={4} // Specifies the number of lines visible at once
                                         value={specialServiceDescription}
@@ -1939,7 +1936,7 @@ const AddBooking = ({ route }) => {
                         buttonColor="red"
                         textColor='#fff'
                     >
-                        Cancel
+                        {translate?.ROOMBOOKING?.CANCEL}
                     </Button>
                     <Button
                         mode="contained"
@@ -1947,7 +1944,7 @@ const AddBooking = ({ route }) => {
                         style={styles.button}
                         buttonColor={colors.primary}
                     >
-                        Submit
+                        {translate?.LOGINGPAGE?.SUBMIT}
                     </Button>
 
                 </View>
@@ -2020,7 +2017,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     dropdownHeaderText: {
-        fontSize: 16,
+        fontSize: 14,
     },
     dropdownContent: {
         marginTop: 12,
@@ -2092,7 +2089,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 5,
-        padding: 1,
+        padding: 8,
         textAlignVertical: 'top', // Ensures text starts at the top of the input
     },
 
