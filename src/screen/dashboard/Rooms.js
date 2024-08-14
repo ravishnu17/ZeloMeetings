@@ -9,12 +9,13 @@ import { ToastColor } from '../utils/ToastColors';
 import { context } from '../../navigation/Appnav';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { FloorBasedFilter, findAllResourceByBuildingId, findBuildingListBasedonLocationId, findCateringListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonCustomerLocationId, findDesksbyFilters, findEquipmentByBuildingId, findEquipmentsListBasedonCustomerLocationId, findITSupporttBasedonCustomerLocationId, findMeetingRoomsbyFilters, findParkingSeatbyFilters, floorListbyBuildingId, getDesksByLocationId, getLocationlist,getMeetingRoomsByLocationId, getParkingSeatByLocationId, loginHomeAccess } from '../../apiservices/Apiservices';
+import { FloorBasedFilter, findAllResourceByBuildingId, findBuildingListBasedonLocationId, findCateringListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonCustomerLocationId, findDesksbyFilters, findEquipmentByBuildingId, findEquipmentsListBasedonCustomerLocationId, findITSupporttBasedonCustomerLocationId, findMeetingRoomsbyFilters, findParkingSeatbyFilters, floorListbyBuildingId, getChargingCarList, getChargingCarListWithFilter, getDesksByLocationId, getLocationlist,getMeetingRoomsByLocationId, getParkingSeatByLocationId, loginHomeAccess } from '../../apiservices/Apiservices';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import meetingRoomImg from '../../assets/meetingRoom.jpg';
 import deskImg from '../../assets/desk.jpg';
 import parkingSeatImg from '../../assets/parking-seats.jpg';
+import chargingCarImg from '../../assets/charging_car.jpeg';
 import LoadingIndicator from '../LoadingIndicator';
 
 const Rooms = () => {
@@ -33,6 +34,7 @@ const Rooms = () => {
   const [selectedFloor, setSelectedFloor] = useState();
   const [desks, setDesks] = useState([]);
   const [parkingSeats, setParkingSeats] = useState([]);
+  const [chargingCars, setChargingCars] = useState([]);
 
   // services
   const serviceItems = { equipment: [], catering: [], IT_support: [], mobileEquip: [], Special: [] };
@@ -62,7 +64,8 @@ const Rooms = () => {
     { label: translate?.ROOMS?.ALL, value: 'All' },
     { label: translate?.ROOMS?.MEETINGROOM, value: 'meetingRoom' },
     { label: translate?.ROOMS?.DESK, value: 'desk' },
-    { label: translate?.DISPLAYMODALFORM?.PARKINGSEAT, value: 'parkingSeat' }
+    { label: translate?.DISPLAYMODALFORM?.PARKINGSEAT, value: 'parkingSeat' },
+    { label: translate?.DISPLAYMODALFORM?.CHARGINGCAR, value: 'chargingCar' }
   ]
 
   const viewPlant = () => {
@@ -226,6 +229,19 @@ const Rooms = () => {
       }).catch((err) => {
         console.log("parking seat location", err);
         setParkingSeats([]);
+      }).finally(() => resource !== 'all' && setLoading(false));
+    }
+
+    if (resource === 'All' || resource === 'chargingCar') {
+      getChargingCarList(location).then((res) => {
+        if (res.status) {
+          setChargingCars(res.chargingCarDTOs);
+        } else {
+          setChargingCars([]);
+        }
+      }).catch((err) => {
+        console.log("charging car location", err);
+        setChargingCars([]);
       }).finally(() => setLoading(false));
     }
   }
@@ -259,6 +275,9 @@ const Rooms = () => {
     } else if (type === 'parkingSeat') {
       resourceImg = parkingSeatImg
       enableBooking= rights?.includes('BOOK A PARKING SEAT');
+    }else if (type === 'chargingCar') {
+      resourceImg = chargingCarImg
+      enableBooking= rights?.includes('BOOK A CHARGING CAR');
     }
 
     if (rights?.includes('ALL'))
@@ -442,6 +461,7 @@ const Rooms = () => {
               setMeetingRooms(res?.resourceDTO?.meetingRooms);
               setDesks(res?.resourceDTO?.desks);
               setParkingSeats(res?.resourceDTO?.parkingSeats);
+              setChargingCars(res?.resourceDTO?.chargingCars);
             }
           }).catch((error) => {
             console.log("filter-room", error);
@@ -454,6 +474,7 @@ const Rooms = () => {
               setMeetingRooms(res?.floorBasedFilterDto?.meetingRoomDTOs);
               setDesks(res?.floorBasedFilterDto?.deskDTOs);
               setParkingSeats(res?.floorBasedFilterDto?.parkingSeatDTOs);
+              setChargingCars(res?.floorBasedFilterDto?.chargingCarDTOs);
             }
           }).catch((error) => {
             console.log("floor-based-filter", error);
@@ -504,6 +525,22 @@ const Rooms = () => {
           }
         }).catch((error) => {
           console.log("filter-parking seat", error);
+        }).finally(() => {
+          setLoading(false);
+        });
+      }
+
+      if (selectedResource === 'All' || selectedResource === 'chargingCar') {
+        // get parking seat
+        getChargingCarListWithFilter(selectedLocation, dateFormat(startDateTime), timeFormat(startDateTime), dateFormat(endDateTime), timeFormat(endDateTime), selectedBuilding, selectedFloor).then((res) => {
+         console.log("charging car", res);
+          if (res.status) {
+            setChargingCars(res?.chargingCarDTOs ||[]);
+          } else {
+            setChargingCars([]);
+          }
+        }).catch((error) => {
+          console.log("filter-charging car", error);
         }).finally(() => {
           setLoading(false);
         });
@@ -561,6 +598,9 @@ const Rooms = () => {
             {
               (selectedResource === 'All' || selectedResource === 'parkingSeat') && parkingSeats?.map((item, index) => renderResourceView(index, item, 'parkingSeat'))
             }
+             {
+              (selectedResource === 'All' || selectedResource === 'chargingCar') && chargingCars?.map((item, index) => renderResourceView(index, item, 'chargingCar'))
+            }
             {/* Empty msg */}
             {
               selectedResource === 'meetingRoom' && meetingRooms?.length === 0 && <Text style={styles.noData}>{translate?.USERSETTINGS?.NODATAFOUND}!</Text>
@@ -570,6 +610,9 @@ const Rooms = () => {
             }
             {
               selectedResource === 'parkingSeat' && parkingSeats?.length === 0 && <Text style={styles.noData}>{translate?.USERSETTINGS?.NODATAFOUND}!</Text>
+            }
+            {
+              selectedResource === 'chargingCar' && chargingCars?.length === 0 && <Text style={styles.noData}>{translate?.USERSETTINGS?.NODATAFOUND}!</Text>
             }
           </>
             :
@@ -773,7 +816,7 @@ const Rooms = () => {
                       />
                     </View>
                   </View>
-                  {selectedResource !== 'desk' && <View style={{ marginTop: 15 }}>
+                  {['All','meetingRoom'].includes(selectedResource) && <View style={{ marginTop: 15 }}>
                     <Text style={styles.headText}>{translate?.ROOMS?.EQUIPMENTS}</Text>
                     <MultiSelect
                       data={equipmentList}

@@ -1073,12 +1073,14 @@ const AddBooking = ({ route }) => {
         let enableRooms=false;
         let enableDesks=false;
         let enableParkingSeats=false;
+        let enableChargingCar=false;
         let enableAll= false;
 
           const backendResponse = [];
           enableRooms= rights?.includes('BOOK A ROOM');
           enableDesks= rights?.includes('BOOK A DESK');
           enableParkingSeats= rights?.includes('BOOK A PARKING SEAT');
+          enableChargingCar= rights?.includes('BOOK A CHARGING CAR');
           enableAll= rights?.includes('ALL');
         //   console.log("enableRooms ",enableRooms, rights?.includes('BOOK A ROOM')," enableDesks",enableDesks,rights?.includes('BOOK A DESK')," enableParkingSeats",enableParkingSeats ,rights?.includes('BOOK A PARKING SEAT'));
         if (enableRooms || enableAll) {
@@ -1089,6 +1091,9 @@ const AddBooking = ({ route }) => {
         }
         if (enableParkingSeats || enableAll) {
             backendResponse.push({ id: "parkingSeat", resource: translate?.DISPLAYMODALFORM?.PARKINGSEAT });
+        }
+        if (enableChargingCar || enableAll) {
+            backendResponse.push({ id: "chargingCar", resource: translate?.DISPLAYMODALFORM?.CHARGINGCAR });
         }
 
 

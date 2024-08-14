@@ -963,3 +963,36 @@ export const updateUserProfile = async (data)=>{
     throw error;
   }
 }
+
+// Dashboard screen charging car
+export const getChargingCarList = async (locationId)=>{
+  try{
+    const res=await axiosInstance.get(`chargingcar/listchargings/bycustomerlocation?customerLocationId=${locationId}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+// Rooms API charging car
+export const getChargingCarListWithFilter = async (locationId, startDate,startTime, endDate, endTime, buildingId, floorId)=>{
+  try{
+    const res=await axiosInstance.get(`/chargingcar/listchargingcars/bycustomerlocationandtime?customerLocationId=${locationId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0${buildingId ? '&buildingId='+buildingId:''}${floorId ? '&floorId='+floorId:''}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+// charging car in calendar view
+export const getChargingCarByBuildingFloor =async (buildingId, floorId) =>{
+  try{
+    const res=await axiosInstance.get(`/chargingcar/chargingCarlistbyBuildingFloor?buildingId=${buildingId}&floorId=${floorId ? floorId : 0}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}

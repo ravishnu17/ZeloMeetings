@@ -14,10 +14,10 @@ const Dashboard = () => {
 
     const props = useContext(context);
     const setLoading = props?.setLoading;
-    const translate= props?.language;
-    const tableDisplayResource= ['meetingRoom', 'desk'];
+    const translate = props?.language;
+    const tableDisplayResource = ['meetingRoom', 'desk','parkingSeat','chargingCar'];
     const isFocus = useIsFocused();
-    const navigate= useNavigation();
+    const navigate = useNavigation();
 
     const dashBoardDetails = async () => {
         setLoading(true);
@@ -45,8 +45,13 @@ const Dashboard = () => {
         } else if (item?.bookingType === 'desk') {
             data.type = 'Desk';
             data.name = item?.desk?.name;
+        } else if (item?.bookingType === 'parkingSeat') {
+            data.type = 'Parking Seat';
+            data.name = 'Parking Seat'//item?.parkingSeats?.map(item => item?.name).join(', ');
+        }else if (item?.bookingType === 'chargingCar') {
+            data.type = 'Charging Car';
+            data.name =  'Charging Car' // item?.chargingCars?.map(item => item?.name).join(', ');
         }
-
         return data
     }
 
@@ -92,8 +97,9 @@ const Dashboard = () => {
         )
     }
 
-    const handleEdit = (id) =>{
-        navigate.navigate('EditBooking', { id: id, from : 'DashboardScreen'}); }
+    const handleEdit = (id) => {
+        navigate.navigate('EditBooking', { id: id, from: 'DashboardScreen' });
+    }
 
     useEffect(() => {
         if (isFocus) {
@@ -109,8 +115,9 @@ const Dashboard = () => {
             <View style={styles.row}>
                 {/* Room */}
                 <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.ROOMS}</Text>
                     <View style={styles?.progressText} >
-                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.ROOMS} ({dashboard?.percentageOfRoomsBooked}%)</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.percentageOfRoomsBooked}%</Text>
                         <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.availableRooms}/{dashboard?.engagedRooms}</Text>
                     </View>
                     <View style={styles.progressContainer}>
@@ -120,23 +127,35 @@ const Dashboard = () => {
 
                 {/* Desk */}
                 <View style={{ flex: 1 }}>
+                    <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.DESKS}</Text>
                     <View style={styles?.progressText} >
-                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.DESKS} ({dashboard?.percentageOfDesksBooked}%)</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.percentageOfDesksBooked}%</Text>
                         <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.availableDesks}/{dashboard?.engagedDesks}</Text>
                     </View>
                     <View style={styles.progressContainer}>
                         <View style={[styles.filler, { width: `${dashboard?.percentageOfDesksBooked ? dashboard?.percentageOfDesksBooked : 0}%` }]} />
                     </View>
                 </View>
-
                 {/* Parking */}
                 <View style={{ flex: 1 }}>
-                    <View style={styles?.progressText} >
-                        <Text style={{ fontSize: 11, fontWeight: 'bold', marginRight:20}}>{translate?.ENDUSERDASHBOARD?.PARKINGSEATS} ({dashboard?.percentageOfParkingSeatsBooked}%)</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.PARKINGSEATS}</Text>
+                        <View style={styles?.progressText} >
+                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.percentageOfParkingSeatsBooked}%</Text>
                         <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.availableParkingSeats}/{dashboard?.engagedParkingSeats}</Text>
                     </View>
                     <View style={styles.progressContainer}>
                         <View style={[styles.filler, { width: `${dashboard?.percentageOfParkingSeatsBooked ? dashboard?.percentageOfParkingSeatsBooked : 0}%` }]} />
+                    </View>
+                </View>
+                {/* Charging car */}
+                <View style={{ flex: 1 }}>
+                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ROOMBOOKING?.CHARGINGCARS}</Text>
+                        <View style={styles?.progressText} >
+                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.percentageOfChargingCarsBooked}%</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.availableChargingCars}/{dashboard?.engagedChargingCars}</Text>
+                    </View>
+                    <View style={styles.progressContainer}>
+                        <View style={[styles.filler, { width: `${dashboard?.percentageOfChargingCarsBooked ? dashboard?.percentageOfChargingCarsBooked : 0}%` }]} />
                     </View>
                 </View>
             </View>
@@ -150,13 +169,14 @@ const Dashboard = () => {
             </View>
 
             <View style={{ marginTop: 25 }}>
-                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.ROOMS} / {translate?.ENDUSERDASHBOARD?.DESKS} {translate?.ENDUSERDASHBOARD?.ROOMDESKBOOKINGREQUESTS}</Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.ROOMDESKBOOKINGREQUESTS}</Text>
+                {/* {translate?.ENDUSERDASHBOARD?.ROOMS} / {translate?.ENDUSERDASHBOARD?.DESKS} {translate?.ENDUSERDASHBOARD?.ROOMDESKBOOKINGREQUESTS} */}
                 <Table
                     cols={[translate?.ENDUSERDASHBOARD?.TYPE,
-                        translate?.ENDUSERDASHBOARD?.RESOURCE,
-                        translate?.ENDUSERDASHBOARD?.REQUESTERNAME,
-                        translate?.ENDUSERDASHBOARD?.STARTTIME,
-                        translate?.ENDUSERDASHBOARD?.ENDTIME
+                    translate?.ENDUSERDASHBOARD?.RESOURCE,
+                    translate?.ENDUSERDASHBOARD?.REQUESTERNAME,
+                    translate?.ENDUSERDASHBOARD?.STARTTIME,
+                    translate?.ENDUSERDASHBOARD?.ENDTIME
                     ]}
                     rows={dashboard?.bookingList ? dashboard?.bookingList?.filter(item => tableDisplayResource.includes(item?.bookingType)).map((item) => getDetails(item)).filter((item) => item.isEnded === false) : []}
                     handleCancelAcceptClick={updateRequest}
@@ -164,7 +184,7 @@ const Dashboard = () => {
                     menuIndex={menuIndex}
                     setMenuIndex={setMenuIndex}
                     loading={props?.loading}
-                    noDataText= {translate?.USERSETTINGS?.NODATAFOUND}
+                    noDataText={translate?.USERSETTINGS?.NODATAFOUND}
                     editText={translate?.USERSETTINGS?.EDIT}
                     cancelText={translate?.ROOMS?.CANCEL}
                     acceptText={translate?.ENDUSERDASHBOARD?.ACCEPT}
@@ -195,11 +215,11 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         overflow: 'hidden',
     },
-    progressText:{
+    progressText: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 5,
-        alignItems:'flex-end',
+        alignItems: 'flex-end',
     },
     filler: {
         height: '100%',

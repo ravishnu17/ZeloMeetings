@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { findBuildingListBasedonLocationId, findFloorsListBasedonBuildingId, getCalenderData, getCalenderResourceData, getDeskListBuildingAndFloor, getDesksByLocationId, getLocationlist, getMeetingRoomListBuildingAndFloor, getParkingSeatByLocationId, getParkingSeatListBuildingAndFloor, locationBasedCalenderMeetingRoom, loginHomeAccess } from '../../apiservices/Apiservices';
+import { findBuildingListBasedonLocationId, findFloorsListBasedonBuildingId, getCalenderData, getCalenderResourceData, getChargingCarByBuildingFloor, getChargingCarList, getDeskListBuildingAndFloor, getDesksByLocationId, getLocationlist, getMeetingRoomListBuildingAndFloor, getParkingSeatByLocationId, getParkingSeatListBuildingAndFloor, locationBasedCalenderMeetingRoom, loginHomeAccess } from '../../apiservices/Apiservices';
 import { context } from '../../navigation/Appnav';
 
 const CalendarView = () => {
@@ -25,6 +25,7 @@ const CalendarView = () => {
   const [itemsLocations, setItemsLocations] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
 
+  const defaultBuilding= { value: null, label: translate?.ROOMBOOKING?.SELECTBUILDING };
   const [itemsBuildings, setItemsBuildings] = useState([]);
   const [selectedBuilding, setSelectedBuilding] = useState(null);
 
@@ -41,11 +42,15 @@ const CalendarView = () => {
   const [parkingSeat, setParkingSeat] = useState([]);
   const [selectedParkingSeat, setSelectedParkingSeat] = useState(null);
 
+  const [chargingCar, setChargingCars]= useState([]);
+  const [selectedChargingCar, setSelectedChargingCar]= useState(null);
+
   const [selectResource, setSelectResource] = useState("meetingRoom");
 
 
   useEffect(() => {
     if (isFocus) {
+      setSelectResource("meetingRoom");
       scrollRef.current?.scrollTo({x: 0, y: 0, animated: true});
       props?.setPre();
       props?.setActive(2);
@@ -138,21 +143,26 @@ const CalendarView = () => {
   }, [selectedLocation, isFocus]);
 
   useEffect(() => {
-    if (selectedBuilding && isFocus) {
+    if (selectedBuilding) {
       getFloorListApi(selectedBuilding);
+    }else{
+      setItemsFloors([]);
+      setSelectFloors(null);
     }
-  }, [selectedBuilding, isFocus]);
+  }, [selectedBuilding]);
 
   useEffect(() => {
     if (selectedBuilding && isFocus) {
       getMeetingRoomListByBuildingAndFloorId(selectedBuilding, selectFloors);
       getDeskListByBuildingAndFloorId(selectedBuilding, selectFloors);
       getParkingSeatListByBuildingAndFloorId(selectedBuilding, selectFloors);
+      getChargingCarListByBuildingAndFloorId(selectedBuilding, selectFloors);
 
     } else if (selectedLocation) {
       getMeetingRoomListByLocationId(selectedLocation);
       getDeskListByLocationId(selectedLocation);
       getParkinseatsListByLocationId(selectedLocation);
+      getChargingCarListByLocationId(selectedLocation);
     }
 
   }, [selectedLocation, selectedBuilding, selectFloors, isFocus]);
@@ -267,7 +277,7 @@ const CalendarView = () => {
 
   const getBulidingListApi = (id) => {
     findBuildingListBasedonLocationId(id).then((res) => {
-      setItemsBuildings([]);
+      setItemsBuildings([defaultBuilding]);
       setSelectedBuilding(null);
       if (res.status) {
 
@@ -294,7 +304,7 @@ const CalendarView = () => {
           value: item.id,
         }));
 
-        setItemsBuildings(buildingOptions);
+        setItemsBuildings([defaultBuilding,...buildingOptions]);
 
 
       }
@@ -409,6 +419,46 @@ const CalendarView = () => {
     });
   };
 
+  // location based chargingCar
+  const getChargingCarListByLocationId = (id) => {
+    setLoading(true);
+    getChargingCarList(id).then((res) => {
+      setSelectedChargingCar(null);
+      if (res.status) {
+        const chargingCarOption = res?.chargingCarDTOs?.map((item) => ({
+          label: item.name,
+          value: item.id,
+        }));
+        setChargingCars(chargingCarOption);
+      }else{
+        setChargingCars([]);
+      }
+    }).catch((err) => {
+      console.log("charging car location", err);
+      setChargingCars([]);
+    }).finally(() => setLoading(false));
+  };
+
+  // charging car by building & floor
+  const getChargingCarListByBuildingAndFloorId = (selectedBuilding, selectFloors) => {
+    setLoading(true);
+    getChargingCarByBuildingFloor(selectedBuilding, selectFloors).then((res) => {
+      setSelectedChargingCar(null);
+      if (res.status) {
+        const chargingCarOption = res?.chargingCarDTOs?.map((item) => ({
+          label: item.name,
+          value: item.id,
+        }));
+        setChargingCars(chargingCarOption);
+      }else{
+        setChargingCars([]);
+      }
+    }).catch((err) => {
+      console.log("charging car location", err);
+      setChargingCars([]);
+    }).finally(() => setLoading(false));
+  };
+
 
   const formatDate = (date1) => {
     const day = date1.getDate().toString().padStart(2, '0');
@@ -438,6 +488,9 @@ const CalendarView = () => {
             )}
             {selectResource === "parkingSeat" && (
               <Text style={styles.eventText}>{event?.parkingSeat?.name || 'N/A'}</Text>
+            )}
+            {selectResource === "chargingCar" && (
+              <Text style={styles.eventText}>{event?.chargingCar?.name || 'N/A'}</Text>
             )}
             <Text style={styles.eventText}>{event?.subject}</Text>
           </TouchableOpacity>
@@ -574,58 +627,48 @@ const CalendarView = () => {
               />
             </View>
           }
+          {
+            selectResource === 'chargingCar' &&
+            <View style={styles.locationview}>
+              <Text>{translate?.DISPLAYMODALFORM?.CHARGINGCAR}</Text>
+              <Dropdown
+                style={styles.dropdown}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                data={chargingCar}
+                labelField="label"
+                valueField="value"
+                placeholder={translate?.DISPLAYMODALFORM?.SELECTCHARGINGCAR}
+                value={selectedParkingSeat}
+                onChange={(item) => setSelectedChargingCar(item.value)}
+              />
+            </View>
+          }
 
 
         </View>
 
         <View style={styles.buttonsContainer}>
           <View style={{ flex: 1 }}>
-            {
-              selectResource === 'meetingRoom' ? (
-
-                <TouchableOpacity style={styles.selectRoomButton} onPress={() => setSelectResource('meetingRoom')}>
+                <TouchableOpacity style={selectResource === 'meetingRoom' ? styles.selectRoomButton : styles.roombutton} onPress={() => setSelectResource('meetingRoom')}>
                   <Text style={styles.buttonText} >{translate?.DISPLAYMODALFORM?.MEETINGROOM}</Text>
                 </TouchableOpacity>
-
-
-              ) : (
-                <TouchableOpacity style={styles.roombutton} onPress={() => setSelectResource('meetingRoom')}>
-                  <Text style={styles.buttonText} >{translate?.DISPLAYMODALFORM?.MEETINGROOM}</Text>
-                </TouchableOpacity>
-              )
-            }
           </View>
           <View style={{ flex: 1 }}>
-            {
-              selectResource === 'desk' ? (
-
-                <TouchableOpacity style={styles.selectDeskButton} onPress={() => setSelectResource('desk')}>
+                <TouchableOpacity style={selectResource === 'desk' ? styles.selectDeskButton : styles.deskbutton} onPress={() => setSelectResource('desk')}>
                   <Text style={styles.buttonText} >{translate?.DISPLAYMODALFORM?.DESK}</Text>
                 </TouchableOpacity>
-
-
-              ) : (
-                <TouchableOpacity style={styles.deskbutton} onPress={() => setSelectResource('desk')}>
-                  <Text style={styles.buttonText} >{translate?.DISPLAYMODALFORM?.DESK}</Text>
-                </TouchableOpacity>
-              )
-            }
           </View>
           <View style={{ flex: 1 }}>
-            {
-              selectResource === 'parkingSeat' ? (
-
-                <TouchableOpacity style={styles.selectParkingseatButton} onPress={() => setSelectResource('parkingSeat')}>
+                <TouchableOpacity style={selectResource === 'parkingSeat' ? styles.selectParkingseatButton : styles.parkingseatbutton} onPress={() => setSelectResource('parkingSeat')}>
                   <Text style={styles.buttonText} >{translate?.DISPLAYMODALFORM?.PARKINGSEAT}</Text>
                 </TouchableOpacity>
-
-
-              ) : (
-                <TouchableOpacity style={styles.parkingseatbutton} onPress={() => setSelectResource('parkingSeat')}>
-                  <Text style={styles.buttonText} >{translate?.DISPLAYMODALFORM?.PARKINGSEAT}</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+                <TouchableOpacity style={selectResource === 'chargingCar' ? styles.selectChargingCarButton : styles.chargingCarButton} onPress={() => setSelectResource('chargingCar')}>
+                  <Text style={styles.buttonText} >{translate?.DISPLAYMODALFORM?.CHARGINGCAR}</Text>
                 </TouchableOpacity>
-              )
-            }
           </View>
         </View>
 
@@ -690,6 +733,7 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: 20,
     fontWeight: 'bold',
+    marginTop: 10,
     marginBottom: 10,
     color: '#007bff',
   },
@@ -734,9 +778,22 @@ const styles = StyleSheet.create({
     borderColor: '#F70ACC',
     borderWidth: 3,
   },
+  chargingCarButton: {
+    padding: 10,
+    backgroundColor: '#3c4355',
+    borderRadius: 5,
+  },
+  selectChargingCarButton: {
+    padding: 10,
+    backgroundColor: '#3c4355',
+    borderRadius: 5,
+    borderColor: '#F70ACC',
+    borderWidth: 3,
+  },
   buttonText: {
     color: '#fff',
     fontSize: 15,
+    alignSelf: 'center'
   },
 
   resourceContainer: {
