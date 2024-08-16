@@ -650,6 +650,53 @@ export const getChargingCarListGetFloorBased = async (location, building, checke
   }
 };
 
+
+// Edit Charging car Apis
+//charging car Add booking Api LOcation Based
+export const getChargingCarListGetLocationBasedEdit = async (location, startDate, startTime, endDate, endTime, bookingId) => {
+  const locationId = Number(location);
+  const editBookingId = Number(bookingId);
+  
+  try {
+    const response = await axiosInstance.get(`/chargingcar/listchargingcars/bycustomerlocationandtime/v1?customerLocationId=${locationId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=${editBookingId}`);
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+};
+
+//charging car Add booking Apis  Building Based
+export const getChargingCarListGetBuildingBasedEdit = async (location, building, startDate, startTime, endDate, endTime, bookingId) => {
+  const locationId = Number(location);
+  const buildingId = Number(building);
+  const editBookingId = Number(bookingId);
+  try {   
+    const response = await axiosInstance.get(`/chargingcar/listchargingcars/bycustomerlocationandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=${editBookingId}`);
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+  }
+
+  //charging car Add booking Apis  Floor Based
+
+export const getChargingCarListGetFloorBasedEdit = async (location, building, checkedFloors, startDate, startTime, endDate, endTime, bookingId) => {
+  const locationId = Number(location);
+  const buildingId = Number(building);
+  const floorIds = Object.keys(checkedFloors).filter(key => checkedFloors[key] === true).join(',');
+  const editBookingId = Number(bookingId);
+  try {
+    const response = await axiosInstance.get(`/chargingcar/listchargingcars/bycustomerlocationandtime/v1?customerLocationId=${locationId}&buildingId=${buildingId}&floorId=${floorIds}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=${editBookingId}`);
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+};
+
+
 export const getEndUserList = async () => {
   try {
     const response = await axiosInstance.get(`/user/listactiveendusersforbooking`);
