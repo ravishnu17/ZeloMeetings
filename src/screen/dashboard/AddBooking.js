@@ -6,7 +6,7 @@ import { Checkbox } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { addBookingApi, findBuildingListBasedonLocationId, findCapacityBuildingBased, findCapacityLocationBased, findCateringListBasedonBuildingId, findCateringListBasedonCustomerLocationId, findCateringStatusBasedonBasedonBuildingId, findCateringStatusBasedonCustomerLocationId, findCustomerCleaningSattusBasedonBuildingId, findCustomerCleaningStatusBasedonCustomerLocationId, findCustomeritsupportsettingListBasedonBuildingId, findCustomeritsupportsettingListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonBuildingId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerMobileEquipmentStatusBasedonBuildingId, findCustomerMobileEquipmentStatusBasedonCustomerLocationId, findCustomerSpecialSettingBasedonBuildingId, findCustomerSpecialSettingBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonBuildingId, findCustomerSpecialSettingListBasedonCustomerLocationId, findEquipmentsListBasedonBuildingId, findEquipmentsListBasedonCustomerLocationId, findFloorsListBasedonBuildingId, findITSupporttBasedonBuildingId, findITSupporttBasedonCustomerLocationId, findMobileEquipmentsBasedonCustomerLocationId, getDeskList, getEndUserList, getLocationlist, getMeetingRoomList, getMeetingRoomListForEquipmentAndCapacity, getParkingSeatList, getVisitorList, loginHomeAccess, visitorCreateAndUpdate } from '../../apiservices/Apiservices';
+import { addBookingApi, findBuildingListBasedonLocationId, findCapacityBuildingBased, findCapacityLocationBased, findCateringListBasedonBuildingId, findCateringListBasedonCustomerLocationId, findCateringStatusBasedonBasedonBuildingId, findCateringStatusBasedonCustomerLocationId, findCustomerCleaningSattusBasedonBuildingId, findCustomerCleaningStatusBasedonCustomerLocationId, findCustomeritsupportsettingListBasedonBuildingId, findCustomeritsupportsettingListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonBuildingId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerMobileEquipmentStatusBasedonBuildingId, findCustomerMobileEquipmentStatusBasedonCustomerLocationId, findCustomerSpecialSettingBasedonBuildingId, findCustomerSpecialSettingBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonBuildingId, findCustomerSpecialSettingListBasedonCustomerLocationId, findEquipmentsListBasedonBuildingId, findEquipmentsListBasedonCustomerLocationId, findFloorsListBasedonBuildingId, findITSupporttBasedonBuildingId, findITSupporttBasedonCustomerLocationId, findMobileEquipmentsBasedonCustomerLocationId, getChargingCarListGetBuildingBased, getChargingCarListGetFloorBased, getChargingCarListGetLocationBased, getDeskList, getEndUserList, getLocationlist, getMeetingRoomList, getMeetingRoomListForEquipmentAndCapacity, getParkingSeatList, getVisitorList, loginHomeAccess, visitorCreateAndUpdate } from '../../apiservices/Apiservices';
 import { useNavigation } from '@react-navigation/native';
 import { context } from '../../navigation/Appnav';
 import Toast from 'react-native-simple-toast';
@@ -48,6 +48,14 @@ const AddBooking = ({ route }) => {
 
     const [parkingseat, setParkingseat] = useState([]);
     const [selectedParkingSeat, setSelectedParkingSeat] = useState(null);
+
+    const [chargingCar, setChargingCar] = useState([]);
+    const [checkedChargingCar, setCheckedChargingCar] = useState({});
+    const [isOpenChargingCar, setIsOpenChargingCar] = useState(false);
+
+    
+
+
 
     const [requesterName, setRequesterName] = useState('');
     const [requesterEmail, setRequesterEmail] = useState('');
@@ -132,18 +140,7 @@ const AddBooking = ({ route }) => {
     const [endShowTime, setEndShowTime] = useState(false);
 
     const [durationValue, setDurationValue] = useState(null);
-    const [duration, setDuration] = useState([
-        { label: 'Select Duration', value: null, disabled: true },
-        { label: '15 min', value: '15' },
-        { label: '30 min', value: '30' },
-        { label: '45 min', value: '45' },
-        { label: '60 min', value: '60' },
-        { label: '75 min', value: '75' },
-        { label: '90 min', value: '90' },
-        { label: '105 min', value: '105' },
-        { label: '120 min', value: '120' },
-        { label: 'All Day', value: '1440' }
-    ]);
+    const [duration, setDuration] = useState([]);
 
     const addVisitorFormStatus = () => {
         if (visitorFormEnable) {
@@ -191,6 +188,8 @@ const AddBooking = ({ route }) => {
 
         } else if (selectedResource === 'desk') {
             setDurationValue(duration.find((d) => d.value === '120').value);
+        }else if (selectedResource === 'chargingCar') {
+            setDurationValue(duration.find((d) => d.value === '60').value);
         }
 
     }, [selectedResource])
@@ -258,11 +257,18 @@ const AddBooking = ({ route }) => {
             } else if (params?.resource === 'parkingSeat') {
                 setSelectedParkingSeat(params?.parkingSeat);
             }
+            
+            // else if (params?.resource === 'chargingCar') {
+            //     setSelectedChargingCar(params?.chargingCar);
+            // }
         } else {
             setSelectedMeetingRoom(null);
             setSelectedDesk(null);
             setSelectedParkingSeat(null);
         }
+       
+        
+
     }, [params]);
 
     useEffect(() => {
@@ -962,6 +968,14 @@ const AddBooking = ({ route }) => {
             getDesk(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors);
             getParkingSeats(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors);
 
+            getChargingCarListGetFloorBased(selectedLocation, selectedBuilding,checkedFloors,startDate, startTime, endDate1, endTime).then((res) => {
+                // console.log("getChargingCarListGetFloorBased ",res);
+                setChargingCar([]);
+                if (res?.status) {  
+                    setChargingCar(res?.chargingCarDTOs);
+                }
+            })
+
 
         } else if (selectedLocation && selectedBuilding) {
             // console.log("Both ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
@@ -984,15 +998,48 @@ const AddBooking = ({ route }) => {
             getDesk(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors);
             getParkingSeats(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors);
 
+            getChargingCarListGetBuildingBased(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime).then((res) => {
+                // console.log(" Building Based Charging Car ",res);
+                setChargingCar([]);
+                if (res?.status) {  
+                    setChargingCar(res?.chargingCarDTOs);
+                }
+            })
+
         } else if (selectedLocation) {
             // console.log("Location ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
             getMettingRooms(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime);
             getDesk(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedFloors);
             getParkingSeats(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedFloors);
 
+            getChargingCarListGetLocationBased(selectedLocation, startDate, startTime, endDate1, endTime).then((res) => {
+                // console.log(" getChargingCarListGetLocationBased ",res);
+                setChargingCar([]);
+                if (res?.status) {  
+                    setChargingCar(res?.chargingCarDTOs);
+                }
+            })
+
         }
 
     }, [selectedLocation, selectedBuilding, startDate, endDate1, startTime, endTime, checkedEquipments, selectedCapacity, checkedFloors])
+
+
+    const handleChargingCarToggle = () => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setIsOpenChargingCar(!isOpenChargingCar);
+    };
+
+    const handleChargingCarCheckboxChange = (id) => {
+        const newSelectedItems = { ...checkedChargingCar, [id]: !checkedChargingCar[id] };
+        
+        setCheckedChargingCar(newSelectedItems);
+    };
+
+    const selectedChargingCarNames = Object.entries(checkedChargingCar)
+        .filter(([id, isChecked]) => isChecked)
+        .map(([id]) => chargingCar.find(item => item.id === Number(id))?.name || '');
+
 
     const formatDate = (date1) => {
         const day = date1.getDate().toString().padStart(2, '0');
@@ -1112,6 +1159,31 @@ const AddBooking = ({ route }) => {
     
             }
         }
+
+
+        setDuration([]);
+       
+        if(selectedResource !== 'chargingCar'){
+            const duration =[{ label: 'Select Duration', value: null, disabled: true },
+            { label: '15 min', value: '15' },
+            { label: '30 min', value: '30' },
+            { label: '45 min', value: '45' },
+            { label: '60 min', value: '60' },
+            { label: '75 min', value: '75' },
+            { label: '90 min', value: '90' },
+            { label: '105 min', value: '105' },
+            { label: '120 min', value: '120' },
+            { label: 'All Day', value: '1440' }]
+            setDuration(duration);
+        }else{
+            const duration =[{ label: 'Select Duration', value: null, disabled: true },
+            { label: '15 min', value: '15' },
+            { label: '30 min', value: '30' },
+            { label: '1 Hour', value: '60' },
+           ]
+           setDuration(duration);
+        }
+
      
 
     }, [rights]);
@@ -1166,6 +1238,29 @@ const AddBooking = ({ route }) => {
 
     const resourceSelected = (item) => {
         setSelectedResource(item.value);
+        setDuration([]);
+       
+        if(item.value !== 'chargingCar'){
+            const duration =[{ label: 'Select Duration', value: null, disabled: true },
+            { label: '15 min', value: '15' },
+            { label: '30 min', value: '30' },
+            { label: '45 min', value: '45' },
+            { label: '60 min', value: '60' },
+            { label: '75 min', value: '75' },
+            { label: '90 min', value: '90' },
+            { label: '105 min', value: '105' },
+            { label: '120 min', value: '120' },
+            { label: 'All Day', value: '1440' }]
+            setDuration(duration);
+        }else{
+            const duration =[{ label: 'Select Duration', value: null, disabled: true },
+            { label: '15 min', value: '15' },
+            { label: '30 min', value: '30' },
+            { label: '1 Hour', value: '60' },
+           ]
+           setDuration(duration);
+        }
+
         //caltering
         setCheckCatering({});
         setCateringisOpen(!cateringisOpen);
@@ -1191,6 +1286,17 @@ const AddBooking = ({ route }) => {
         setSpecialServiceisOpen(!specialServiceisOpen);
 
         setViewMoreenable(!viewMoreenable);
+
+        setSelectedDesk(null);
+        setSelectedParkingSeat(null);
+        setSelectedMeetingRoom(null);
+        // setChargingCar([]);
+
+        setCheckedChargingCar({});
+        setIsOpenChargingCar(!isOpenChargingCar);
+
+       
+
 
     }
 
@@ -1229,6 +1335,7 @@ const AddBooking = ({ route }) => {
         const visitorId = Object.keys(checkVisitor).filter(key => checkVisitor[key] === true);
         const catringdataId = Object.keys(checkCatering).filter(key => checkCatering[key] === true);
         const bookingCatringdtoresponse = [];
+        const chargingCarIds = Object.keys(checkedChargingCar).filter(key => checkedChargingCar[key] === true);
 
         if (catringdataId.length > 0) {
             catringdataId.forEach((item) => {
@@ -1264,7 +1371,7 @@ const AddBooking = ({ route }) => {
             attendeeIds: users,
             visitorEmails: [],
             parkingSeatsIds: parkingSeatIds,
-            chargingCarIds: [],
+            chargingCarIds:chargingCarIds,
             cleaningRequired: isCleaning,
             customerCleaningDescription: cleaning,
             customerMobileEquipmentsIds: mobileEquipmentIds,
@@ -1293,6 +1400,7 @@ const AddBooking = ({ route }) => {
         }
         // console.log("submit data", datas);
         addBookingApi(datas).then((res) => {
+            // console.log("add booking ", res);
             Toast.showWithGravity(
                 res?.information?.description,
                 Toast.SHORT,
@@ -1598,6 +1706,37 @@ const AddBooking = ({ route }) => {
                             onChange={item => parkingseatChange(item)}
                         />
                     </View>
+                }
+
+                {
+                    selectedResource === 'chargingCar' &&
+
+                    <View style={styles.pickerContainer}>
+                    <Text> {translate?.DISPLAYMODALFORM?.CHARGINGCAR} </Text>
+                    <View style={styles.dropdownContainer}>
+                        <TouchableOpacity onPress={handleChargingCarToggle} style={styles.dropdownHeader}>
+                            {selectedChargingCarNames.length > 0 ? (
+                                <Text>{selectedChargingCarNames.join(', ')}</Text>
+                            ) : (
+                                <Text style={styles.dropdownHeaderText}>select ChargingCar</Text>
+                            )}
+                        </TouchableOpacity>
+                        {isOpenChargingCar && (
+                            <View style={styles.dropdownContent}>
+                                {chargingCar?.map((item) => (
+                                    <View key={item.id} style={styles.dropdownItem}>
+                                        <Checkbox
+                                            status={checkedChargingCar[item.id] ? 'checked' : 'unchecked'}
+                                            onPress={() => handleChargingCarCheckboxChange(item.id)}
+                                        />
+                                        <Text>{item.name}</Text>
+                                    </View>
+                                ))}
+                            </View>
+                        )}
+
+                    </View>
+                </View>
                 }
 
                 <View style={styles.pickerContainer}>
