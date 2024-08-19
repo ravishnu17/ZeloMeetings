@@ -6,7 +6,7 @@ import { Checkbox } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { addBookingApi, findBookingById, findBuildingListBasedonLocationId, findCapacityBuildingBased, findCapacityLocationBased, findCateringListBasedonBuildingId, findCateringListBasedonCustomerLocationId, findCateringStatusBasedonBasedonBuildingId, findCateringStatusBasedonCustomerLocationId, findCustomerCleaningSattusBasedonBuildingId, findCustomerCleaningStatusBasedonCustomerLocationId, findCustomeritsupportsettingListBasedonBuildingId, findCustomeritsupportsettingListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonBuildingId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerMobileEquipmentStatusBasedonBuildingId, findCustomerMobileEquipmentStatusBasedonCustomerLocationId, findCustomerSpecialSettingBasedonBuildingId, findCustomerSpecialSettingBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonBuildingId, findCustomerSpecialSettingListBasedonCustomerLocationId, findEquipmentsListBasedonBuildingId, findEquipmentsListBasedonCustomerLocationId, findFloorsListBasedonBuildingId, findITSupporttBasedonBuildingId, findITSupporttBasedonCustomerLocationId, findMobileEquipmentsBasedonCustomerLocationId, getDeskList, getEditDeskList, getEditMeetingRoomList, getEditMeetingRoomListForEquipmentAndCapacity, getEditParkingSeatList, getEndUserList, getLocationlist, getMeetingRoomList, getMeetingRoomListForEquipmentAndCapacity, getParkingSeatList, getVisitorList, loginHomeAccess, visitorCreateAndUpdate } from '../../apiservices/Apiservices';
+import { addBookingApi, findBookingById, findBuildingListBasedonLocationId, findCapacityBuildingBased, findCapacityLocationBased, findCateringListBasedonBuildingId, findCateringListBasedonCustomerLocationId, findCateringStatusBasedonBasedonBuildingId, findCateringStatusBasedonCustomerLocationId, findCustomerCleaningSattusBasedonBuildingId, findCustomerCleaningStatusBasedonCustomerLocationId, findCustomeritsupportsettingListBasedonBuildingId, findCustomeritsupportsettingListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonBuildingId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerMobileEquipmentStatusBasedonBuildingId, findCustomerMobileEquipmentStatusBasedonCustomerLocationId, findCustomerSpecialSettingBasedonBuildingId, findCustomerSpecialSettingBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonBuildingId, findCustomerSpecialSettingListBasedonCustomerLocationId, findEquipmentsListBasedonBuildingId, findEquipmentsListBasedonCustomerLocationId, findFloorsListBasedonBuildingId, findITSupporttBasedonBuildingId, findITSupporttBasedonCustomerLocationId, findMobileEquipmentsBasedonCustomerLocationId, getChargingCarListGetBuildingBasedEdit, getChargingCarListGetFloorBasedEdit, getChargingCarListGetLocationBasedEdit, getDeskList, getEditDeskList, getEditMeetingRoomList, getEditMeetingRoomListForEquipmentAndCapacity, getEditParkingSeatList, getEndUserList, getLocationlist, getMeetingRoomList, getMeetingRoomListForEquipmentAndCapacity, getParkingSeatList, getVisitorList, loginHomeAccess, visitorCreateAndUpdate } from '../../apiservices/Apiservices';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { context } from '../../navigation/Appnav';
 import Toast from 'react-native-simple-toast';
@@ -51,6 +51,19 @@ const EditBooking = ({ route }) => {
 
     const [parkingseat, setParkingseat] = useState([]);
     const [selectedParkingSeat, setSelectedParkingSeat] = useState(null);
+
+    const [chargingCar, setChargingCar] = useState([]);
+    const [checkedChargingCar, setCheckedChargingCar] = useState({});
+    const [isOpenChargingCar, setIsOpenChargingCar] = useState(false);
+
+    const [prakingseatResonse, setPrakingseatResonse] = useState([]);
+    const [checkedParkingSeat, setCheckedParkingSeat] = useState({});
+    const [isOpenParkingSeat, setIsOpenParkingSeat] = useState(false);
+    
+    const [rightsEnableChargingCar, setRightsEnableChargingCar] = useState(false);
+    const [rightsEnableParkingSeat, setRightsEnableParkingSeat] = useState(false);
+    
+
 
     const [requesterName, setRequesterName] = useState('');
     const [requesterEmail, setRequesterEmail] = useState('');
@@ -135,18 +148,7 @@ const EditBooking = ({ route }) => {
     const [endShowTime, setEndShowTime] = useState(false);
 
     const [durationValue, setDurationValue] = useState(null);
-    const [duration, setDuration] = useState([
-        { label: 'Select Duration', value: null, disabled: true },
-        { label: '15 min', value: '15' },
-        { label: '30 min', value: '30' },
-        { label: '45 min', value: '45' },
-        { label: '60 min', value: '60' },
-        { label: '75 min', value: '75' },
-        { label: '90 min', value: '90' },
-        { label: '105 min', value: '105' },
-        { label: '120 min', value: '120' },
-        { label: 'All Day', value: '1440' }
-    ]);
+    const [duration, setDuration] = useState([]);
 
     const [disableUpdate, setDisableUpdate] = useState(true);
 
@@ -1164,7 +1166,7 @@ const EditBooking = ({ route }) => {
         // console.log("checkedEquipments ",checkedEquipments);
         // console.log("selectedCapacity ",selectedCapacity);
         // console.log("checkedFloors ",checkedFloors);
-        // console.log("bookingResponse ",bookingResponse);
+        console.log("bookingResponse ",bookingResponse);
 
         const bookingId = bookingResponse?.id;
 
@@ -1281,7 +1283,7 @@ const EditBooking = ({ route }) => {
 
             getDesk(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
             getParkingSeats(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
-
+            getChargingcarApis(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
 
         } else if (selectedBuilding) {
             // console.log(" call selectedBuilding",selectedBuilding,"booking id ",bookingId);
@@ -1315,7 +1317,7 @@ const EditBooking = ({ route }) => {
             // console.log("bookingId ",bookingId);
             getDesk(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
             getParkingSeats(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
-
+            getChargingcarApis(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
         } else if (selectedLocation) {
 
             // console.log("desk call  selectedLocation");
@@ -1323,6 +1325,7 @@ const EditBooking = ({ route }) => {
             getMettingRooms(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, bookingId);
             getDesk(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
             getParkingSeats(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
+            getChargingcarApis(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
 
         }
 
@@ -1412,6 +1415,7 @@ const EditBooking = ({ route }) => {
             setParkingseat([]);
             setSelectedParkingSeat(null);
             if (res?.status) {
+                setPrakingseatResonse(res?.parkingSeatDTOs);
 
                 const mappedItems = res?.parkingSeatDTOs?.map(resource => ({
                     label: resource.name,
@@ -1422,19 +1426,140 @@ const EditBooking = ({ route }) => {
 
                 //  console.log("booking response ",bookingResponse?.parkingSeats);
 
-                if (bookingResponse?.parkingSeats[0]?.id) {
-                    mappedItems?.map((item) => {
-                        // console.log("bookingResponse?.building?.id ",bookingResponse?.parkingSeats[0]?.id);
-                        if (item.value === bookingResponse?.parkingSeats[0]?.id) {
-                            setSelectedParkingSeat(item.value);
-                        }
+                if(bookingResponse.bookingType === "parkingSeat"){
+                    if (bookingResponse?.parkingSeats[0]?.id) {
+                        mappedItems?.map((item) => {
+                            // console.log("bookingResponse?.building?.id ",bookingResponse?.parkingSeats[0]?.id);
+                            if (item.value === bookingResponse?.parkingSeats[0]?.id) {
+                                setSelectedParkingSeat(item.value);
+                            }
+    
+                        })
+                    }
+                    
+                }else{
 
-                    })
+                    if(bookingResponse?.parkingSeats?.length > 0){
+                        initializeParkingSeat(res?.parkingSeatDTOs, bookingResponse?.parkingSeats);
+                    }
+
+
                 }
+
+               
             }
 
         })
     }
+
+
+
+    const initializeParkingSeat = (parkingseats, customerParkingSeat) => {
+        const parkinseatIdsArray = customerParkingSeat?.map(parking => parking?.id);
+        const checkedState = {};
+
+        parkingseats?.forEach(parking => {
+            checkedState[parking?.id] = parkinseatIdsArray?.includes(parking?.id);
+        });
+
+        setCheckedParkingSeat(checkedState);
+
+        // setCheckedChargingCar(checkedState);
+    };
+
+
+    const handleParkingSeatToggle = () => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setIsOpenParkingSeat(!isOpenParkingSeat);
+    };
+
+    const handleParkingSeatCheckboxChange = (id) => {
+        const newSelectedItems = { ...checkedParkingSeat, [id]: !checkedParkingSeat[id] };
+        
+        setCheckedParkingSeat(newSelectedItems);
+    };
+
+    const selectedParkinSeatNames = Object.entries(checkedParkingSeat)
+        .filter(([id, isChecked]) => isChecked)
+        .map(([id]) => prakingseatResonse.find(item => item.id === Number(id))?.name || '');
+
+
+
+       const getChargingcarApis = (selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors, bookingId) =>{
+    //    console.log("checkedFloors",checkedFloors);
+        if(Object.keys(checkedFloors).length > 0){
+            getChargingCarListGetFloorBasedEdit(selectedLocation,selectedBuilding,checkedFloors,startDate,startTime,endDate1,endTime,bookingId).then((res) => {
+                // console.log("getChargingCarListGetFloorBasedEdit ",res);
+                setChargingCar([]);
+                if (res?.status) {  
+                    setChargingCar(res?.chargingCarDTOs);
+                    if(bookingResponse.chargingCars){
+                        initializeChargingcar(res?.chargingCarDTOs, bookingResponse.chargingCars);
+                    }
+
+                }
+            })
+            
+        }else if(selectedBuilding > 0){
+            getChargingCarListGetBuildingBasedEdit(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime,bookingId).then((res) => {
+                // console.log("select building ",selectedBuilding);
+                // console.log("getChargingCarListGetBuildingBasedEdit ",res);
+                setChargingCar([]);
+                if (res?.status) {  
+                    setChargingCar(res?.chargingCarDTOs);
+                    if(bookingResponse.chargingCars){
+                        initializeChargingcar(res?.chargingCarDTOs, bookingResponse.chargingCars);
+                    }
+
+                }
+            })
+        }else{
+            getChargingCarListGetLocationBasedEdit(selectedLocation,startDate,startTime,endDate1,endTime,bookingId).then((res) => {
+                setChargingCar([]);
+                // console.log("getChargingCarListGetLocationBasedEdit ",res);
+                if (res?.status) {  
+                    setChargingCar(res?.chargingCarDTOs);
+                    
+
+                    if(bookingResponse.chargingCars){
+                        initializeChargingcar(res?.chargingCarDTOs, bookingResponse.chargingCars);
+                    }
+
+                }
+            })
+        }
+      
+       
+       }
+
+
+
+    const initializeChargingcar = (chargingcar, customerChargingcar) => {
+        const chargingcarIdsArray = customerChargingcar?.map(special => special?.id);
+        const checkedState = {};
+
+        chargingcar?.forEach(special => {
+            checkedState[special?.id] = chargingcarIdsArray?.includes(special?.id);
+        });
+
+        setCheckedChargingCar(checkedState);
+    };
+
+
+        const handleChargingCarToggle = () => {
+            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+            setIsOpenChargingCar(!isOpenChargingCar);
+        };
+    
+        const handleChargingCarCheckboxChange = (id) => {
+            const newSelectedItems = { ...checkedChargingCar, [id]: !checkedChargingCar[id] };
+            
+            setCheckedChargingCar(newSelectedItems);
+        };
+    
+        const selectedChargingCarNames = Object.entries(checkedChargingCar)
+            .filter(([id, isChecked]) => isChecked)
+            .map(([id]) => chargingCar.find(item => item.id === Number(id))?.name || '');
 
     useEffect(() => {
         // const backendResponse = [
@@ -1447,11 +1572,13 @@ const EditBooking = ({ route }) => {
         let enableDesks = false;
         let enableParkingSeats = false;
         let enableAll = false;
+        let enableChargingCar=false;
 
         const backendResponse = [];
         enableRooms = rights?.includes('BOOK A ROOM');
         enableDesks = rights?.includes('BOOK A DESK');
         enableParkingSeats = rights?.includes('BOOK A PARKING SEAT');
+        enableChargingCar= rights?.includes('BOOK A CHARGING CAR');
         enableAll = rights?.includes('ALL');
         //   console.log("enableRooms ",enableRooms, rights?.includes('BOOK A ROOM')," enableDesks",enableDesks,rights?.includes('BOOK A DESK')," enableParkingSeats",enableParkingSeats ,rights?.includes('BOOK A PARKING SEAT'));
         if (enableRooms || enableAll) {
@@ -1462,8 +1589,13 @@ const EditBooking = ({ route }) => {
         }
         if (enableParkingSeats || enableAll) {
             backendResponse.push({ id: "parkingSeat", resource: translate?.DISPLAYMODALFORM?.PARKINGSEAT });
+            setRightsEnableParkingSeat(true);
+             
         }
-
+        if (enableChargingCar || enableAll) {
+            backendResponse.push({ id: "chargingCar", resource: translate?.DISPLAYMODALFORM?.CHARGINGCAR });
+            setRightsEnableChargingCar(true);
+        }
 
 
         // console.log("backendResponse ",backendResponse);
@@ -1483,6 +1615,30 @@ const EditBooking = ({ route }) => {
                 }
             })
 
+        }
+
+
+        setDuration([]);
+       
+        if(selectedResource !== 'chargingCar'){
+            const duration =[{ label: 'Select Duration', value: null, disabled: true },
+            { label: '15 min', value: '15' },
+            { label: '30 min', value: '30' },
+            { label: '45 min', value: '45' },
+            { label: '60 min', value: '60' },
+            { label: '75 min', value: '75' },
+            { label: '90 min', value: '90' },
+            { label: '105 min', value: '105' },
+            { label: '120 min', value: '120' },
+            { label: 'All Day', value: '1440' }]
+            setDuration(duration);
+        }else{
+            const duration =[{ label: 'Select Duration', value: null, disabled: true },
+            { label: '15 min', value: '15' },
+            { label: '30 min', value: '30' },
+            { label: '1 Hour', value: '60' },
+           ]
+           setDuration(duration);
         }
 
 
@@ -1538,6 +1694,30 @@ const EditBooking = ({ route }) => {
 
     const resourceSelected = (item) => {
         setSelectedResource(item.value);
+
+        setDuration([]);
+       
+        if(item.value !== 'chargingCar'){
+            const duration =[{ label: 'Select Duration', value: null, disabled: true },
+            { label: '15 min', value: '15' },
+            { label: '30 min', value: '30' },
+            { label: '45 min', value: '45' },
+            { label: '60 min', value: '60' },
+            { label: '75 min', value: '75' },
+            { label: '90 min', value: '90' },
+            { label: '105 min', value: '105' },
+            { label: '120 min', value: '120' },
+            { label: 'All Day', value: '1440' }]
+            setDuration(duration);
+        }else{
+            const duration =[{ label: 'Select Duration', value: null, disabled: true },
+            { label: '15 min', value: '15' },
+            { label: '30 min', value: '30' },
+            { label: '1 Hour', value: '60' },
+           ]
+           setDuration(duration);
+        }
+        
         //caltering
         setCheckCatering({});
         setCateringisOpen(!cateringisOpen);
@@ -1561,6 +1741,15 @@ const EditBooking = ({ route }) => {
         setCheckedSpecialService({});
         setSpecialServiceDescription('');
         setSpecialServiceisOpen(!specialServiceisOpen);
+
+        setCheckedParkingSeat({});
+        setIsOpenParkingSeat(!isOpenParkingSeat);
+
+        setCheckedChargingCar({});
+        setIsOpenChargingCar(!isOpenChargingCar);
+        selectedMeetingRoom(null);
+        setSelectedDesk(null);
+        setSelectedParkingSeat(null);
 
         setViewMoreenable(!viewMoreenable);
 
@@ -1602,6 +1791,8 @@ const EditBooking = ({ route }) => {
         const visitorId = Object.keys(checkVisitor).filter(key => checkVisitor[key] === true);
         const catringdataId = Object.keys(checkCatering).filter(key => checkCatering[key] === true);
         const bookingCatringdtoresponse = [];
+        const chargingCarIds = Object.keys(checkedChargingCar).filter(key => checkedChargingCar[key] === true);
+        const parkingSeatIdsList = Object.keys(checkedParkingSeat).filter(key => checkedParkingSeat[key] === true);
 
         if (catringdataId.length > 0) {
             catringdataId.forEach((item) => {
@@ -1616,7 +1807,9 @@ const EditBooking = ({ route }) => {
             })
         }
 
-        const parkingSeatIds = selectedParkingSeat ? [selectedParkingSeat] : [];
+        const parkingSeatIds = selectedParkingSeat ? [selectedParkingSeat] : parkingSeatIdsList;
+
+        console.log("parking seat ids ", parkingSeatIds);
 
         //  console.log("parkingSeatIds ",parkingSeatIds);
 
@@ -1643,7 +1836,7 @@ const EditBooking = ({ route }) => {
             attendeeIds: users,
             visitorEmails: [],
             parkingSeatsIds: parkingSeatIds,
-            chargingCarIds: [],
+            chargingCarIds: chargingCarIds,
             cleaningRequired: isCleaning,
             customerCleaningDescription: cleaning,
             customerMobileEquipmentsIds: mobileEquipmentIds,
@@ -2109,6 +2302,67 @@ const EditBooking = ({ route }) => {
                     (viewMoreenable && (selectedResource === 'meetingRoom' || selectedResource === 'desk')) &&
 
                     <View>
+
+{
+                        rightsEnableParkingSeat && (
+                            <View style={styles.pickerContainer}>
+                            <Text>{translate?.DISPLAYMODALFORM?.PARKINGSEAT}</Text>
+                            <View style={styles.dropdownContainer}>
+                                <TouchableOpacity onPress={handleParkingSeatToggle} style={styles.dropdownHeader}>
+                                {selectedParkinSeatNames.length > 0 ? (
+                                    <Text>{selectedParkinSeatNames.join(', ')}</Text>
+                                ) : (
+                                    <Text style={styles.dropdownHeaderText}>{translate.DISPLAYMODALFORM.SELECTPARKINGSEAT}</Text>
+                                )}
+                                </TouchableOpacity>
+                                {isOpenParkingSeat && (
+                                <View style={styles.dropdownContent}>
+                                    {prakingseatResonse?.map((item) => (
+                                    <View key={item?.id} style={styles.dropdownItem}>
+                                        <Checkbox
+                                        status={checkedParkingSeat[item?.id] ? 'checked' : 'unchecked'}
+                                        onPress={() => handleParkingSeatCheckboxChange(item.id)}
+                                        />
+                                        <Text>{item?.name}</Text>
+                                    </View>
+                                    ))}
+                                </View>
+                                )}
+                            </View>
+                            </View>
+                            )
+                        }
+
+                        {
+                            rightsEnableChargingCar &&
+                             <View style={styles.pickerContainer}>
+                             <Text> {translate?.DISPLAYMODALFORM?.CHARGINGCAR} </Text>
+                             <View style={styles.dropdownContainer}>
+                                 <TouchableOpacity onPress={handleChargingCarToggle} style={styles.dropdownHeader}>
+                                     {selectedChargingCarNames.length > 0 ? (
+                                         <Text>{selectedChargingCarNames.join(', ')}</Text>
+                                     ) : (
+                                         <Text style={styles.dropdownHeaderText}>Select ChargingCar</Text>
+                                     )}
+                                 </TouchableOpacity>
+                                 {isOpenChargingCar && (
+                                     <View style={styles.dropdownContent}>
+                                         {chargingCar?.map((item) => (
+                                             <View key={item.id} style={styles.dropdownItem}>
+                                                 <Checkbox
+                                                     status={checkedChargingCar[item.id] ? 'checked' : 'unchecked'}
+                                                     onPress={() => handleChargingCarCheckboxChange(item.id)}
+                                                 />
+                                                 <Text>{item.name}</Text>
+                                             </View>
+                                         ))}
+                                     </View>
+                                 )}
+         
+                             </View>
+                         </View>
+                        }
+
                         {/* catring Hide For Web  */}
                         {
                             (bookingResponse?.bookingCateringDTOs.length == 0 && cateringFormEnable) &&
