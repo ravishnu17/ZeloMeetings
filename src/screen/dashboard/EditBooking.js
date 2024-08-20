@@ -25,6 +25,8 @@ const EditBooking = ({ route }) => {
     const [itemsLocations, setItemsLocations] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState(null);
 
+    const [filterOptionsEnabled, setFilterOptionsEnabled] = useState(false);
+
     const [itemsBuildings, setItemsBuildings] = useState([]);
     const [selectedBuilding, setSelectedBuilding] = useState(null);
 
@@ -1162,7 +1164,7 @@ const EditBooking = ({ route }) => {
         // console.log("checkedEquipments ",checkedEquipments);
         // console.log("selectedCapacity ",selectedCapacity);
         // console.log("checkedFloors ",checkedFloors);
-        console.log("bookingResponse ",bookingResponse);
+        // console.log("bookingResponse ",bookingResponse);
 
         const bookingId = bookingResponse?.id;
 
@@ -1691,6 +1693,8 @@ const EditBooking = ({ route }) => {
     const resourceSelected = (item) => {
         setSelectedResource(item.value);
 
+        setFilterOptionsEnabled(false);
+
         setDuration([]);
        
         if(item.value !== 'chargingCar'){
@@ -1805,7 +1809,7 @@ const EditBooking = ({ route }) => {
 
         const parkingSeatIds = selectedParkingSeat ? [selectedParkingSeat] : parkingSeatIdsList;
 
-        console.log("parking seat ids ", parkingSeatIds);
+        // console.log("parking seat ids ", parkingSeatIds);
 
         //  console.log("parkingSeatIds ",parkingSeatIds);
 
@@ -1884,6 +1888,12 @@ const EditBooking = ({ route }) => {
 
 
 
+  // console.log("cateringFormEnable",cateringFormEnable);
+
+  const handleFilter = () => {
+    setFilterOptionsEnabled(!filterOptionsEnabled);
+    // console.log("filterOptionsEnabled ", filterOptionsEnabled);
+}
 
 
 
@@ -1893,7 +1903,7 @@ const EditBooking = ({ route }) => {
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>{translate?.ROOMBOOKING?.EDITBOOKING}</Text>
             <ScrollView>
-                <View style={styles.pickerContainer}>
+                {/* <View style={styles.pickerContainer}>
                     <Text>{translate?.ROOMBOOKING?.LOCATIONS}</Text>
                     <Dropdown
                         style={styles.dropdown}
@@ -2020,8 +2030,158 @@ const EditBooking = ({ route }) => {
 
                     </View>
 
+                } */}
+
+
+<View style={styles.pickerContainer}>
+                    <View style={styles.row}>
+                        <View style={styles.dropdownWrapper} >
+                            <Text>{translate?.ROOMBOOKING?.RESOURCES}</Text>
+                            <Dropdown
+                                style={styles.dropdown}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                inputSearchStyle={styles.inputSearchStyle}
+                                data={itemsResources}
+                                labelField="label"
+                                valueField="value"
+                                placeholder={translate?.ROOMBOOKING?.SELCETRESOURCE}
+                                value={selectedResource}
+                                onChange={item => resourceSelected(item)}
+                            />
+                        </View>
+                        <View style={styles.buttonWrapper}>
+                            <Button mode="contained" style={{}} buttonColor={colors.primary} onPress={handleFilter} > Filter</Button>
+                        </View>
+
+                    </View>
+
+
+                </View>
+
+
+  {
+                    filterOptionsEnabled &&
+                    <View>
+                        <View style={styles.pickerContainer}>
+                            <Text>{translate?.ROOMBOOKING?.LOCATIONS}</Text>
+                            <Dropdown
+                                style={styles.dropdown}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                inputSearchStyle={styles.inputSearchStyle}
+                                data={itemsLocations}
+                                labelField="label"
+                                valueField="value"
+                                placeholder={translate?.ROOMBOOKING?.SELECTLOCATION}
+                                value={selectedLocation}
+                                onChange={item => setSelectedLocation(item.value)}
+                            />
+                        </View>
+
+                        <View style={styles.pickerContainer}>
+                            <Text>{translate?.ROOMBOOKING?.BUILDING}</Text>
+                            <Dropdown
+                                style={styles.dropdown}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                inputSearchStyle={styles.inputSearchStyle}
+                                data={itemsBuildings}
+                                labelField="label"
+                                valueField="value"
+                                placeholder={translate?.ROOMBOOKING?.SELECTBUILDING}
+                                value={selectedBuilding}
+                                onChange={item => setSelectedBuilding(item.value)}
+                            />
+                        </View>
+
+                        <View style={styles.pickerContainer}>
+                            <Text> {translate?.ROOMBOOKING?.FLOOR} </Text>
+                            <View style={styles.dropdownContainer}>
+                                <TouchableOpacity onPress={handleFloorToggle} style={styles.dropdownHeader}>
+                                    {selectedFloorNames.length > 0 ? (
+                                        <Text>{selectedFloorNames.join(', ')}</Text>
+                                    ) : (
+                                        <Text style={styles.dropdownHeaderText}>{translate?.ROOMBOOKING?.SELECTFLOOR}</Text>
+                                    )}
+                                </TouchableOpacity>
+                                {isOpenFloor && (
+                                    <View style={styles.dropdownContent}>
+                                        {itemsFloors.map((item) => (
+                                            <View key={item.id} style={styles.dropdownItem}>
+                                                <Checkbox
+                                                    status={checkedFloors[item.id] ? 'checked' : 'unchecked'}
+                                                    onPress={() => handleFloorCheckboxChange(item.id)}
+                                                />
+                                                <Text>{item.name}</Text>
+                                            </View>
+                                        ))}
+                                    </View>
+                                )}
+
+                            </View>
+                        </View>
+
+
+                        {
+                    (selectedResource === 'meetingRoom' && equipmentData.length > 0) &&
+                    <View style={styles.pickerContainer}>
+                        <Text>{translate?.ROOMBOOKING?.EQUIPMENT}</Text>
+                        <View style={styles.dropdownContainer}>
+                            <TouchableOpacity onPress={handleToggle} style={styles.dropdownHeader}>
+                                {selectedNames.length > 0 ? (
+                                    <Text style={styles.dropdownHeaderText}>
+                                        {selectedNames.join(', ')}
+                                    </Text>
+                                ) : (
+                                    <Text style={styles.dropdownHeaderText}>Select Equipments</Text>
+                                )}
+                            </TouchableOpacity>
+                            {isOpen && (
+                                <View style={styles.dropdownContent}>
+                                    {equipmentData.map((item) => (
+                                        <View key={item.id} style={styles.dropdownItem}>
+                                            <Checkbox
+                                                status={checkedEquipments[item.id] ? 'checked' : 'unchecked'}
+                                                onPress={() => handleCheckboxChange(item.id)}
+                                            />
+                                            <Text>{item.name}</Text>
+                                        </View>
+                                    ))}
+                                </View>
+                            )}
+                        </View>
+                    </View>
                 }
 
+
+
+                {
+                    (selectedResource === 'meetingRoom' && itemsCapacity.length > 0) &&
+                    <View style={styles.pickerContainer}>
+                        <Text>{translate?.ROOMBOOKING?.CAPACITY}</Text>
+
+                        <Dropdown
+                            style={styles.dropdown}
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            data={itemsCapacity}
+                            labelField="label"
+                            valueField="value"
+                            placeholder="Select capacity"
+                            value={selectedCapacity}
+                            onChange={item => setSelectedCapacity(item.value)}
+                        />
+
+                    </View>
+
+                }
+
+
+                    </View>
+
+                }
 
 
                 <View style={styles.pickerContainer}>
@@ -2825,6 +2985,21 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         backgroundColor: 'red',
+    },
+
+
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center', // Align items vertically
+        justifyContent: 'space-between', // Optional: distribute space between dropdown and button
+    },
+    dropdownWrapper: {
+        flex: 1, // Take up the remaining space
+        marginRight: 10, // Add space between dropdown and button
+    },
+    buttonWrapper: {
+        flexShrink: 1, // Ensure the button doesn't stretch
+        marginTop: 14
     },
 
 

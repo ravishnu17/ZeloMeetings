@@ -15,12 +15,14 @@ import { ToastColor } from '../utils/ToastColors';
 const AddBooking = ({ route }) => {
     const params = route.params;
     const props = useContext(context);
-    const translate= props?.language;
+    const translate = props?.language;
     const navigation = useNavigation();
     const { colors } = useTheme();
     const [rights, setRights] = useState();
     const [itemsLocations, setItemsLocations] = useState([]);
     const [selectedLocation, setSelectedLocation] = useState(null);
+
+    const [filterOptionsEnabled, setFilterOptionsEnabled] = useState(false);
 
     const [itemsBuildings, setItemsBuildings] = useState([]);
     const [selectedBuilding, setSelectedBuilding] = useState(null);
@@ -52,7 +54,7 @@ const AddBooking = ({ route }) => {
     const [chargingCar, setChargingCar] = useState([]);
     const [checkedChargingCar, setCheckedChargingCar] = useState({});
     const [isOpenChargingCar, setIsOpenChargingCar] = useState(false);
-    
+
     const [prakingseatResonse, setPrakingseatResonse] = useState([]);
     const [checkedParkingSeat, setCheckedParkingSeat] = useState({});
     const [isOpenParkingSeat, setIsOpenParkingSeat] = useState(false);
@@ -194,7 +196,7 @@ const AddBooking = ({ route }) => {
 
         } else if (selectedResource === 'desk') {
             setDurationValue(duration.find((d) => d.value === '120').value);
-        }else if (selectedResource === 'chargingCar') {
+        } else if (selectedResource === 'chargingCar') {
             setDurationValue(duration.find((d) => d.value === '60').value);
         }
 
@@ -261,17 +263,17 @@ const AddBooking = ({ route }) => {
             } else if (params?.resource === 'desk') {
                 params?.desk && setSelectedDesk(params?.desk);
             } else if (params?.resource === 'parkingSeat') {
-                params?.parkingSeat &&setSelectedParkingSeat(params?.parkingSeat);
+                params?.parkingSeat && setSelectedParkingSeat(params?.parkingSeat);
             } else if (params?.resource === 'chargingCar') {
-                params?.chargingCar && setCheckedChargingCar({[params?.chargingCar]:true});
+                params?.chargingCar && setCheckedChargingCar({ [params?.chargingCar]: true });
             }
         } else {
             setSelectedMeetingRoom(null);
             setSelectedDesk(null);
             setSelectedParkingSeat(null);
         }
-       
-        
+
+
 
     }, [params]);
 
@@ -281,7 +283,7 @@ const AddBooking = ({ route }) => {
 
     const getLoginUser = async () => {
         props?.setLoading(true)
-        let Userrights= await AsyncStorage.getItem('rights');
+        let Userrights = await AsyncStorage.getItem('rights');
         setRights(Userrights);
         const userId = await AsyncStorage.getItem('userId');
         if (userId) {
@@ -592,7 +594,7 @@ const AddBooking = ({ route }) => {
             if (res.status) {
                 // console.log("catering status ", res.customerCateringSetting.isAllowedCateringWithinHours);
                 setCateringFormEnable(res.customerCateringSetting.isAllowedCateringWithinHours);
-            }else{
+            } else {
                 setCateringFormEnable(false);
             }
         })
@@ -621,7 +623,7 @@ const AddBooking = ({ route }) => {
             if (res.status) {
                 // console.log("catering status ", res.customerCateringSetting.isAllowedCateringWithinHours);
                 setCateringFormEnable(res.customerCateringSetting.isAllowedCateringWithinHours);
-            }else{
+            } else {
                 setCateringFormEnable(false);
             }
         })
@@ -668,7 +670,7 @@ const AddBooking = ({ route }) => {
                 // console.log("cleaning status ", res.customerCleaning.cleaningTimeStatus);
                 setCleaningFormEnable(res.customerCleaning.cleaningTimeStatus);
                 // setCleaningFormEnable(res.customerCleaningSetting.isAllowedCleaningWithinHours);
-            }else{
+            } else {
                 setCleaningFormEnable(false);
             }
         })
@@ -679,7 +681,7 @@ const AddBooking = ({ route }) => {
             // console.log("cleaning status Building Baesd ");
             if (res.status) {
                 setCleaningFormEnable(res.customerCleaning.cleaningTimeStatus);
-            }else{
+            } else {
                 setCleaningFormEnable(false);
             }
         })
@@ -978,10 +980,10 @@ const AddBooking = ({ route }) => {
             getDesk(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors);
             getParkingSeats(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors);
 
-            getChargingCarListGetFloorBased(selectedLocation, selectedBuilding,checkedFloors,startDate, startTime, endDate1, endTime).then((res) => {
+            getChargingCarListGetFloorBased(selectedLocation, selectedBuilding, checkedFloors, startDate, startTime, endDate1, endTime).then((res) => {
                 // console.log("getChargingCarListGetFloorBased ",res);
                 setChargingCar([]);
-                if (res?.status) {  
+                if (res?.status) {
                     setChargingCar(res?.chargingCarDTOs);
                 }
             })
@@ -1011,7 +1013,7 @@ const AddBooking = ({ route }) => {
             getChargingCarListGetBuildingBased(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime).then((res) => {
                 // console.log(" Building Based Charging Car ",res);
                 setChargingCar([]);
-                if (res?.status) {  
+                if (res?.status) {
                     setChargingCar(res?.chargingCarDTOs);
                 }
             })
@@ -1025,7 +1027,7 @@ const AddBooking = ({ route }) => {
             getChargingCarListGetLocationBased(selectedLocation, startDate, startTime, endDate1, endTime).then((res) => {
                 // console.log(" getChargingCarListGetLocationBased ",res);
                 setChargingCar([]);
-                if (res?.status) {  
+                if (res?.status) {
                     setChargingCar(res?.chargingCarDTOs);
                 }
             })
@@ -1035,7 +1037,7 @@ const AddBooking = ({ route }) => {
     }, [selectedLocation, selectedBuilding, startDate, endDate1, startTime, endTime, checkedEquipments, selectedCapacity, checkedFloors])
 
 
- 
+
 
     const formatDate = (date1) => {
         const day = date1.getDate().toString().padStart(2, '0');
@@ -1116,7 +1118,7 @@ const AddBooking = ({ route }) => {
 
     const handleParkingSeatCheckboxChange = (id) => {
         const newSelectedItems = { ...checkedParkingSeat, [id]: !checkedParkingSeat[id] };
-        
+
         setCheckedParkingSeat(newSelectedItems);
     };
 
@@ -1125,21 +1127,21 @@ const AddBooking = ({ route }) => {
         .map(([id]) => prakingseatResonse.find(item => item.id === Number(id))?.name || '');
 
 
-        const handleChargingCarToggle = () => {
-            LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-            setIsOpenChargingCar(!isOpenChargingCar);
-        };
-    
-        const handleChargingCarCheckboxChange = (id) => {
-            const newSelectedItems = { ...checkedChargingCar, [id]: !checkedChargingCar[id] };
-            
-            setCheckedChargingCar(newSelectedItems);
-        };
-    
-        const selectedChargingCarNames = Object.entries(checkedChargingCar)
-            .filter(([id, isChecked]) => isChecked)
-            .map(([id]) => chargingCar.find(item => item.id === Number(id))?.name || '');
-    
+    const handleChargingCarToggle = () => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setIsOpenChargingCar(!isOpenChargingCar);
+    };
+
+    const handleChargingCarCheckboxChange = (id) => {
+        const newSelectedItems = { ...checkedChargingCar, [id]: !checkedChargingCar[id] };
+
+        setCheckedChargingCar(newSelectedItems);
+    };
+
+    const selectedChargingCarNames = Object.entries(checkedChargingCar)
+        .filter(([id, isChecked]) => isChecked)
+        .map(([id]) => chargingCar.find(item => item.id === Number(id))?.name || '');
+
 
 
 
@@ -1150,18 +1152,18 @@ const AddBooking = ({ route }) => {
         //     { id: "parkingSeat", resource: "Parking seat" },
         // ];
         // console.log("rights ",rights);
-        let enableRooms=false;
-        let enableDesks=false;
-        let enableParkingSeats=false;
-        let enableChargingCar=false;
-        let enableAll= false;
+        let enableRooms = false;
+        let enableDesks = false;
+        let enableParkingSeats = false;
+        let enableChargingCar = false;
+        let enableAll = false;
 
-          const backendResponse = [];
-          enableRooms= rights?.includes('BOOK A ROOM');
-          enableDesks= rights?.includes('BOOK A DESK');
-          enableParkingSeats= rights?.includes('BOOK A PARKING SEAT');
-          enableChargingCar= rights?.includes('BOOK A CHARGING CAR');
-          enableAll= rights?.includes('ALL');
+        const backendResponse = [];
+        enableRooms = rights?.includes('BOOK A ROOM');
+        enableDesks = rights?.includes('BOOK A DESK');
+        enableParkingSeats = rights?.includes('BOOK A PARKING SEAT');
+        enableChargingCar = rights?.includes('BOOK A CHARGING CAR');
+        enableAll = rights?.includes('ALL');
         //   console.log("enableRooms ",enableRooms, rights?.includes('BOOK A ROOM')," enableDesks",enableDesks,rights?.includes('BOOK A DESK')," enableParkingSeats",enableParkingSeats ,rights?.includes('BOOK A PARKING SEAT'));
         if (enableRooms || enableAll) {
             backendResponse.push({ id: "meetingRoom", resource: translate?.ROOMS?.MEETINGROOM });
@@ -1172,7 +1174,7 @@ const AddBooking = ({ route }) => {
         if (enableParkingSeats || enableAll) {
             backendResponse.push({ id: "parkingSeat", resource: translate?.DISPLAYMODALFORM?.PARKINGSEAT });
             setRightsEnableParkingSeat(true);
-             
+
         }
         if (enableChargingCar || enableAll) {
             backendResponse.push({ id: "chargingCar", resource: translate?.DISPLAYMODALFORM?.CHARGINGCAR });
@@ -1189,18 +1191,18 @@ const AddBooking = ({ route }) => {
         }));
 
         setItemsResources(resourceOptions);
-        if(resourceOptions?.length > 0){
+        if (resourceOptions?.length > 0) {
             if (selectedResource === null && !params?.resource) {
                 setSelectedResource(resourceOptions[0].value);
-    
+
             }
         }
 
 
         setDuration([]);
-       
-        if(selectedResource !== 'chargingCar'){
-            const duration =[{ label: 'Select Duration', value: null, disabled: true },
+
+        if (selectedResource !== 'chargingCar') {
+            const duration = [{ label: 'Select Duration', value: null, disabled: true },
             { label: '15 min', value: '15' },
             { label: '30 min', value: '30' },
             { label: '45 min', value: '45' },
@@ -1211,16 +1213,16 @@ const AddBooking = ({ route }) => {
             { label: '120 min', value: '120' },
             { label: 'All Day', value: '1440' }]
             setDuration(duration);
-        }else{
-            const duration =[{ label: 'Select Duration', value: null, disabled: true },
+        } else {
+            const duration = [{ label: 'Select Duration', value: null, disabled: true },
             { label: '15 min', value: '15' },
             { label: '30 min', value: '30' },
             { label: '1 Hour', value: '60' },
-           ]
-           setDuration(duration);
+            ]
+            setDuration(duration);
         }
 
-     
+
 
     }, [rights]);
 
@@ -1274,10 +1276,11 @@ const AddBooking = ({ route }) => {
 
     const resourceSelected = (item) => {
         setSelectedResource(item.value);
+        setFilterOptionsEnabled(false);
         setDuration([]);
-       
-        if(item.value !== 'chargingCar'){
-            const duration =[{ label: 'Select Duration', value: null, disabled: true },
+
+        if (item.value !== 'chargingCar') {
+            const duration = [{ label: 'Select Duration', value: null, disabled: true },
             { label: '15 min', value: '15' },
             { label: '30 min', value: '30' },
             { label: '45 min', value: '45' },
@@ -1288,13 +1291,13 @@ const AddBooking = ({ route }) => {
             { label: '120 min', value: '120' },
             { label: 'All Day', value: '1440' }]
             setDuration(duration);
-        }else{
-            const duration =[{ label: 'Select Duration', value: null, disabled: true },
+        } else {
+            const duration = [{ label: 'Select Duration', value: null, disabled: true },
             { label: '15 min', value: '15' },
             { label: '30 min', value: '30' },
             { label: '1 Hour', value: '60' },
-           ]
-           setDuration(duration);
+            ]
+            setDuration(duration);
         }
 
         //caltering
@@ -1330,10 +1333,10 @@ const AddBooking = ({ route }) => {
 
         setCheckedChargingCar({});
         setIsOpenChargingCar(!isOpenChargingCar);
-        
+
         setCheckedParkingSeat({});
         setIsOpenParkingSeat(!isOpenParkingSeat);
-       
+
 
 
     }
@@ -1397,7 +1400,7 @@ const AddBooking = ({ route }) => {
 
         console.log("parking seat ids ", parkingSeatIds);
 
-      
+
         datas = {
             locationId: selectedLocation,
             buildingId: selectedBuilding,
@@ -1416,7 +1419,7 @@ const AddBooking = ({ route }) => {
             attendeeIds: users,
             visitorEmails: [],
             parkingSeatsIds: parkingSeatIds,
-            chargingCarIds:chargingCarIds,
+            chargingCarIds: chargingCarIds,
             cleaningRequired: isCleaning,
             customerCleaningDescription: cleaning,
             customerMobileEquipmentsIds: mobileEquipmentIds,
@@ -1453,7 +1456,7 @@ const AddBooking = ({ route }) => {
                 ToastColor.ERROR
             );
             if (res.status) {
-                params?.from ? navigation.navigate(params?.from) : navigation.navigate('CalendarScreen',  { type: selectedResource });
+                params?.from ? navigation.navigate(params?.from) : navigation.navigate('CalendarScreen', { type: selectedResource });
             }
         }).finally(() => {
             props?.setLoading(false);
@@ -1461,86 +1464,109 @@ const AddBooking = ({ route }) => {
     }
 
     // console.log("cateringFormEnable",cateringFormEnable);
-    
+
+    const handleFilter = () => {
+        setFilterOptionsEnabled(!filterOptionsEnabled);
+        // console.log("filterOptionsEnabled ", filterOptionsEnabled);
+    }
+
+
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>{translate?.ROOMBOOKING?.NEWBOOKING}</Text>
             <ScrollView>
-                <View style={styles.pickerContainer}>
-                    <Text>{translate?.ROOMBOOKING?.LOCATIONS}</Text>
-                    <Dropdown
-                        style={styles.dropdown}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        data={itemsLocations}
-                        labelField="label"
-                        valueField="value"
-                        placeholder={translate?.ROOMBOOKING?.SELECTLOCATION}
-                        value={selectedLocation}
-                        onChange={item => setSelectedLocation(item.value)}
-                    />
-                </View>
 
                 <View style={styles.pickerContainer}>
-                    <Text>{translate?.ROOMBOOKING?.BUILDING}</Text>
-                    <Dropdown
-                        style={styles.dropdown}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        data={itemsBuildings}
-                        labelField="label"
-                        valueField="value"
-                        placeholder={translate?.ROOMBOOKING?.SELECTBUILDING}
-                        value={selectedBuilding}
-                        onChange={item => setSelectedBuilding(item.value)}
-                    />
-                </View>
-
-                <View style={styles.pickerContainer}>
-                    <Text> {translate?.ROOMBOOKING?.FLOOR} </Text>
-                    <View style={styles.dropdownContainer}>
-                        <TouchableOpacity onPress={handleFloorToggle} style={styles.dropdownHeader}>
-                            {selectedFloorNames.length > 0 ? (
-                                <Text>{selectedFloorNames.join(', ')}</Text>
-                            ) : (
-                                <Text style={styles.dropdownHeaderText}>{translate?.ROOMBOOKING?.SELECTFLOOR}</Text>
-                            )}
-                        </TouchableOpacity>
-                        {isOpenFloor && (
-                            <View style={styles.dropdownContent}>
-                                {itemsFloors.map((item) => (
-                                    <View key={item.id} style={styles.dropdownItem}>
-                                        <Checkbox
-                                            status={checkedFloors[item.id] ? 'checked' : 'unchecked'}
-                                            onPress={() => handleFloorCheckboxChange(item.id)}
-                                        />
-                                        <Text>{item.name}</Text>
-                                    </View>
-                                ))}
-                            </View>
-                        )}
+                    <View style={styles.row}>
+                        <View style={styles.dropdownWrapper} >
+                            <Text>{translate?.ROOMBOOKING?.RESOURCES}</Text>
+                            <Dropdown
+                                style={styles.dropdown}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                inputSearchStyle={styles.inputSearchStyle}
+                                data={itemsResources}
+                                labelField="label"
+                                valueField="value"
+                                placeholder={translate?.ROOMBOOKING?.SELCETRESOURCE}
+                                value={selectedResource}
+                                onChange={item => resourceSelected(item)}
+                            />
+                        </View>
+                        <View style={styles.buttonWrapper}>
+                            <Button mode="contained" style={{}} buttonColor={colors.primary} onPress={handleFilter} > Filter</Button>
+                        </View>
 
                     </View>
+
+
                 </View>
 
-                <View style={styles.pickerContainer}>
-                    <Text>{translate?.ROOMBOOKING?.RESOURCES}</Text>
-                    <Dropdown
-                        style={styles.dropdown}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
-                        inputSearchStyle={styles.inputSearchStyle}
-                        data={itemsResources}
-                        labelField="label"
-                        valueField="value"
-                        placeholder={translate?.ROOMBOOKING?.SELCETRESOURCE}
-                        value={selectedResource}
-                        onChange={item => resourceSelected(item)}
-                    />
-                </View>
+
                 {
+                    filterOptionsEnabled &&
+                    <View>
+                        <View style={styles.pickerContainer}>
+                            <Text>{translate?.ROOMBOOKING?.LOCATIONS}</Text>
+                            <Dropdown
+                                style={styles.dropdown}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                inputSearchStyle={styles.inputSearchStyle}
+                                data={itemsLocations}
+                                labelField="label"
+                                valueField="value"
+                                placeholder={translate?.ROOMBOOKING?.SELECTLOCATION}
+                                value={selectedLocation}
+                                onChange={item => setSelectedLocation(item.value)}
+                            />
+                        </View>
+
+                        <View style={styles.pickerContainer}>
+                            <Text>{translate?.ROOMBOOKING?.BUILDING}</Text>
+                            <Dropdown
+                                style={styles.dropdown}
+                                placeholderStyle={styles.placeholderStyle}
+                                selectedTextStyle={styles.selectedTextStyle}
+                                inputSearchStyle={styles.inputSearchStyle}
+                                data={itemsBuildings}
+                                labelField="label"
+                                valueField="value"
+                                placeholder={translate?.ROOMBOOKING?.SELECTBUILDING}
+                                value={selectedBuilding}
+                                onChange={item => setSelectedBuilding(item.value)}
+                            />
+                        </View>
+
+                        <View style={styles.pickerContainer}>
+                            <Text> {translate?.ROOMBOOKING?.FLOOR} </Text>
+                            <View style={styles.dropdownContainer}>
+                                <TouchableOpacity onPress={handleFloorToggle} style={styles.dropdownHeader}>
+                                    {selectedFloorNames.length > 0 ? (
+                                        <Text>{selectedFloorNames.join(', ')}</Text>
+                                    ) : (
+                                        <Text style={styles.dropdownHeaderText}>{translate?.ROOMBOOKING?.SELECTFLOOR}</Text>
+                                    )}
+                                </TouchableOpacity>
+                                {isOpenFloor && (
+                                    <View style={styles.dropdownContent}>
+                                        {itemsFloors.map((item) => (
+                                            <View key={item.id} style={styles.dropdownItem}>
+                                                <Checkbox
+                                                    status={checkedFloors[item.id] ? 'checked' : 'unchecked'}
+                                                    onPress={() => handleFloorCheckboxChange(item.id)}
+                                                />
+                                                <Text>{item.name}</Text>
+                                            </View>
+                                        ))}
+                                    </View>
+                                )}
+
+                            </View>
+                        </View>
+
+
+                        {
                     (selectedResource === 'meetingRoom' && equipmentData.length > 0) &&
                     <View style={styles.pickerContainer}>
                         <Text>{translate?.ROOMBOOKING?.EQUIPMENT}</Text>
@@ -1596,87 +1622,93 @@ const AddBooking = ({ route }) => {
                 }
 
 
+                    </View>
+
+                }
+             
+
+
 
                 <View style={styles.pickerContainer}>
                     <View style={styles.dateTimeContainer}>
-                        <View style={{flex: 1}}>
-                        <Text style={{marginBottom:5}} >{translate?.ROOMBOOKING?.STARTDATE}</Text>
-                        <TouchableOpacity onPress={showDatepicker} style={styles.dateTimePicker}>
-                            <Text style={styles.selectedText}>{date.toLocaleDateString()}</Text>
-                            <Icon name="calendar" size={20} color="#000" style={styles.icon} />
-                        </TouchableOpacity>
+                        <View style={{ flex: 1 }}>
+                            <Text style={{ marginBottom: 5 }} >{translate?.ROOMBOOKING?.STARTDATE}</Text>
+                            <TouchableOpacity onPress={showDatepicker} style={styles.dateTimePicker}>
+                                <Text style={styles.selectedText}>{date.toLocaleDateString()}</Text>
+                                <Icon name="calendar" size={20} color="#000" style={styles.icon} />
+                            </TouchableOpacity>
 
-                        {show && (
-                        <DateTimePicker
-                            testID="dateTimePicker"
-                            value={date}
-                            mode={mode}
-                            display="default"
-                            onChange={onChange}
-                            onTouchCancel={()=> setShow(false)}
-                        />
-                    )}
+                            {show && (
+                                <DateTimePicker
+                                    testID="dateTimePicker"
+                                    value={date}
+                                    mode={mode}
+                                    display="default"
+                                    onChange={onChange}
+                                    onTouchCancel={() => setShow(false)}
+                                />
+                            )}
                         </View>
-                        <View style={{flex: 1}}>
-                        <Text style={{marginBottom:5}} >{translate?.ROOMBOOKING?.STARTTIME}</Text>
-                        <TouchableOpacity onPress={showTimepicker} style={styles.dateTimePicker}>
-                            <Text style={styles.selectedText}>{date.toLocaleTimeString()}</Text>
-                            <Icon name="clock-o" size={20} color="#000" style={styles.icon} />
-                        </TouchableOpacity>
-                    {showTime && (
-                        <DateTimePicker
-                            testID="timePicker"
-                            value={date}
-                            mode="time"
-                            display="default"
-                            onChange={onChange}
-                            onTouchCancel={()=> setShowTime(false)}
-                        />
-                    )}
+                        <View style={{ flex: 1 }}>
+                            <Text style={{ marginBottom: 5 }} >{translate?.ROOMBOOKING?.STARTTIME}</Text>
+                            <TouchableOpacity onPress={showTimepicker} style={styles.dateTimePicker}>
+                                <Text style={styles.selectedText}>{date.toLocaleTimeString()}</Text>
+                                <Icon name="clock-o" size={20} color="#000" style={styles.icon} />
+                            </TouchableOpacity>
+                            {showTime && (
+                                <DateTimePicker
+                                    testID="timePicker"
+                                    value={date}
+                                    mode="time"
+                                    display="default"
+                                    onChange={onChange}
+                                    onTouchCancel={() => setShowTime(false)}
+                                />
+                            )}
                         </View>
                     </View>
                 </View>
 
                 <View style={styles.pickerContainer}>
                     <View style={styles.dateTimeContainer}>
-                        <View style={{flex: 1}}>
-                        <Text style={{marginBottom:5}} >{translate?.ROOMBOOKING?.ENDDATE}</Text>
-                        <TouchableOpacity onPress={endshowDatepicker} style={styles.dateTimePicker}>
-                            <Text style={styles.selectedText}>
-                                {endDate ? endDate.toLocaleDateString() : 'Select End Date'}
-                            </Text>
-                            <Icon name="calendar" size={20} color="#000" style={styles.icon} />
-                        </TouchableOpacity>
+                        <View style={{ flex: 1 }}>
+                            <Text style={{ marginBottom: 5 }} >{translate?.ROOMBOOKING?.ENDDATE}</Text>
+                            <TouchableOpacity onPress={endshowDatepicker} style={styles.dateTimePicker}>
+                                <Text style={styles.selectedText}>
+                                    {endDate ? endDate.toLocaleDateString() : 'Select End Date'}
+                                </Text>
+                                <Icon name="calendar" size={20} color="#000" style={styles.icon} />
+                            </TouchableOpacity>
 
-                        {endShow && (
-                        <DateTimePicker
-                            testID="dateTimePicker"
-                            value={endDate}
-                            mode={endMode}
-                            display="default"
-                            onChange={onChangeEnd}
-                            onTouchCancel={()=>setEndShow(false)}
-                        />
-                    )}
+                            {endShow && (
+                                <DateTimePicker
+                                    testID="dateTimePicker"
+                                    value={endDate}
+                                    mode={endMode}
+                                    display="default"
+                                    onChange={onChangeEnd}
+                                    onTouchCancel={() => setEndShow(false)}
+                                />
+                            )}
                         </View>
-                        <View style={{flex: 1}}>
-                        <Text style={{marginBottom:5}}>{translate?.ROOMBOOKING?.ENDTIME}</Text>
-                        <TouchableOpacity onPress={endShowTimepicker} style={styles.dateTimePicker}>
-                            <Text style={styles.selectedText}>
-                                {endDate ? endDate.toLocaleTimeString() : 'Select End Time'}
-                            </Text>
-                            <Icon name="clock-o" size={20} color="#000" style={styles.icon} />
-                        </TouchableOpacity>
-                        {endShowTime && (
-                        <DateTimePicker
-                            testID="timePicker"
-                            value={endDate}
-                            mode="time"
-                            display="default"
-                            onChange={onChangeEnd}
-                            onTouchCancel={()=> setEndShowTime(false)}
-                        />
-                    )}
+                        <View style={{ flex: 1 }}>
+                            <Text style={{ marginBottom: 5 }}>{translate?.ROOMBOOKING?.ENDTIME}</Text>
+                            <TouchableOpacity onPress={endShowTimepicker} style={styles.dateTimePicker}>
+                                <Text style={styles.selectedText}>
+                                    {endDate ? endDate.toLocaleTimeString() : 'Select End Time'}
+                                </Text>
+                                <Icon name="clock-o" size={20} color="#000" style={styles.icon} />
+                            </TouchableOpacity>
+                            {endShowTime && (
+                                <DateTimePicker
+                                    testID="timePicker"
+                                    value={endDate}
+                                    mode="time"
+                                    display="default"
+                                    onChange={onChangeEnd}
+                                    onTouchCancel={() => setEndShowTime(false)}
+                                />
+                            )}
                         </View>
                     </View>
                 </View>
@@ -1757,31 +1789,31 @@ const AddBooking = ({ route }) => {
                     selectedResource === 'chargingCar' &&
 
                     <View style={styles.pickerContainer}>
-                    <Text> {translate?.DISPLAYMODALFORM?.CHARGINGCAR} </Text>
-                    <View style={styles.dropdownContainer}>
-                        <TouchableOpacity onPress={handleChargingCarToggle} style={styles.dropdownHeader}>
-                            {selectedChargingCarNames.length > 0 ? (
-                                <Text>{selectedChargingCarNames.join(', ')}</Text>
-                            ) : (
-                                <Text style={styles.dropdownHeaderText}>select ChargingCar</Text>
+                        <Text> {translate?.DISPLAYMODALFORM?.CHARGINGCAR} </Text>
+                        <View style={styles.dropdownContainer}>
+                            <TouchableOpacity onPress={handleChargingCarToggle} style={styles.dropdownHeader}>
+                                {selectedChargingCarNames.length > 0 ? (
+                                    <Text>{selectedChargingCarNames.join(', ')}</Text>
+                                ) : (
+                                    <Text style={styles.dropdownHeaderText}>select ChargingCar</Text>
+                                )}
+                            </TouchableOpacity>
+                            {isOpenChargingCar && (
+                                <View style={styles.dropdownContent}>
+                                    {chargingCar?.map((item) => (
+                                        <View key={item.id} style={styles.dropdownItem}>
+                                            <Checkbox
+                                                status={checkedChargingCar[item.id] ? 'checked' : 'unchecked'}
+                                                onPress={() => handleChargingCarCheckboxChange(item.id)}
+                                            />
+                                            <Text>{item.name}</Text>
+                                        </View>
+                                    ))}
+                                </View>
                             )}
-                        </TouchableOpacity>
-                        {isOpenChargingCar && (
-                            <View style={styles.dropdownContent}>
-                                {chargingCar?.map((item) => (
-                                    <View key={item.id} style={styles.dropdownItem}>
-                                        <Checkbox
-                                            status={checkedChargingCar[item.id] ? 'checked' : 'unchecked'}
-                                            onPress={() => handleChargingCarCheckboxChange(item.id)}
-                                        />
-                                        <Text>{item.name}</Text>
-                                    </View>
-                                ))}
-                            </View>
-                        )}
 
+                        </View>
                     </View>
-                </View>
                 }
 
                 <View style={styles.pickerContainer}>
@@ -1843,7 +1875,7 @@ const AddBooking = ({ route }) => {
 
                     <View>
 
-                        <View style={{...styles.dateTimeContainer, alignItems:'center', paddingLeft:8}}>
+                        <View style={{ ...styles.dateTimeContainer, alignItems: 'center', paddingLeft: 8 }}>
 
                             {/* <TextInput style={styles.textInput} placeholder="" className="input" value={visitor} onChangeText={text => setVisitor(text)} /> */}
                             <View style={styles.visitorContainer}>
@@ -1907,64 +1939,64 @@ const AddBooking = ({ route }) => {
                     (viewMoreenable && (selectedResource === 'meetingRoom' || selectedResource === 'desk')) &&
 
                     <View>
-                       {
-                        rightsEnableParkingSeat && (
-                            <View style={styles.pickerContainer}>
-                            <Text>{translate?.DISPLAYMODALFORM?.PARKINGSEAT}</Text>
-                            <View style={styles.dropdownContainer}>
-                                <TouchableOpacity onPress={handleParkingSeatToggle} style={styles.dropdownHeader}>
-                                {selectedParkinSeatNames.length > 0 ? (
-                                    <Text>{selectedParkinSeatNames.join(', ')}</Text>
-                                ) : (
-                                    <Text style={styles.dropdownHeaderText}>{translate.DISPLAYMODALFORM.SELECTPARKINGSEAT}</Text>
-                                )}
-                                </TouchableOpacity>
-                                {isOpenParkingSeat && (
-                                <View style={styles.dropdownContent}>
-                                    {prakingseatResonse?.map((item) => (
-                                    <View key={item?.id} style={styles.dropdownItem}>
-                                        <Checkbox
-                                        status={checkedParkingSeat[item?.id] ? 'checked' : 'unchecked'}
-                                        onPress={() => handleParkingSeatCheckboxChange(item.id)}
-                                        />
-                                        <Text>{item?.name}</Text>
+                        {
+                            rightsEnableParkingSeat && (
+                                <View style={styles.pickerContainer}>
+                                    <Text>{translate?.DISPLAYMODALFORM?.PARKINGSEAT}</Text>
+                                    <View style={styles.dropdownContainer}>
+                                        <TouchableOpacity onPress={handleParkingSeatToggle} style={styles.dropdownHeader}>
+                                            {selectedParkinSeatNames.length > 0 ? (
+                                                <Text>{selectedParkinSeatNames.join(', ')}</Text>
+                                            ) : (
+                                                <Text style={styles.dropdownHeaderText}>{translate.DISPLAYMODALFORM.SELECTPARKINGSEAT}</Text>
+                                            )}
+                                        </TouchableOpacity>
+                                        {isOpenParkingSeat && (
+                                            <View style={styles.dropdownContent}>
+                                                {prakingseatResonse?.map((item) => (
+                                                    <View key={item?.id} style={styles.dropdownItem}>
+                                                        <Checkbox
+                                                            status={checkedParkingSeat[item?.id] ? 'checked' : 'unchecked'}
+                                                            onPress={() => handleParkingSeatCheckboxChange(item.id)}
+                                                        />
+                                                        <Text>{item?.name}</Text>
+                                                    </View>
+                                                ))}
+                                            </View>
+                                        )}
                                     </View>
-                                    ))}
                                 </View>
-                                )}
-                            </View>
-                            </View>
                             )
                         }
 
                         {
                             rightsEnableChargingCar &&
-                             <View style={styles.pickerContainer}>
-                             <Text> {translate?.DISPLAYMODALFORM?.CHARGINGCAR} </Text>
-                             <View style={styles.dropdownContainer}>
-                                 <TouchableOpacity onPress={handleChargingCarToggle} style={styles.dropdownHeader}>
-                                     {selectedChargingCarNames.length > 0 ? (
-                                         <Text>{selectedChargingCarNames.join(', ')}</Text>
-                                     ) : (
-                                         <Text style={styles.dropdownHeaderText}>Select ChargingCar</Text>
-                                     )}
-                                 </TouchableOpacity>
-                                 {isOpenChargingCar && (
-                                     <View style={styles.dropdownContent}>
-                                         {chargingCar?.map((item) => (
-                                             <View key={item.id} style={styles.dropdownItem}>
-                                                 <Checkbox
-                                                     status={checkedChargingCar[item.id] ? 'checked' : 'unchecked'}
-                                                     onPress={() => handleChargingCarCheckboxChange(item.id)}
-                                                 />
-                                                 <Text>{item.name}</Text>
-                                             </View>
-                                         ))}
-                                     </View>
-                                 )}
-         
-                             </View>
-                         </View>
+                            <View style={styles.pickerContainer}>
+                                <Text> {translate?.DISPLAYMODALFORM?.CHARGINGCAR} </Text>
+                                <View style={styles.dropdownContainer}>
+                                    <TouchableOpacity onPress={handleChargingCarToggle} style={styles.dropdownHeader}>
+                                        {selectedChargingCarNames.length > 0 ? (
+                                            <Text>{selectedChargingCarNames.join(', ')}</Text>
+                                        ) : (
+                                            <Text style={styles.dropdownHeaderText}>Select ChargingCar</Text>
+                                        )}
+                                    </TouchableOpacity>
+                                    {isOpenChargingCar && (
+                                        <View style={styles.dropdownContent}>
+                                            {chargingCar?.map((item) => (
+                                                <View key={item.id} style={styles.dropdownItem}>
+                                                    <Checkbox
+                                                        status={checkedChargingCar[item.id] ? 'checked' : 'unchecked'}
+                                                        onPress={() => handleChargingCarCheckboxChange(item.id)}
+                                                    />
+                                                    <Text>{item.name}</Text>
+                                                </View>
+                                            ))}
+                                        </View>
+                                    )}
+
+                                </View>
+                            </View>
                         }
 
                         {
@@ -2330,7 +2362,7 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 5,
-        padding:11,
+        padding: 11,
         textAlignVertical: 'top', // Ensures text starts at the top of the input
     },
     textInputPragraph: {
@@ -2392,6 +2424,21 @@ const styles = StyleSheet.create({
     },
     cancelButton: {
         backgroundColor: 'red',
+    },
+
+
+    row: {
+        flexDirection: 'row',
+        alignItems: 'center', // Align items vertically
+        justifyContent: 'space-between', // Optional: distribute space between dropdown and button
+    },
+    dropdownWrapper: {
+        flex: 1, // Take up the remaining space
+        marginRight: 10, // Add space between dropdown and button
+    },
+    buttonWrapper: {
+        flexShrink: 1, // Ensure the button doesn't stretch
+        marginTop: 14
     },
 
 
