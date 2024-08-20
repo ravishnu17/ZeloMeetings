@@ -785,7 +785,7 @@ const Rooms = () => {
                   </View>
                   <View style={styles.filterView}>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>{translate?.ROOMS?.BUILDING} </Text>
+                      <Text style={styles.headText}>{translate?.ROOMBOOKING?.BUILDING} </Text>
                       <Dropdown
                         data={building}
                         value={selectedBuilding}
@@ -802,7 +802,7 @@ const Rooms = () => {
                       />
                     </View>
                     <View style={{ flex: 1 }}>
-                      <Text style={styles.headText}>{translate?.ROOMS?.FLOOR} </Text>
+                      <Text style={styles.headText}>{translate?.ROOMBOOKING?.FLOOR} </Text>
                       <Dropdown
                         data={floor}
                         value={selectedFloor}

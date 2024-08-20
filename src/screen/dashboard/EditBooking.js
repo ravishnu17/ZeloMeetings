@@ -118,11 +118,7 @@ const EditBooking = ({ route }) => {
     const [checkedSpecialService, setCheckedSpecialService] = useState({});
     const [specialServiceDescription, setSpecialServiceDescription] = useState('');
     const [specialServiceisOpen, setSpecialServiceisOpen] = useState(false);
-
-
-
-
-
+    
     const [user, setUser] = useState([]);
     const [checkUser, setCheckUser] = useState({});
     const [userisOpen, setUserisOpen] = useState(false);
@@ -1776,7 +1772,7 @@ const EditBooking = ({ route }) => {
 
     const handleClickCancel = () => {
         // navigation.navigate('Dashboard');  
-        navigation.navigate('CalendarScreen')
+        navigation.navigate('CalendarScreen', { type: selectedResource })
     }
 
     const handleClickSubmit = () => {
@@ -1877,7 +1873,7 @@ const EditBooking = ({ route }) => {
             );
             if (res.status) {
                 // console.log("add booking  success", res);
-                params?.from ? navigation.navigate(params?.from) : navigation.navigate('CalendarScreen')
+                params?.from ? navigation.navigate(params?.from) : navigation.navigate('CalendarScreen', { type: selectedResource })
             }
         }).finally(() => {
             props?.setLoading(false);
@@ -2177,6 +2173,37 @@ const EditBooking = ({ route }) => {
                             onChange={item => parkingseatChange(item)}
                         />
                     </View>
+                }
+
+{
+                    selectedResource === 'chargingCar' &&
+
+                    <View style={styles.pickerContainer}>
+                    <Text> {translate?.DISPLAYMODALFORM?.CHARGINGCAR} </Text>
+                    <View style={styles.dropdownContainer}>
+                        <TouchableOpacity onPress={handleChargingCarToggle} style={styles.dropdownHeader}>
+                            {selectedChargingCarNames.length > 0 ? (
+                                <Text>{selectedChargingCarNames.join(', ')}</Text>
+                            ) : (
+                                <Text style={styles.dropdownHeaderText}>{translate?.DISPLAYMODALFORM?.SELECTCHARGINGCAR}</Text>
+                            )}
+                        </TouchableOpacity>
+                        {isOpenChargingCar && (
+                            <View style={styles.dropdownContent}>
+                                {chargingCar?.map((item) => (
+                                    <View key={item.id} style={styles.dropdownItem}>
+                                        <Checkbox
+                                            status={checkedChargingCar[item.id] ? 'checked' : 'unchecked'}
+                                            onPress={() => handleChargingCarCheckboxChange(item.id)}
+                                        />
+                                        <Text>{item.name}</Text>
+                                    </View>
+                                ))}
+                            </View>
+                        )}
+
+                    </View>
+                </View>
                 }
 
                 <View style={styles.pickerContainer}>

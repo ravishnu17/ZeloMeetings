@@ -253,20 +253,18 @@ const AddBooking = ({ route }) => {
         setSelectedLocation(params?.locationID || null);
         setSelectedBuilding(params?.buildingID || null)
         setCheckedFloors(params?.floorID ? { [params.floorID]: true } : {});
-
+        //from calendar view and rooms view
         if (params) {
             setSelectedResource(params.resource);
             if (params?.resource === 'meetingRoom') {
-                setSelectedMeetingRoom(params?.meetingRoom);
+                params?.meetingRoom && setSelectedMeetingRoom(params?.meetingRoom);
             } else if (params?.resource === 'desk') {
-                setSelectedDesk(params?.desk);
+                params?.desk && setSelectedDesk(params?.desk);
             } else if (params?.resource === 'parkingSeat') {
-                setSelectedParkingSeat(params?.parkingSeat);
+                params?.parkingSeat &&setSelectedParkingSeat(params?.parkingSeat);
+            } else if (params?.resource === 'chargingCar') {
+                params?.chargingCar && setCheckedChargingCar({[params?.chargingCar]:true});
             }
-            
-            // else if (params?.resource === 'chargingCar') {
-            //     setSelectedChargingCar(params?.chargingCar);
-            // }
         } else {
             setSelectedMeetingRoom(null);
             setSelectedDesk(null);
@@ -303,6 +301,7 @@ const AddBooking = ({ route }) => {
 
     // console.log("loginUser ",loginUser.id);
     const getlocationApi = () => {
+        props?.setLoading(true)
         getLocationlist().then((res) => {
             // console.log("location ", res);
             setItemsLocations([]);
@@ -320,6 +319,8 @@ const AddBooking = ({ route }) => {
                     }
                 })
             }
+        }).finally(() => {
+            props?.setLoading(false);
         })
     }
 
@@ -383,6 +384,7 @@ const AddBooking = ({ route }) => {
     useEffect(() => {
         // console.log("selectedLocation ",selectedLocation);
         if (selectedLocation) {
+            props?.setLoading(true);
             getBulidingListApi(selectedLocation);
             getEqupmentListApi(selectedLocation);
             getCustomerITSupporting(selectedLocation);
@@ -524,6 +526,8 @@ const AddBooking = ({ route }) => {
                 }
 
             }
+        }).finally(() => {
+            props?.setLoading(false);
         })
     }
 
@@ -868,7 +872,7 @@ const AddBooking = ({ route }) => {
             setSpecialService([]);
             setCheckedSpecialService({});
             if (res.status) {
-                setSpecialService(res.customerSpecialServices);
+                setSpecialService(res.customerSpecialServices || []);
                 // const initialCheckedState = res.customerSpecialServices.reduce((acc, equipment) => {
                 //     acc[equipment.id] = false;
                 //     return acc;      
@@ -1354,7 +1358,7 @@ const AddBooking = ({ route }) => {
 
 
     const handleClickCancel = () => {
-        params?.from ? navigation.navigate(params?.from) : navigation.navigate('CalendarScreen');
+        params?.from ? navigation.navigate(params?.from) : navigation.navigate('CalendarScreen', { type: selectedResource });
     }
 
     // console.log("praking seat ", parkingseat);
@@ -1449,7 +1453,7 @@ const AddBooking = ({ route }) => {
                 ToastColor.ERROR
             );
             if (res.status) {
-                params?.from ? navigation.navigate(params?.from) : navigation.navigate('CalendarScreen');
+                params?.from ? navigation.navigate(params?.from) : navigation.navigate('CalendarScreen',  { type: selectedResource });
             }
         }).finally(() => {
             props?.setLoading(false);

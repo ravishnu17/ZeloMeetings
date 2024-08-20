@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Dashboard from '../screen/dashboard/Dashboard';
-import CalendarView from '../screen/dashboard/CalendarVIew';
+import CalendarView from '../screen/dashboard/CalendarView';
 import Rooms from '../screen/dashboard/Rooms';
 import Report from '../screen/dashboard/Report';
 import Menu from '../screen/dashboard/Menu';
