@@ -103,7 +103,7 @@ const CalendarView = ({ route }) => {
     getCalenderData(resource, locationId, startDate, endDate, buildingId, floorId).then((res) => {
       setEvents({});
       if (res?.status) {
-        const eventMarks = res?.bookings?.reduce((acc, event) => {
+        const eventMarks = res?.bookings?.sort((a,b) => new Date(a.startDate + ' ' + a.startTime) - new Date(b.startDate + ' ' + b.startTime))?.reduce((acc, event) => {
           const date = event.startDate;
           if (date && date.match(/^\d{4}-\d{2}-\d{2}$/)) {
             if (!acc[date]) {
@@ -175,12 +175,13 @@ const CalendarView = ({ route }) => {
         setItemsLocations(locationOptions);
         locationOptions.forEach((item) => {
           if (item.value === userLocation) {
-            // setSelectedLocation(item.value);
             handleChangeLocation({ value: item.value }, params?.type || "meetingRoom");
           }
         });
       }
-    }).finally(() => setLoading(false));
+    }).finally(() => {
+      // setLoading(false);
+    });
   };
 
   const getBulidingListApi = (id) => {
@@ -346,24 +347,30 @@ const CalendarView = ({ route }) => {
     const eventDetails = events[dateString]?.events || [];
     if (eventDetails.length > 0) {
       return eventDetails.map((event, index) => {
-        let color = event?.status === 'ongoing' ? '#ea4334' : event?.status === 'upcoming' ? '#03397E' : '#6d7486' ;
+        let color = event?.status === 'ongoing' ? '#bb3f34' : event?.status === 'upcoming' ? '#03397E' : '#6d7486';
         return (
           <View key={index} style={styles.eventContainer}>
-            <TouchableOpacity style={{backgroundColor: color, borderRadius: 5, padding: 8}} onPress={() => handleEventClick(event.id)}>
-              {selectResource === "meetingRoom" && (
-                <Text style={styles.eventText}>{event?.meetingRoom?.name || 'N/A'}</Text>
-              )}
-              {selectResource === "desk" && (
-                <Text style={styles.eventText}>{event?.desk?.name || 'N/A'}</Text>
-              )}
-              {selectResource === "parkingSeat" && (
-                <Text style={styles.eventText}>{event?.parkingSeat?.name || 'N/A'}</Text>
-              )}
-              {selectResource === "chargingCar" && (
-                <Text style={styles.eventText}>{event?.chargingCar?.name || 'N/A'}</Text>
-              )}
-              <Text style={styles.eventText}>{event?.subject}</Text>
-              <Text style={{color:'#fff', fontSize:12 , marginTop: 5}}>{`${event?.startDate}, ${event?.startTime} - ${event?.endDate}, ${event?.endTime}`}</Text>
+            <TouchableOpacity style={{ flexDirection: 'row',justifyContent: 'space-between', alignItems:'center', backgroundColor: color, borderRadius: 5, padding: 8 }} onPress={() => handleEventClick(event.id)}>
+              <View style={{ flex: 6 }}>
+                {selectResource === "meetingRoom" && (
+                  <Text style={styles.eventText}>{event?.meetingRoom?.name || 'N/A'}</Text>
+                )}
+                {selectResource === "desk" && (
+                  <Text style={styles.eventText}>{event?.desk?.name || 'N/A'}</Text>
+                )}
+                {selectResource === "parkingSeat" && (
+                  <Text style={styles.eventText}>{event?.parkingSeat?.name || 'N/A'}</Text>
+                )}
+                {selectResource === "chargingCar" && (
+                  <Text style={styles.eventText}>{event?.chargingCar?.name || 'N/A'}</Text>
+                )}
+                <Text style={[styles.eventText,{fontSize:14, marginTop: 3}]}>{event?.subject}</Text>
+              </View>
+              <View style={{ flex: 4, alignItems: 'center'}}>
+                <Text style={{ color: '#fff', fontSize: 13, marginTop: 5 }}>{`${event?.startDate}, ${event?.startTime}`}</Text>
+                <Text style={{ color: '#fff', fontSize: 13, marginTop: 5 }}>{`${event?.endDate}, ${event?.endTime}`}</Text>
+              </View>
+
             </TouchableOpacity>
           </View>
         );
@@ -491,6 +498,8 @@ const CalendarView = ({ route }) => {
       const endDate = nextMonthFirstDay.toISOString().split('T')[0];
       setMonthStartDate(startDate);
       setMonthEndDate(endDate);
+    }else{
+      setSelectedLocation(null);
     }
   }, [isFocus]);
 
@@ -649,7 +658,7 @@ const CalendarView = ({ route }) => {
       </ScrollView>
       <View style={styles.addButtonContainer}>
         <TouchableOpacity onPress={() => navigation.navigate('AddBooking', { resource: selectResource })}>
-          <Icon name="plus-circle" size={30} color="#007bff" style={{backgroundColor:'white', borderRadius: 100}} />
+          <Icon name="plus-circle" size={30} color="#007bff" style={{ backgroundColor: 'white', borderRadius: 100 }} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -663,7 +672,7 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     flexDirection: 'column',
-    marginVertical: 20,
+    marginTop: 15,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
@@ -696,12 +705,12 @@ const styles = StyleSheet.create({
   },
   eventText: {
     fontSize: 16,
-    color:'#fff'
+    color: '#fff'
   },
   addButtonContainer: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
+    bottom: 10,
+    right: 10,
   },
   heading: {
     fontSize: 20,
@@ -714,6 +723,7 @@ const styles = StyleSheet.create({
   resourceContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 20
   },
   resourceButton: {
     flex: 1,
@@ -723,7 +733,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 5,
     // paddingHorizontal: 10, // Ensure some padding inside the buttons
-    padding: 6
+    padding: 5
   },
   resourceButtonText: {
     color: '#FFFFFF',
