@@ -61,7 +61,7 @@ function Profile() {
                 contactName: res?.user?.firstName,
                 email: res?.user?.email,
                 countryId: res?.user?.country?.id,
-                locationId: res?.user?.location?.id,
+                locationId: Templocation,
                 buildingId: res?.user?.buildingId,
                 floorId: res?.user?.floorId || null,
                 language: res?.user?.language,
@@ -172,6 +172,7 @@ function Profile() {
             }
         }
         setLoading(true);
+        console.log("postData", postData);
         updateUserProfile(postData).then(res => {
             if (res?.status) {
                 Toast.showWithGravity(res?.information?.description, Toast.SHORT, Toast.BOTTOM);

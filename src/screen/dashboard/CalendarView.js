@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
-import { findBuildingListBasedonLocationId, findFloorsListBasedonBuildingId, getCalenderData, getCalenderResourceData, getChargingCarByBuildingFloor, getChargingCarList, getDeskListBuildingAndFloor, getDesksByLocationId, getLocationlist, getMeetingRoomListBuildingAndFloor, getParkingSeatByLocationId, getParkingSeatListBuildingAndFloor, locationBasedCalenderMeetingRoom, loginHomeAccess } from '../../apiservices/Apiservices';
+import { findBuildingListBasedonLocationId, findFloorsListBasedonBuildingId, getCalenderData, getCalenderResourceData, getCarByBuildingFloor, getCarListByLocation, getChargingCarByBuildingFloor, getChargingCarList, getDeskListBuildingAndFloor, getDesksByLocationId, getLocationlist, getMeetingRoomListBuildingAndFloor, getParkingSeatByLocationId, getParkingSeatListBuildingAndFloor, locationBasedCalenderMeetingRoom, loginHomeAccess } from '../../apiservices/Apiservices';
 import { context } from '../../navigation/Appnav';
 
 const CalendarView = ({ route }) => {
@@ -50,6 +50,10 @@ const CalendarView = ({ route }) => {
   const defaultChargingCar = { value: null, label: translate?.DISPLAYMODALFORM?.SELECTCHARGINGCAR };
   const [chargingCar, setChargingCars] = useState([]);
   const [selectedChargingCar, setSelectedChargingCar] = useState(null);
+
+  const defaultCar = { value: null, label: translate?.ROOMBOOKING?.SELECTCAR };
+  const [car, setCars] = useState([]);
+  const [selectedCar, setSelectedCar] = useState(null);
 
   const [selectResource, setSelectResource] = useState("meetingRoom");
 
@@ -103,7 +107,7 @@ const CalendarView = ({ route }) => {
     getCalenderData(resource, locationId, startDate, endDate, buildingId, floorId).then((res) => {
       setEvents({});
       if (res?.status) {
-        const eventMarks = res?.bookings?.sort((a,b) => new Date(a.startDate + ' ' + a.startTime) - new Date(b.startDate + ' ' + b.startTime))?.reduce((acc, event) => {
+        const eventMarks = res?.bookings?.sort((a, b) => new Date(a.startDate + ' ' + a.startTime) - new Date(b.startDate + ' ' + b.startTime))?.reduce((acc, event) => {
           const date = event.startDate;
           if (date && date.match(/^\d{4}-\d{2}-\d{2}$/)) {
             if (!acc[date]) {
@@ -113,15 +117,15 @@ const CalendarView = ({ route }) => {
           }
           return acc;
         }, {});
+        eventMarks[selectedDate] ? eventMarks[selectedDate]['selected'] = true : eventMarks[selectedDate]= {'selected': true}
         setEvents(eventMarks);
       }
     }).finally(() => setLoading(false));
   };
 
-  const resourcedateBasedBooking = (locationId, resource, meetingRoom, desk, parkingSeat, chargingCarId, monthStartDate, monthEndDate) => {
-
+  const resourcedateBasedBooking = (locationId, resource, meetingRoom, desk, parkingSeat, chargingCarId, carId, monthStartDate, monthEndDate) => {
     datas = {
-      carId: null,
+      carId: carId,
       chargingCarId: chargingCarId,
       customerLocationId: locationId,
       deskId: desk,
@@ -131,7 +135,6 @@ const CalendarView = ({ route }) => {
       sourceType: resource,
       startDate: monthStartDate,
     }
-
     setLoading(true);
     getCalenderResourceData(datas).then((res) => {
       setEvents({});
@@ -146,6 +149,7 @@ const CalendarView = ({ route }) => {
           }
           return acc;
         }, {});
+        eventMarks[selectedDate] ? eventMarks[selectedDate]['selected'] = true : eventMarks[selectedDate]= {'selected': true}
         setEvents(eventMarks);
       }
     }).finally(() => setLoading(false));
@@ -338,10 +342,48 @@ const CalendarView = ({ route }) => {
         setChargingCars([]);
       }
     }).catch((err) => {
-      console.log("charging car location", err);
+      console.log("charging car building floor", err);
       setChargingCars([]);
     }).finally(() => setLoading(false));
   };
+
+  // location based car
+  const getCarListByLocationId = (id) => {
+    getCarListByLocation(id).then((res) => {
+      setSelectedCar(null);
+      console.log("car location", res);
+      if (res.status) {
+        const carOption = res?.carDTOs?.map((item) => ({
+          label: item.name,
+          value: item.id,
+        }));
+        setCars([defaultChargingCar, ...carOption]);
+      } else {
+        setCars([]);
+      }
+    }).catch((err) => {
+      console.log(" car location", err);
+      setCars([]);
+    }).finally(() => setLoading(false));
+  }
+  // car by building & floor
+  const getCarListByBuildingAndFloorId = (selectedBuilding, selectFloors) => {
+    getCarByBuildingFloor(selectedBuilding, selectFloors).then((res) => {
+      setSelectedCar(null);
+      if (res.status) {
+        const carOption = res?.carDTOs?.map((item) => ({
+          label: item.name,
+          value: item.id,
+        }));
+        setCars([defaultChargingCar, ...carOption]);
+      } else {
+        setCars([]);
+      }
+    }).catch((err) => {
+      console.log(" car building floor", err);
+      setCars([]);
+    }).finally(() => setLoading(false));
+  }
 
   const renderEventDetails = (dateString) => {
     const eventDetails = events[dateString]?.events || [];
@@ -350,7 +392,7 @@ const CalendarView = ({ route }) => {
         let color = event?.status === 'ongoing' ? '#bb3f34' : event?.status === 'upcoming' ? '#03397E' : '#6d7486';
         return (
           <View key={index} style={styles.eventContainer}>
-            <TouchableOpacity style={{ flexDirection: 'row',justifyContent: 'space-between', alignItems:'center', backgroundColor: color, borderRadius: 5, padding: 8 }} onPress={() => handleEventClick(event.id)}>
+            <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: color, borderRadius: 5, padding: 8 }} onPress={() => handleEventClick(event.id)}>
               <View style={{ flex: 6 }}>
                 {selectResource === "meetingRoom" && (
                   <Text style={styles.eventText}>{event?.meetingRoom?.name || 'N/A'}</Text>
@@ -364,11 +406,14 @@ const CalendarView = ({ route }) => {
                 {selectResource === "chargingCar" && (
                   <Text style={styles.eventText}>{event?.chargingCar?.name || 'N/A'}</Text>
                 )}
-                <Text style={[styles.eventText,{fontSize:14, marginTop: 3}]}>{event?.subject}</Text>
+                {selectResource === "car" && (
+                  <Text style={styles.eventText}>{event?.car?.name || 'N/A'}</Text>
+                )}
+                <Text style={[styles.eventText, { fontSize: 13, marginTop: 3 }]}>{event?.subject}</Text>
               </View>
-              <View style={{ flex: 4, alignItems: 'center'}}>
-                <Text style={{ color: '#fff', fontSize: 13, marginTop: 5 }}>{`${event?.startDate}, ${event?.startTime}`}</Text>
-                <Text style={{ color: '#fff', fontSize: 13, marginTop: 5 }}>{`${event?.endDate}, ${event?.endTime}`}</Text>
+              <View style={{ flex: 4, alignItems: 'center', paddingRight: 10 }}>
+                <Text style={{ color: '#fff', fontSize: 12, marginTop: 5 }}>{`${event?.startDate}, ${event?.startTime}`}</Text>
+                <Text style={{ color: '#fff', fontSize: 12, marginTop: 5 }}>{`${event?.endDate}, ${event?.endTime}`}</Text>
               </View>
 
             </TouchableOpacity>
@@ -393,6 +438,8 @@ const CalendarView = ({ route }) => {
       getParkinseatsListByLocationId(locationID);
     } else if (resourceType === "chargingCar") {
       getChargingCarListByLocationId(locationID);
+    } else if (resourceType === "car") {
+      getCarListByLocationId(locationID);
     }
   }
 
@@ -406,6 +453,8 @@ const CalendarView = ({ route }) => {
       getParkingSeatListByBuildingAndFloorId(buildingID, floorID);
     } else if (resourceType === "chargingCar") {
       getChargingCarListByBuildingAndFloorId(buildingID, floorID);
+    } else if (resourceType === "car") {
+      getCarListByBuildingAndFloorId(buildingID, floorID);
     }
   }
 
@@ -446,12 +495,16 @@ const CalendarView = ({ route }) => {
 
   // Handle Change resource 
   const handleChangeResource = (value) => {
-    setSelectResource(value);
-    setEvents({});
+    if (selectResource !== value) {
+      setSelectResource(value);
+      const today = new Date().toISOString().split('T')[0];
+      setSelectedDate(today);
+      setEvents({});
 
-    // Set empty
-    clearSelection();
-    handleChangeLocation({ value: selectedLocation }, value);
+      // Set empty
+      clearSelection();
+      handleChangeLocation({ value: selectedLocation }, value);
+    }
   };
 
   // Handle event click
@@ -461,12 +514,12 @@ const CalendarView = ({ route }) => {
 
   // Get calendar event data based on specific resource or location, building and floor
   useEffect(() => {
-    if (selectedMeetingRoom !== null || selectedDesk !== null || selectedParkingSeat !== null || selectedChargingCar !== null) {
-      resourcedateBasedBooking(selectedLocation, selectResource, selectedMeetingRoom, selectedDesk, selectedParkingSeat, selectedChargingCar, monthStartDate, monthEndDate);
+    if (selectedMeetingRoom !== null || selectedDesk !== null || selectedParkingSeat !== null || selectedChargingCar !== null || selectedCar !== null) {
+      resourcedateBasedBooking(selectedLocation, selectResource, selectedMeetingRoom, selectedDesk, selectedParkingSeat, selectedChargingCar, selectedCar, monthStartDate, monthEndDate);
     } else {
       selectedLocation && calenderApi(selectedLocation, selectedBuilding, selectFloors, selectResource, monthStartDate, monthEndDate);
     }
-  }, [selectedLocation, selectedBuilding, selectFloors, selectResource, monthStartDate, monthEndDate, selectedMeetingRoom, selectedDesk, selectedParkingSeat, selectedChargingCar]);
+  }, [selectedLocation, selectedBuilding, selectFloors, selectResource, monthStartDate, monthEndDate, selectedMeetingRoom, selectedDesk, selectedParkingSeat, selectedChargingCar, selectedCar]);
 
   // Initial useEffect call
   useEffect(() => {
@@ -498,7 +551,7 @@ const CalendarView = ({ route }) => {
       const endDate = nextMonthFirstDay.toISOString().split('T')[0];
       setMonthStartDate(startDate);
       setMonthEndDate(endDate);
-    }else{
+    } else {
       setSelectedLocation(null);
     }
   }, [isFocus]);
@@ -509,6 +562,11 @@ const CalendarView = ({ route }) => {
         <Calendar
           current={selectedDate}
           onDayPress={(day) => {
+            let tempEvents= {...events, 
+              [day.dateString]: {...events[day.dateString], selected: true}, 
+              [selectedDate]: {...events[selectedDate], selected: false }
+            };
+            setEvents(tempEvents);
             setSelectedDate(day.dateString);
           }}
           onMonthChange={onMonthChange}
@@ -636,6 +694,24 @@ const CalendarView = ({ route }) => {
               />
             </View>
           }
+          {
+            selectResource === 'car' &&
+            <View style={styles.locationview}>
+              <Text>{translate?.ROOMS?.CAR}</Text>
+              <Dropdown
+                style={styles.dropdown}
+                placeholderStyle={styles.placeholderStyle}
+                selectedTextStyle={styles.selectedTextStyle}
+                inputSearchStyle={styles.inputSearchStyle}
+                data={car}
+                labelField="label"
+                valueField="value"
+                placeholder={translate?.ROOMBOOKING?.SELECTCAR}
+                value={selectedCar}
+                onChange={(item) => setSelectedCar(item.value)}
+              />
+            </View>
+          }
         </View>
 
         <View style={styles.resourceContainer}>
@@ -651,14 +727,17 @@ const CalendarView = ({ route }) => {
           <TouchableOpacity style={[styles.resourceButton, selectResource === 'chargingCar' ? styles?.selectedResource : {}, { backgroundColor: '#3c4355' }]} onPress={() => handleChangeResource('chargingCar')}>
             <Text style={styles.resourceButtonText} >{translate?.DISPLAYMODALFORM?.CHARGINGCAR}</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={[styles.resourceButton, selectResource === 'car' ? styles?.selectedResource : {}, { backgroundColor: '#f15e44' }]} onPress={() => handleChangeResource('car')}>
+            <Text style={styles.resourceButtonText} >{translate?.ROOMS?.CAR}</Text>
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.heading}>{translate?.MENU?.BOOKING}</Text>
         {!props?.loading && <ScrollView>{renderEventDetails(selectedDate)}</ScrollView>}
       </ScrollView>
       <View style={styles.addButtonContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate('AddBooking', { resource: selectResource })}>
-          <Icon name="plus-circle" size={30} color="#007bff" style={{ backgroundColor: 'white', borderRadius: 100 }} />
+        <TouchableOpacity style={{ backgroundColor: 'white', borderRadius: 50, height: 30, width: 30, alignItems: 'center', justifyContent: 'center' }} onPress={() => navigation.navigate('AddBooking', { resource: selectResource })}>
+          <Icon name="plus-circle" size={30} color="#007bff" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -722,22 +801,20 @@ const styles = StyleSheet.create({
   // Resource buttons
   resourceContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    columnGap: 5,
     marginTop: 20
   },
   resourceButton: {
     flex: 1,
-    marginHorizontal: 5,
-    // height: 50, // Fixed height to ensure all buttons have the same height
+    // marginHorizontal: 5,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 5,
-    // paddingHorizontal: 10, // Ensure some padding inside the buttons
-    padding: 5
+    padding: 3
   },
   resourceButtonText: {
     color: '#FFFFFF',
-    fontSize: 15,
+    // fontSize: 13,
     textAlign: 'center',
     flexWrap: 'wrap', // Allow text to wrap inside the button
   },

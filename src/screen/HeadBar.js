@@ -94,7 +94,7 @@ const HeadBar = () => {
                 <TouchableOpacity>
                   <Image source={require('../assets/passcode.png')} style={styles.passcode} />
                 </TouchableOpacity>
-                <TouchableOpacity >
+                <TouchableOpacity onPress={() => navigation.navigate('QrCodeScanner')} >
                   <Icon
                     source="qrcode"
                     size={30}

@@ -1084,3 +1084,36 @@ export const getChargingCarByBuildingFloor =async (buildingId, floorId) =>{
     throw error;
   }
 }
+
+// Calendar 
+// Cars
+export const getCarListByLocation = async (locationId)=>{
+  try{
+    const res=await axiosInstance.get(`/car/list/bycustomerlocationId?customerLocationId=${locationId}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const getCarByBuildingFloor = async (buildingId, floorId)=>{
+  try{
+    const res=await axiosInstance.get(`/car/listCarbyBuilding?buildingId=${buildingId}&floorId=${floorId ? floorId : 0}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+// QR find resource
+export const getResourceDataById = async (resourceId)=>{
+  try{
+    const res=await axiosInstance.get(`/kiosk/find?id=${resourceId}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}

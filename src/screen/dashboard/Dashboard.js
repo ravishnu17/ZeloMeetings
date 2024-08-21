@@ -7,6 +7,7 @@ import { context } from '../../navigation/Appnav';
 import Toast from 'react-native-simple-toast';
 import { ToastColor } from '../utils/ToastColors';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Dashboard = () => {
     const [dashboard, setDashboard] = useState();
@@ -15,13 +16,25 @@ const Dashboard = () => {
     const props = useContext(context);
     const setLoading = props?.setLoading;
     const translate = props?.language;
-    const tableDisplayResource = ['meetingRoom', 'desk','parkingSeat','chargingCar'];
+    const tableDisplayResource = ['meetingRoom', 'desk', 'parkingSeat', 'chargingCar'];
     const isFocus = useIsFocused();
     const navigate = useNavigation();
 
     const dashBoardDetails = async () => {
         setLoading(true);
-        let temp = await getDashboardData();
+        let temp={};
+        try {
+            temp = await getDashboardData();
+        } catch (error) {
+            setLoading(false);
+            if (error?.response?.status === 403) {
+                AsyncStorage.clear();
+                navigate.navigate('LoginScreen');
+                return
+            } else {
+                console.error('API Error:', error);
+            }
+        }
         setLoading(false);
         if (temp?.status) {
             setDashboard(temp?.dashboardEndUserDTO);
@@ -48,9 +61,9 @@ const Dashboard = () => {
         } else if (item?.bookingType === 'parkingSeat') {
             data.type = 'Parking Seat';
             data.name = 'Parking Seat'//item?.parkingSeats?.map(item => item?.name).join(', ');
-        }else if (item?.bookingType === 'chargingCar') {
+        } else if (item?.bookingType === 'chargingCar') {
             data.type = 'Charging Car';
-            data.name =  'Charging Car' // item?.chargingCars?.map(item => item?.name).join(', ');
+            data.name = 'Charging Car' // item?.chargingCars?.map(item => item?.name).join(', ');
         }
         return data
     }
@@ -138,8 +151,8 @@ const Dashboard = () => {
                 </View>
                 {/* Parking */}
                 <View style={{ flex: 1 }}>
-                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.PARKINGSEATS}</Text>
-                        <View style={styles?.progressText} >
+                    <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.PARKINGSEATS}</Text>
+                    <View style={styles?.progressText} >
                         <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.percentageOfParkingSeatsBooked}%</Text>
                         <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.availableParkingSeats}/{dashboard?.engagedParkingSeats}</Text>
                     </View>
@@ -149,8 +162,8 @@ const Dashboard = () => {
                 </View>
                 {/* Charging car */}
                 <View style={{ flex: 1 }}>
-                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ROOMBOOKING?.CHARGINGCARS}</Text>
-                        <View style={styles?.progressText} >
+                    <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ROOMBOOKING?.CHARGINGCARS}</Text>
+                    <View style={styles?.progressText} >
                         <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.percentageOfChargingCarsBooked}%</Text>
                         <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.availableChargingCars}/{dashboard?.engagedChargingCars}</Text>
                     </View>
