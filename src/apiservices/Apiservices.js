@@ -1107,17 +1107,6 @@ export const getCarByBuildingFloor = async (buildingId, floorId)=>{
   }
 }
 
-// QR find resource
-export const getResourceDataById = async (resourceId)=>{
-  try{
-    const res=await axiosInstance.get(`/kiosk/find?id=${resourceId}`);
-    return res.data;
-  }catch(error){
-    console.error('API Error:', error);
-    throw error;
-  }
-}
-
 //car Booking  filter Apis
 
 export const getLocationbasedCars = async (location, startDate,startTime, endDate, endTime) =>{
@@ -1200,6 +1189,27 @@ export const getEditBookingFloorbasedCars = async (location,building,checkedFloo
 
   try{
     const res =await axiosInstance.get(`/car/list/bylocationandtime?customerLocationId=${locationId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=${bookingId}&buildingId=${buildingId}&floorId=${floorIds}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+// QR find resource
+export const resourceCheckIn = async (resourceId)=>{
+  try{
+    const res=await axiosInstance.get(`/checkInCheckOut/verifyCheckin?meetingRoomId=${resourceId}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const AddCheckIn = async (bookingId, meetingsroomId)=>{
+  try{
+    const res=await axiosInstance.get(`/checkInCheckOut/doCheckin?bookingId=${bookingId}&meetingRoomId=${meetingsroomId}`);
     return res.data;
   }catch(error){
     console.error('API Error:', error);

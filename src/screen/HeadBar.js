@@ -89,12 +89,15 @@ const HeadBar = () => {
         rightComponent={
           <View style={styles.header_container}>
             {
-              index === 1 &&
+              (index === 1 && preState?.id !== 1) &&
               <>
                 <TouchableOpacity>
                   <Image source={require('../assets/passcode.png')} style={styles.passcode} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('QrCodeScanner')} >
+                <TouchableOpacity onPress={() => {
+                  props?.setPre({id: 1, name: 'DashboardScreen'});
+                  navigation.navigate('QrCodeScanner');
+                }} >
                   <Icon
                     source="qrcode"
                     size={30}

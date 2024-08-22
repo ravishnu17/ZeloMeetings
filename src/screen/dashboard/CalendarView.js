@@ -117,7 +117,7 @@ const CalendarView = ({ route }) => {
           }
           return acc;
         }, {});
-        eventMarks[selectedDate] ? eventMarks[selectedDate]['selected'] = true : eventMarks[selectedDate]= {'selected': true}
+        eventMarks[selectedDate] ? eventMarks[selectedDate]['selected'] = true : eventMarks[selectedDate] = { 'selected': true }
         setEvents(eventMarks);
       }
     }).finally(() => setLoading(false));
@@ -149,7 +149,7 @@ const CalendarView = ({ route }) => {
           }
           return acc;
         }, {});
-        eventMarks[selectedDate] ? eventMarks[selectedDate]['selected'] = true : eventMarks[selectedDate]= {'selected': true}
+        eventMarks[selectedDate] ? eventMarks[selectedDate]['selected'] = true : eventMarks[selectedDate] = { 'selected': true }
         setEvents(eventMarks);
       }
     }).finally(() => setLoading(false));
@@ -197,8 +197,6 @@ const CalendarView = ({ route }) => {
           label: item.name,
           value: item.id,
         }));
-        // console.log("defaultBuilding ",defaultBuilding);
-        // console.log("buildingOptions ",buildingOptions);
         setItemsBuildings([defaultBuilding, ...buildingOptions]);
       }
     });
@@ -359,7 +357,7 @@ const CalendarView = ({ route }) => {
           label: item.name,
           value: item.id,
         }));
-        setCars([defaultChargingCar, ...carOption]);
+        setCars([defaultCar, ...carOption]);
       } else {
         setCars([]);
       }
@@ -377,7 +375,7 @@ const CalendarView = ({ route }) => {
           label: item.name,
           value: item.id,
         }));
-        setCars([defaultChargingCar, ...carOption]);
+        setCars([defaultCar, ...carOption]);
       } else {
         setCars([]);
       }
@@ -394,8 +392,12 @@ const CalendarView = ({ route }) => {
         let color = event?.status === 'ongoing' ? '#bb3f34' : event?.status === 'upcoming' ? '#03397E' : '#6d7486';
         return (
           <View key={index} style={styles.eventContainer}>
-            <TouchableOpacity style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: color, borderRadius: 5, padding: 8 }} onPress={() => handleEventClick(event.id)}>
-              <View style={{ flex: 6 }}>
+            <TouchableOpacity style={{ flexDirection: 'row', backgroundColor: '#555353', alignItems: 'center', borderRadius: 5 }} onPress={() => handleEventClick(event.id)}>
+              <View style={{ backgroundColor: color, padding: 8, borderTopLeftRadius: 5, borderBottomLeftRadius: 5 }}>
+                <Text style={{ color: '#fff', fontSize: 12, marginTop: 5 }}>{`${event?.startDate}, ${event?.startTime}`}</Text>
+                <Text style={{ color: '#fff', fontSize: 12, marginTop: 5 }}>{`${event?.endDate}, ${event?.endTime}`}</Text>
+              </View>
+              <View style={{ paddingLeft: 10 }} >
                 {selectResource === "meetingRoom" && (
                   <Text style={styles.eventText}>{event?.meetingRoom?.name || 'N/A'}</Text>
                 )}
@@ -413,11 +415,6 @@ const CalendarView = ({ route }) => {
                 )}
                 <Text style={[styles.eventText, { fontSize: 13, marginTop: 3 }]}>{event?.subject}</Text>
               </View>
-              <View style={{ flex: 4, alignItems: 'center', paddingRight: 10 }}>
-                <Text style={{ color: '#fff', fontSize: 12, marginTop: 5 }}>{`${event?.startDate}, ${event?.startTime}`}</Text>
-                <Text style={{ color: '#fff', fontSize: 12, marginTop: 5 }}>{`${event?.endDate}, ${event?.endTime}`}</Text>
-              </View>
-
             </TouchableOpacity>
           </View>
         );
@@ -564,9 +561,10 @@ const CalendarView = ({ route }) => {
         <Calendar
           current={selectedDate}
           onDayPress={(day) => {
-            let tempEvents= {...events, 
-              [day.dateString]: {...events[day.dateString], selected: true}, 
-              [selectedDate]: {...events[selectedDate], selected: false }
+            let tempEvents = {
+              ...events,
+              [day.dateString]: { ...events[day.dateString], selected: true },
+              [selectedDate]: { ...events[selectedDate], selected: false }
             };
             setEvents(tempEvents);
             setSelectedDate(day.dateString);
@@ -790,8 +788,8 @@ const styles = StyleSheet.create({
   },
   addButtonContainer: {
     position: 'absolute',
-    bottom: 10,
-    right: 10,
+    bottom: 20,
+    right: 20,
   },
   heading: {
     fontSize: 20,
@@ -822,7 +820,7 @@ const styles = StyleSheet.create({
   },
   selectedResource: {
     borderRadius: 5,
-    borderColor: '#F70ACC',
+    borderColor: '#000',
     borderWidth: 3,
   }
 });

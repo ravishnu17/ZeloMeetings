@@ -56,7 +56,7 @@ const Footer = () => {
             {
                 menu.map((item, index) =>
                     <TouchableOpacity key={index} style={{ flex: 1, alignItems: 'center' }} onPress={() => handleClick(item.id)}>
-                        <Icon source={item.icon} size={25} color={color(item.id)} />
+                        <Icon source={item.icon} size={23} color={color(item.id)} />
                         <Text style={{ color: color(item.id), fontSize: 11, marginTop: 5 }}>{item.name}</Text>
                     </TouchableOpacity>
                 )
@@ -71,7 +71,7 @@ const style = StyleSheet.create({
         columnGap: 15,
         backgroundColor: '#035676',
         padding: 7,
-        paddingBottom: 18,
+        paddingBottom: 15,
         paddingLeft: 12
     }
 })

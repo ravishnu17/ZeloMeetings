@@ -120,7 +120,7 @@ const Login = () => {
             <ScrollView>
                 {/* Top Container with 50% border-radius */}
                 <View style={styles.topContainer}>
-                    <TouchableOpacity onPress={() => setShowModel(!showModel)} style={{ position: 'absolute', alignSelf: 'flex-end', padding: 15 }}>
+                    <TouchableOpacity onPress={() => setShowModel(!showModel)} style={{ position: 'absolute', alignSelf: 'flex-end', padding: 15, marginTop: 15 }}>
                         <Image
                             source={language === 'pt' ? require('../../assets/portugal.png') :
                                 language === 'es' ? require('../../assets/spain.png') :
