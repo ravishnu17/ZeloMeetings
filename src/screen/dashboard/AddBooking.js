@@ -6,7 +6,7 @@ import { Checkbox } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { addBookingApi, findBuildingListBasedonLocationId, findCapacityBuildingBased, findCapacityLocationBased, findCateringListBasedonBuildingId, findCateringListBasedonCustomerLocationId, findCateringStatusBasedonBasedonBuildingId, findCateringStatusBasedonCustomerLocationId, findCustomerCleaningSattusBasedonBuildingId, findCustomerCleaningStatusBasedonCustomerLocationId, findCustomeritsupportsettingListBasedonBuildingId, findCustomeritsupportsettingListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonBuildingId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerMobileEquipmentStatusBasedonBuildingId, findCustomerMobileEquipmentStatusBasedonCustomerLocationId, findCustomerSpecialSettingBasedonBuildingId, findCustomerSpecialSettingBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonBuildingId, findCustomerSpecialSettingListBasedonCustomerLocationId, findEquipmentsListBasedonBuildingId, findEquipmentsListBasedonCustomerLocationId, findFloorsListBasedonBuildingId, findITSupporttBasedonBuildingId, findITSupporttBasedonCustomerLocationId, findMobileEquipmentsBasedonCustomerLocationId, getChargingCarListGetBuildingBased, getChargingCarListGetFloorBased, getChargingCarListGetLocationBased, getDeskList, getEndUserList, getLocationlist, getMeetingRoomList, getMeetingRoomListForEquipmentAndCapacity, getParkingSeatList, getVisitorList, loginHomeAccess, visitorCreateAndUpdate } from '../../apiservices/Apiservices';
+import { addBookingApi, findBuildingListBasedonLocationId, findCapacityBuildingBased, findCapacityLocationBased, findCateringListBasedonBuildingId, findCateringListBasedonCustomerLocationId, findCateringStatusBasedonBasedonBuildingId, findCateringStatusBasedonCustomerLocationId, findCustomerCleaningSattusBasedonBuildingId, findCustomerCleaningStatusBasedonCustomerLocationId, findCustomeritsupportsettingListBasedonBuildingId, findCustomeritsupportsettingListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonBuildingId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerMobileEquipmentStatusBasedonBuildingId, findCustomerMobileEquipmentStatusBasedonCustomerLocationId, findCustomerSpecialSettingBasedonBuildingId, findCustomerSpecialSettingBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonBuildingId, findCustomerSpecialSettingListBasedonCustomerLocationId, findEquipmentsListBasedonBuildingId, findEquipmentsListBasedonCustomerLocationId, findFloorsListBasedonBuildingId, findITSupporttBasedonBuildingId, findITSupporttBasedonCustomerLocationId, findMobileEquipmentsBasedonCustomerLocationId, getBuildingbasedCars, getChargingCarListGetBuildingBased, getChargingCarListGetFloorBased, getChargingCarListGetLocationBased, getDeskList, getEndUserList, getFloorbasedCars, getLocationbasedCars, getLocationlist, getMeetingRoomList, getMeetingRoomListForEquipmentAndCapacity, getParkingSeatList, getVisitorList, loginHomeAccess, visitorCreateAndUpdate } from '../../apiservices/Apiservices';
 import { useNavigation } from '@react-navigation/native';
 import { context } from '../../navigation/Appnav';
 import Toast from 'react-native-simple-toast';
@@ -47,6 +47,9 @@ const AddBooking = ({ route }) => {
 
     const [desk, setDesk] = useState([]);
     const [selectedDesk, setSelectedDesk] = useState(null);
+
+    const [cars, setCars] = useState([]);
+    const [selecteCars, setSelectedCars] = useState(null);
 
     const [parkingseat, setParkingseat] = useState([]);
     const [selectedParkingSeat, setSelectedParkingSeat] = useState(null);
@@ -191,7 +194,7 @@ const AddBooking = ({ route }) => {
 
     useEffect(() => {
 
-        if (selectedResource === 'meetingRoom' || selectedResource === 'parkingSeat') {
+        if (selectedResource === 'meetingRoom' || selectedResource === 'parkingSeat' || selectedResource === 'car') {
             setDurationValue(duration.find((d) => d.value === '30').value);
 
         } else if (selectedResource === 'desk') {
@@ -988,6 +991,19 @@ const AddBooking = ({ route }) => {
                 }
             })
 
+            getFloorbasedCars(selectedLocation, selectedBuilding, checkedFloors, startDate, startTime, endDate1, endTime).then((res) => {
+                console.log("cars floor based ", res);
+                setCars([]);
+                if (res?.status) {
+                    const mappedItems = res.carDTOs.map(resource => ({
+                        label: resource.name,
+                        value: resource.id,
+                    }));
+                    setCars(mappedItems);
+                }
+
+            })
+
 
         } else if (selectedLocation && selectedBuilding) {
             // console.log("Both ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
@@ -1018,6 +1034,19 @@ const AddBooking = ({ route }) => {
                 }
             })
 
+            getBuildingbasedCars(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime).then((res) => {
+                console.log("cars building based ", res);
+                setCars([]);
+                if (res?.status) {
+                    const mappedItems = res.carDTOs.map(resource => ({
+                        label: resource.name,
+                        value: resource.id,
+                    }));
+                    setCars(mappedItems);
+                }
+
+            })
+
         } else if (selectedLocation) {
             // console.log("Location ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
             getMettingRooms(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime);
@@ -1029,6 +1058,19 @@ const AddBooking = ({ route }) => {
                 setChargingCar([]);
                 if (res?.status) {
                     setChargingCar(res?.chargingCarDTOs);
+                }
+            })
+
+            getLocationbasedCars(selectedLocation, startDate, startTime, endDate1, endTime).then((res) => {
+                console.log("cars Location based ", res);
+                setCars([]);
+                if (res?.status) {
+                    const mappedItems = res.carDTOs.map(resource => ({
+                        label: resource.name,
+                        value: resource.id,
+                    }));
+
+                    setCars(mappedItems);
                 }
             })
 
@@ -1157,12 +1199,14 @@ const AddBooking = ({ route }) => {
         let enableParkingSeats = false;
         let enableChargingCar = false;
         let enableAll = false;
+        let enableCar = false;
 
         const backendResponse = [];
         enableRooms = rights?.includes('BOOK A ROOM');
         enableDesks = rights?.includes('BOOK A DESK');
         enableParkingSeats = rights?.includes('BOOK A PARKING SEAT');
         enableChargingCar = rights?.includes('BOOK A CHARGING CAR');
+        enableCar = rights?.includes('BOOK A CAR');
         enableAll = rights?.includes('ALL');
         //   console.log("enableRooms ",enableRooms, rights?.includes('BOOK A ROOM')," enableDesks",enableDesks,rights?.includes('BOOK A DESK')," enableParkingSeats",enableParkingSeats ,rights?.includes('BOOK A PARKING SEAT'));
         if (enableRooms || enableAll) {
@@ -1180,6 +1224,11 @@ const AddBooking = ({ route }) => {
             backendResponse.push({ id: "chargingCar", resource: translate?.DISPLAYMODALFORM?.CHARGINGCAR });
             setRightsEnableChargingCar(true);
         }
+        if (enableCar || enableAll) {
+            backendResponse.push({ id: "car", resource: translate?.ROOMS?.CAR });
+        }
+
+
 
 
         // console.log("backendResponse ",backendResponse);
@@ -1337,6 +1386,8 @@ const AddBooking = ({ route }) => {
         setCheckedParkingSeat({});
         setIsOpenParkingSeat(!isOpenParkingSeat);
 
+      setSelectedCars(null);
+
 
 
     }
@@ -1381,6 +1432,8 @@ const AddBooking = ({ route }) => {
         const chargingCarIds = Object.keys(checkedChargingCar).filter(key => checkedChargingCar[key] === true);
         const parkingSeatIdsList = Object.keys(checkedParkingSeat).filter(key => checkedParkingSeat[key] === true);
 
+        
+
         if (catringdataId.length > 0) {
             catringdataId.forEach((item) => {
                 bookingCatringdtoresponse.push({
@@ -1398,7 +1451,7 @@ const AddBooking = ({ route }) => {
 
         const parkingSeatIds = selectedParkingSeat ? [selectedParkingSeat] : parkingSeatIdsList;
 
-        console.log("parking seat ids ", parkingSeatIds);
+        // console.log("parking seat ids ", parkingSeatIds);
 
 
         datas = {
@@ -1444,7 +1497,8 @@ const AddBooking = ({ route }) => {
             parkingSeatId: null,
             parkingSeatDetails: [],
             visitorIds: visitorId,
-            floorIds: floorIds
+            floorIds: floorIds,
+            carId: selecteCars
         }
         // console.log("submit data", datas);
         addBookingApi(datas).then((res) => {
@@ -1567,65 +1621,65 @@ const AddBooking = ({ route }) => {
 
 
                         {
-                    (selectedResource === 'meetingRoom' && equipmentData.length > 0) &&
-                    <View style={styles.pickerContainer}>
-                        <Text>{translate?.ROOMBOOKING?.EQUIPMENT}</Text>
-                        <View style={styles.dropdownContainer}>
-                            <TouchableOpacity onPress={handleToggle} style={styles.dropdownHeader}>
-                                {selectedNames.length > 0 ? (
-                                    <Text style={styles.dropdownHeaderText}>
-                                        {selectedNames.join(', ')}
-                                    </Text>
-                                ) : (
-                                    <Text style={styles.dropdownHeaderText}>Select Equipments</Text>
-                                )}
-                            </TouchableOpacity>
-                            {isOpen && (
-                                <View style={styles.dropdownContent}>
-                                    {equipmentData.map((item) => (
-                                        <View key={item.id} style={styles.dropdownItem}>
-                                            <Checkbox
-                                                status={checkedEquipments[item.id] ? 'checked' : 'unchecked'}
-                                                onPress={() => handleCheckboxChange(item.id)}
-                                            />
-                                            <Text>{item.name}</Text>
+                            (selectedResource === 'meetingRoom' && equipmentData.length > 0) &&
+                            <View style={styles.pickerContainer}>
+                                <Text>{translate?.ROOMBOOKING?.EQUIPMENT}</Text>
+                                <View style={styles.dropdownContainer}>
+                                    <TouchableOpacity onPress={handleToggle} style={styles.dropdownHeader}>
+                                        {selectedNames.length > 0 ? (
+                                            <Text style={styles.dropdownHeaderText}>
+                                                {selectedNames.join(', ')}
+                                            </Text>
+                                        ) : (
+                                            <Text style={styles.dropdownHeaderText}>Select Equipments</Text>
+                                        )}
+                                    </TouchableOpacity>
+                                    {isOpen && (
+                                        <View style={styles.dropdownContent}>
+                                            {equipmentData.map((item) => (
+                                                <View key={item.id} style={styles.dropdownItem}>
+                                                    <Checkbox
+                                                        status={checkedEquipments[item.id] ? 'checked' : 'unchecked'}
+                                                        onPress={() => handleCheckboxChange(item.id)}
+                                                    />
+                                                    <Text>{item.name}</Text>
+                                                </View>
+                                            ))}
                                         </View>
-                                    ))}
+                                    )}
                                 </View>
-                            )}
-                        </View>
-                    </View>
-                }
+                            </View>
+                        }
 
 
 
-                {
-                    (selectedResource === 'meetingRoom' && itemsCapacity.length > 0) &&
-                    <View style={styles.pickerContainer}>
-                        <Text>{translate?.ROOMBOOKING?.CAPACITY}</Text>
+                        {
+                            (selectedResource === 'meetingRoom' && itemsCapacity.length > 0) &&
+                            <View style={styles.pickerContainer}>
+                                <Text>{translate?.ROOMBOOKING?.CAPACITY}</Text>
 
-                        <Dropdown
-                            style={styles.dropdown}
-                            placeholderStyle={styles.placeholderStyle}
-                            selectedTextStyle={styles.selectedTextStyle}
-                            inputSearchStyle={styles.inputSearchStyle}
-                            data={itemsCapacity}
-                            labelField="label"
-                            valueField="value"
-                            placeholder="Select capacity"
-                            value={selectedCapacity}
-                            onChange={item => setSelectedCapacity(item.value)}
-                        />
+                                <Dropdown
+                                    style={styles.dropdown}
+                                    placeholderStyle={styles.placeholderStyle}
+                                    selectedTextStyle={styles.selectedTextStyle}
+                                    inputSearchStyle={styles.inputSearchStyle}
+                                    data={itemsCapacity}
+                                    labelField="label"
+                                    valueField="value"
+                                    placeholder="Select capacity"
+                                    value={selectedCapacity}
+                                    onChange={item => setSelectedCapacity(item.value)}
+                                />
 
-                    </View>
+                            </View>
 
-                }
+                        }
 
 
                     </View>
 
                 }
-             
+
 
 
 
@@ -1813,6 +1867,25 @@ const AddBooking = ({ route }) => {
                             )}
 
                         </View>
+                    </View>
+                }
+
+                {
+                    selectedResource === 'car' &&
+                    <View style={styles.pickerContainer}>
+                        <Text>{translate?.ROOMS?.CAR}</Text>
+                        <Dropdown
+                            style={styles.dropdown}
+                            placeholderStyle={styles.placeholderStyle}
+                            selectedTextStyle={styles.selectedTextStyle}
+                            inputSearchStyle={styles.inputSearchStyle}
+                            data={cars}
+                            labelField="label"
+                            valueField="value"
+                            placeholder="Select Car"
+                            value={selecteCars}
+                            onChange={item => setSelectedCars(item.value)}
+                        />
                     </View>
                 }
 

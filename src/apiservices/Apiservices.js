@@ -1117,3 +1117,92 @@ export const getResourceDataById = async (resourceId)=>{
     throw error;
   }
 }
+
+//car Booking  filter Apis
+
+export const getLocationbasedCars = async (location, startDate,startTime, endDate, endTime) =>{
+  const locationId = Number(location);
+  try{
+    const res =await axiosInstance.get(`/car/list/bylocationandtime?customerLocationId=${locationId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&buildingId=0&floorId=`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const getBuildingbasedCars = async (location,building, startDate,startTime, endDate, endTime) =>{
+  const locationId = Number(location);
+  const buildingId = Number(building);
+
+  try{
+    const res =await axiosInstance.get(`/car/list/bylocationandtime?customerLocationId=${locationId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&buildingId=${buildingId}&floorId=`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const getFloorbasedCars = async (location,building,checkedFloors, startDate,startTime, endDate, endTime) =>{
+  const locationId = Number(location);
+  const buildingId = Number(building);
+  const floorIds = Object.keys(checkedFloors).filter(key => checkedFloors[key] === true).join(',');
+
+  try{
+    const res =await axiosInstance.get(`/car/list/bylocationandtime?customerLocationId=${locationId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=0&buildingId=${buildingId}&floorId=${floorIds}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+
+//car EditBooking  filter Apis
+
+export const getEditBookingLocationbasedCars = async (location, startDate,startTime, endDate, endTime,editBookingId) =>{
+  const locationId = Number(location);
+  const bookingId=Number(editBookingId);
+  // console.log("locationId",locationId);
+  // console.log("bookingId",bookingId);
+  // console.log("startDate",startDate,"startTime",startTime,"endDate",endDate,"endTime",endTime );
+
+  // /car/list/bylocationandtime?customerLocationId=3128&startDate=2024-08-21&startTime=21:12&endDate=2024-08-21&endTime=21:41&editBookingId=5493&buildingId=0&floorId=0
+  try{
+    const res =await axiosInstance.get(`/car/list/bylocationandtime?customerLocationId=${locationId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=${bookingId}&buildingId=0&floorId=0`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const getEditBookingBuildingbasedCars = async (location,building, startDate,startTime, endDate, endTime,editBookingId) =>{
+  const locationId = Number(location);
+  const buildingId = Number(building);
+  const bookingId=Number(editBookingId);
+
+  try{
+    const res =await axiosInstance.get(`/car/list/bylocationandtime?customerLocationId=${locationId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=${bookingId}&buildingId=${buildingId}&floorId=0`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export const getEditBookingFloorbasedCars = async (location,building,checkedFloors, startDate,startTime, endDate, endTime,editBookingId) =>{
+  const locationId = Number(location);
+  const buildingId = Number(building);
+  const floorIds = Object.keys(checkedFloors).filter(key => checkedFloors[key] === true).join(',');
+  const bookingId=Number(editBookingId);
+
+  try{
+    const res =await axiosInstance.get(`/car/list/bylocationandtime?customerLocationId=${locationId}&startDate=${startDate}&startTime=${startTime}&endDate=${endDate}&endTime=${endTime}&editBookingId=${bookingId}&buildingId=${buildingId}&floorId=${floorIds}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}

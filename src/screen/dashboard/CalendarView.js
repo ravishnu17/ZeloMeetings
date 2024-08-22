@@ -197,6 +197,8 @@ const CalendarView = ({ route }) => {
           label: item.name,
           value: item.id,
         }));
+        // console.log("defaultBuilding ",defaultBuilding);
+        // console.log("buildingOptions ",buildingOptions);
         setItemsBuildings([defaultBuilding, ...buildingOptions]);
       }
     });
