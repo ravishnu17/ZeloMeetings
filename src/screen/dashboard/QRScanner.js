@@ -21,7 +21,6 @@ function QRScanner() {
     const doCheckIn = (bookingId, resourceId) => {
         setLoading(true);
         AddCheckIn(bookingId, resourceId).then((res) => {
-            console.log(res);
             if (res?.status) {
                 Toast.showWithGravity(
                     res?.information?.description,

@@ -17,6 +17,7 @@ import LoadingIndicator from '../screen/LoadingIndicator';
 import EditBooking from '../screen/dashboard/EditBooking';
 import { translation } from '../Languages/translate';
 import QRScanner from '../screen/dashboard/QRScanner';
+import Pincheckin from '../screen/dashboard/Pincheckin';
 
 const Stack = createNativeStackNavigator();
 export const context = createContext();
@@ -45,6 +46,7 @@ const Appnav = () => {
           <Stack.Navigator screenOptions={{ headerShown: false }} >
             <Stack.Screen name="DashboardScreen" component={Dashboard} />
             <Stack.Screen name="QrCodeScanner" component={QRScanner} />
+            <Stack.Screen name="PinCheckIn" component={Pincheckin} />
             <Stack.Screen name="CalendarScreen" component={CalendarView} />
             <Stack.Screen name="RoomScreen" component={Rooms} />
             <Stack.Screen name="ReportScreen" component={Report} />

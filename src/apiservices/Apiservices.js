@@ -1216,3 +1216,25 @@ export const AddCheckIn = async (bookingId, meetingsroomId)=>{
     throw error;
   }
 }
+
+// Pin check in API
+export const getPinCheckinList =async () =>{
+  try{
+    const res=await axiosInstance.get(`/checkInCheckOut/getPinCheckinResources`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+// check in with pin
+export const checkInWithPin =async (bookingId, pin) =>{
+  try{
+    const res=await axiosInstance.get(`/checkInCheckOut/docheckinwithpin?bookingId=${bookingId}&pin=${pin}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}

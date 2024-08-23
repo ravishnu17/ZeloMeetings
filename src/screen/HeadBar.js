@@ -13,7 +13,7 @@ const HeadBar = () => {
   const index = props?.active;
   const setActive = props?.setActive;
   const preState = props?.pre;
-  const translate= props?.language;
+  const translate = props?.language;
 
   const navigation = useNavigation();
   const [showModel, setShowModel] = useState(false);
@@ -40,9 +40,9 @@ const HeadBar = () => {
   }
 
   const getChecked = (type) => {
-    if (language === type){
+    if (language === type) {
       return 'checked'
-    }else{
+    } else {
       return 'unchecked'
     }
   }
@@ -51,16 +51,18 @@ const HeadBar = () => {
     setShowModel(!showModel);
     setLanguage(language);
     AsyncStorage.setItem('language', language);
-    props?.setHeaderProps({'language':language});
+    props?.setHeaderProps({ 'language': language });
   }
 
   useEffect(() => {
     getLanguage();
   }, [language])
-  
+
+  let headertextStatus = index <= 5 && !preState?.checkIn
+
   return (
     <View>
-      <Header placement={index <= 5 ? 'center' : 'left'} backgroundColor='#035676' statusBarProps={{ barStyle: 'light-content', backgroundColor: '#034a66' }}
+      <Header placement={headertextStatus ? 'center' : 'left'} backgroundColor='#035676' statusBarProps={{ barStyle: 'light-content', backgroundColor: '#034a66' }}
         leftComponent={
           <View>
             {
@@ -80,22 +82,25 @@ const HeadBar = () => {
           </View>
         }
         centerComponent={
-          index <= 5 ? <View style={styles.logoView}>
+          headertextStatus ? <View style={styles.logoView}>
             <Image source={require('../assets/zelo_logo.png')} style={styles.logo} />
           </View>
             :
-            <Text style={styles.menuTitle}>{menuName()}</Text>
+            <Text style={styles.menuTitle}>{preState?.checkIn ? 'Check In with Pin' : menuName()}</Text>
         }
         rightComponent={
           <View style={styles.header_container}>
             {
               (index === 1 && preState?.id !== 1) &&
               <>
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => {
+                  navigation.navigate('PinCheckIn');
+                }}
+                >
                   <Image source={require('../assets/passcode.png')} style={styles.passcode} />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.qrCode} onPress={() => {
-                  props?.setPre({id: 1, name: 'DashboardScreen'});
+                  props?.setPre({ id: 1, name: 'DashboardScreen' });
                   navigation.navigate('QrCodeScanner');
                 }} >
                   <Icon
@@ -108,7 +113,7 @@ const HeadBar = () => {
             }
             {
               index === 3 &&
-              <TouchableOpacity onPress={() => props?.setHeaderProps({showFilter: true })}>
+              <TouchableOpacity onPress={() => props?.setHeaderProps({ showFilter: true })}>
                 <Icon
                   source="filter"
                   size={30}
@@ -122,7 +127,7 @@ const HeadBar = () => {
                 <Image
                   source={language === 'pt' ? require('../assets/portugal.png') :
                     language === 'es' ? require('../assets/spain.png') :
-                        require('../assets/US.png')} style={{ width: 50, height: 30 }} />
+                      require('../assets/US.png')} style={{ width: 50, height: 30 }} />
               </TouchableOpacity>
             }
           </View>

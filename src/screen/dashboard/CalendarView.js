@@ -515,6 +515,7 @@ const CalendarView = ({ route }) => {
   // Handle event click
   const handleEventClick = (event) => {
     navigation.navigate('EditBooking', { id: event });
+    props?.setPre({ id: 2, name: 'CalendarScreen' });
   };
 
   // Get calendar event data based on specific resource or location, building and floor
@@ -742,7 +743,11 @@ const CalendarView = ({ route }) => {
         {!props?.loading && <ScrollView>{renderEventDetails(selectedDate)}</ScrollView>}
       </ScrollView>
       <View style={styles.addButtonContainer}>
-        <TouchableOpacity style={{ backgroundColor: 'white', borderRadius: 50, height: 30, width: 30, alignItems: 'center', justifyContent: 'center' }} onPress={() => navigation.navigate('AddBooking', { resource: selectResource })}>
+        <TouchableOpacity style={{ backgroundColor: 'white', borderRadius: 50, height: 30, width: 30, alignItems: 'center', justifyContent: 'center' }}
+          onPress={() => {
+            navigation.navigate('AddBooking', { resource: selectResource });
+            props?.setPre({ id: 2, name: 'CalendarScreen' });
+          }}>
           <Icon name="plus-circle" size={30} color="#007bff" />
         </TouchableOpacity>
       </View>
@@ -827,8 +832,13 @@ const styles = StyleSheet.create({
   },
   selectedResource: {
     borderRadius: 5,
-    borderColor: '#000',
+    borderColor: '#c90000',
     borderWidth: 2,
+    shadowColor: '#c90000',
+    elevation: 5,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 2
   }
 });
 

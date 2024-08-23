@@ -2129,7 +2129,7 @@ const EditBooking = ({ route }) => {
                             />
                         </View>
                         <View style={styles.buttonWrapper}>
-                            <Button mode="contained" style={{}} buttonColor={colors.primary} onPress={handleFilter} > Filter</Button>
+                            <Button mode="contained" style={{}} buttonColor={'#3699ff'} onPress={handleFilter} > Filter</Button>
                         </View>
 
                     </View>
@@ -2552,7 +2552,7 @@ const EditBooking = ({ route }) => {
                                 </View>
                             </View>
                             <View style={styles.vistorbuttonContainer}>
-                                <Button mode="contained" onPress={() => addVisitorFormStatus()} style={styles.button}>{translate?.ROOMS?.ADDVISITORS}</Button>
+                                <Button mode="contained" buttonColor='#3699ff' onPress={() => addVisitorFormStatus()} style={styles.button}>{translate?.ROOMS?.ADDVISITORS}</Button>
                             </View>
 
 
@@ -2879,7 +2879,7 @@ const EditBooking = ({ route }) => {
                         mode="contained"
                         onPress={handleClickSubmit}
                         style={styles.button}
-                        buttonColor={colors.primary}
+                        buttonColor={'#3699ff'}
                         disabled={disableUpdate}
                     >
                         {translate?.OPENSPACEADDMODAL?.UPDATE}
@@ -3081,7 +3081,7 @@ const styles = StyleSheet.create({
         margin: 8,
     },
     cancelButton: {
-        backgroundColor: 'red',
+        backgroundColor: '#c51616',
     },
 
 

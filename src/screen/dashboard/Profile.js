@@ -384,21 +384,39 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     input: {
-        borderWidth: 1,
+        // borderWidth: 0.1,
+        // borderColor: '#8a8a8a',
         borderRadius: 4,
-        borderColor: '#8a8a8a',
+        backgroundColor: '#fff',
         paddingHorizontal: 10,
         color: '#000',
-        padding: 9
+        padding: 9,
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+        elevation: 2,
     },
     dropdown: {
-        borderWidth: 1,
-        borderColor: '#8a8a8a',
+        // borderWidth: 1,
+        // borderColor: '#8a8a8a',
         borderRadius: 4,
-        padding: 10
+        padding: 9,
+        shadowColor: "#000",
+        backgroundColor: '#fff',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.22,
+        shadowRadius: 2.22,
+        elevation: 2,
     },
     button: {
-        marginBottom: 30,
+        marginTop: 30,
         padding: 10,
         borderRadius: 5,
         alignSelf: 'center',
