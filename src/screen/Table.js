@@ -50,7 +50,7 @@ const Table = ({ cols, rows, handleCancelAcceptClick, handleEdit, menuIndex, set
               }
             </View>)
           :
-          <Text style={styles.nodata}>{loading ? '' : noDataText}</Text>
+          <Text style={styles.nodata}>{loading ? '' : noDataText+'!'}</Text>
       }
     </>
   );

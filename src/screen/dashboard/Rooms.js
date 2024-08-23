@@ -616,7 +616,7 @@ const Rooms = () => {
             }
           </>
             :
-            <Text style={styles.noData}>{loading ? '' : translate?.USERSETTINGS?.NODATAFOUND}</Text>
+            <Text style={styles.noData}>{loading ? '' : translate?.USERSETTINGS?.NODATAFOUND+'!'}</Text>
         }
 
       </ScrollView>
@@ -985,10 +985,11 @@ const styles = StyleSheet.create({
     flex: 1
   },
   noData: {
-    textAlign: 'center',
-    fontSize: 18,
     paddingTop: 30,
-    color: '#9b2929'
+    fontSize: 16,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color:'#a5a5a5'
   },
   labelcard: {
     flex: 1,

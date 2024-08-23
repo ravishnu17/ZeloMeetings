@@ -436,8 +436,10 @@ const styles = StyleSheet.create({
   },
   noData: {
     marginTop: 15,
-    fontSize: 14,
+    fontSize: 16,
     textAlign: 'center',
+    fontWeight: 'bold',
+    color:'#a5a5a5'
   }
 });
 

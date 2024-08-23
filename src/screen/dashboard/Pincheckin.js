@@ -129,7 +129,7 @@ function Pincheckin() {
                 }
             </ScrollView>
             {
-                (!props?.loading && bookingList?.length === 0) && <Text style={styles.noData}>No Data found!</Text>
+                (!props?.loading && bookingList?.length === 0) && <Text style={styles.noData}>{translate?.USERSETTINGS?.NODATAFOUND}!</Text>
             }
             <Modal animationType="fade" transparent={true} visible={showModal}
                 onDismiss={() => setShowModal(false)} onRequestClose={() => setShowModal(false)}>
@@ -198,9 +198,10 @@ const styles = StyleSheet.create({
     },
     noData: {
         flex: 1,
+        fontSize: 16,
         textAlign: 'center',
         fontWeight: 'bold',
-        fontSize: 15
+        color:'#a5a5a5'
     },
     modal: {
         flex: 1,
