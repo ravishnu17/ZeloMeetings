@@ -1,10 +1,11 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, View, LayoutAnimation, TouchableOpacity, ScrollView, Platform, TextInput, Switch } from 'react-native';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { SafeAreaView, StyleSheet, Text, View, LayoutAnimation, TouchableOpacity, ScrollView, Platform, TextInput, Switch, TouchableWithoutFeedback } from 'react-native';
 import { Button, useTheme } from 'react-native-paper';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Checkbox } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { addBookingApi, findBuildingListBasedonLocationId, findCapacityBuildingBased, findCapacityLocationBased, findCateringListBasedonBuildingId, findCateringListBasedonCustomerLocationId, findCateringStatusBasedonBasedonBuildingId, findCateringStatusBasedonCustomerLocationId, findCustomerCleaningSattusBasedonBuildingId, findCustomerCleaningStatusBasedonCustomerLocationId, findCustomeritsupportsettingListBasedonBuildingId, findCustomeritsupportsettingListBasedonCustomerLocationId, findCustomerMobileEquipmentListBasedonBuildingId, findCustomerMobileEquipmentListBasedonCustomerLocationId, findCustomerMobileEquipmentStatusBasedonBuildingId, findCustomerMobileEquipmentStatusBasedonCustomerLocationId, findCustomerSpecialSettingBasedonBuildingId, findCustomerSpecialSettingBasedonCustomerLocationId, findCustomerSpecialSettingListBasedonBuildingId, findCustomerSpecialSettingListBasedonCustomerLocationId, findEquipmentsListBasedonBuildingId, findEquipmentsListBasedonCustomerLocationId, findFloorsListBasedonBuildingId, findITSupporttBasedonBuildingId, findITSupporttBasedonCustomerLocationId, findMobileEquipmentsBasedonCustomerLocationId, getBuildingbasedCars, getChargingCarListGetBuildingBased, getChargingCarListGetFloorBased, getChargingCarListGetLocationBased, getDeskList, getEndUserList, getFloorbasedCars, getLocationbasedCars, getLocationlist, getMeetingRoomList, getMeetingRoomListForEquipmentAndCapacity, getParkingSeatList, getVisitorList, loginHomeAccess, visitorCreateAndUpdate } from '../../apiservices/Apiservices';
 import { useNavigation } from '@react-navigation/native';
@@ -13,6 +14,8 @@ import Toast from 'react-native-simple-toast';
 import { ToastColor } from '../utils/ToastColors';
 
 const AddBooking = ({ route }) => {
+    const scrollRef = useRef(null);
+
     const params = route.params;
     const props = useContext(context);
     const translate = props?.language;
@@ -23,6 +26,9 @@ const AddBooking = ({ route }) => {
     const [selectedLocation, setSelectedLocation] = useState(null);
 
     const [filterOptionsEnabled, setFilterOptionsEnabled] = useState(false);
+
+    const defaultBuilding = { value: null, label: translate?.ROOMBOOKING?.SELECTBUILDING };
+    const defaultFloor = { value: null, label: translate?.ROOMBOOKING?.SELECTFLOOR };
 
     const [itemsBuildings, setItemsBuildings] = useState([]);
     const [selectedBuilding, setSelectedBuilding] = useState(null);
@@ -192,38 +198,6 @@ const AddBooking = ({ route }) => {
         showMode('time');
     };
 
-    useEffect(() => {
-
-        if (selectedResource === 'meetingRoom' || selectedResource === 'parkingSeat' || selectedResource === 'car') {
-            setDurationValue(duration.find((d) => d.value === '30').value);
-
-        } else if (selectedResource === 'desk') {
-            setDurationValue(duration.find((d) => d.value === '120').value);
-        } else if (selectedResource === 'chargingCar') {
-            setDurationValue(duration.find((d) => d.value === '60').value);
-        }
-
-    }, [selectedResource])
-
-    useEffect(() => {
-        const startDate = formatDate(date);
-        const startTime = formatTime(date);
-        const endDate1 = formatDate(endDate);
-        const endTime = formatTime(endDate);
-
-        setStartDate(startDate);
-        setStartTime(startTime);
-        setEndDate1(endDate1);
-        setEndTime(endTime);
-    }, [date, endDate]);
-
-    useEffect(() => {
-        if (durationValue !== null) {
-            const endDateTime = new Date(date.getTime() + durationValue * 60000);
-            setEndDate(endDateTime);
-        }
-    }, [durationValue, date]);
-
     const onChangeEnd = (event, selectedDate) => {
         const currentDate = selectedDate || endDate;
         setEndShow(false);
@@ -250,61 +224,31 @@ const AddBooking = ({ route }) => {
         endShowMode('time');
     };
 
-    useEffect(() => {
-        getLoginUser();
-        getEndUsers();
-        getVisitors();
-
-        setSelectedLocation(params?.locationID || null);
-        setSelectedBuilding(params?.buildingID || null)
-        setCheckedFloors(params?.floorID ? { [params.floorID]: true } : {});
-        //from calendar view and rooms view
-        if (params) {
-            setSelectedResource(params.resource);
-            if (params?.resource === 'meetingRoom') {
-                params?.meetingRoom && setSelectedMeetingRoom(params?.meetingRoom);
-            } else if (params?.resource === 'desk') {
-                params?.desk && setSelectedDesk(params?.desk);
-            } else if (params?.resource === 'parkingSeat') {
-                params?.parkingSeat && setSelectedParkingSeat(params?.parkingSeat);
-            } else if (params?.resource === 'chargingCar') {
-                params?.chargingCar && setCheckedChargingCar({ [params?.chargingCar]: true });
-            }
-        } else {
-            setSelectedMeetingRoom(null);
-            setSelectedDesk(null);
-            setSelectedParkingSeat(null);
-        }
-
-
-
-    }, [params]);
-
-    useEffect(() => {
-        getlocationApi();
-    }, [loginUser])
-
     const getLoginUser = async () => {
         props?.setLoading(true)
         let Userrights = await AsyncStorage.getItem('rights');
         setRights(Userrights);
         const userId = await AsyncStorage.getItem('userId');
+        let res = null;
         if (userId) {
-            loginHomeAccess(userId).then((res) => {
+            res = await loginHomeAccess(userId);
+            // .then((res) => {
+            try {
                 if (res.status) {
                     setLoginUser(res);
                     setRequesterName(res.user.firstName);
                     setRequesterEmail(res.user.email);
                 }
-                // console.log("locationId ",userDetails);
-                // console.log("location ",res.customerDetails.location.location);
-            }).finally(() => {
+            } catch (e) {
+
+            } finally {
                 props?.setLoading(false)
-            })
+
+            }
+            return res;
         }
     }
 
-    // console.log("loginUser ",loginUser.id);
     const getlocationApi = () => {
         props?.setLoading(true)
         getLocationlist().then((res) => {
@@ -316,13 +260,13 @@ const AddBooking = ({ route }) => {
                     value: item.id
                 }));
                 setItemsLocations(locationOptions);
-                const itemsLocationsId = params?.locationID ? params?.locationID : loginUser?.customerDetails?.location?.id || loginUser?.user?.location?.id;
-                // console.log("itemsLocationsId ",itemsLocationsId);
-                locationOptions.map((item) => {
-                    if (item.value === itemsLocationsId) {
-                        setSelectedLocation(item.value);
-                    }
-                })
+                // const itemsLocationsId = params?.locationID ? params?.locationID : loginUser?.customerDetails?.location?.id || loginUser?.user?.location?.id;
+                // // console.log("itemsLocationsId ",itemsLocationsId);
+                // locationOptions.map((item) => {
+                //     if (item.value === itemsLocationsId) {
+                //         setSelectedLocation(item.value);
+                //     }
+                // })
             }
         }).finally(() => {
             props?.setLoading(false);
@@ -386,46 +330,18 @@ const AddBooking = ({ route }) => {
         .filter(([id, isChecked]) => isChecked)
         .map(([id]) => visitor.find(item => item.id === Number(id))?.name || '');
 
-    useEffect(() => {
-        // console.log("selectedLocation ",selectedLocation);
-        if (selectedLocation) {
-            props?.setLoading(true);
-            getBulidingListApi(selectedLocation);
-            getEqupmentListApi(selectedLocation);
-            getCustomerITSupporting(selectedLocation);
-            cateringApi(selectedLocation);
-            cleaningApi(selectedLocation);
-            MobileEquipmentApi(selectedLocation);
-            specialServiceApi(selectedLocation);
-            capcityAp(selectedLocation);
-        }
-    }, [selectedLocation])
-
-    useEffect(() => {
-        if (selectedBuilding) {
-            getFloorListApi(selectedBuilding);
-            getEquipmentListBuilding(selectedBuilding);
-            capacityBuildingBased(selectedBuilding);
-            cateringApiwithBuilding(selectedBuilding);
-            cleaningApiwithBuilding(selectedBuilding);
-            MobileEquipmentApiwithBuilding(selectedBuilding);
-            specialServiceApiwithBuilding(selectedBuilding);
-            getCustomerITSupportingwithBuildingId(selectedBuilding);
-        }
-    }, [selectedBuilding])
-
     const getBulidingListApi = (id) => {
         findBuildingListBasedonLocationId(id).then((res) => {
             // console.log("building ", res.buildings);
             setItemsBuildings([]);
             if (res.status) {
 
-                const buildingOptions = res.buildings.map(item => ({
+                const buildingOptions = res?.buildings ? res.buildings.map(item => ({
                     label: item.name,
                     value: item.id
-                }))
-                setItemsBuildings(buildingOptions);
-                setSelectedBuilding(null || params?.buildingID);
+                })) : [];
+                setItemsBuildings([defaultBuilding, ...buildingOptions]);
+                setSelectedBuilding(params?.buildingID ? params?.buildingID : selectedBuilding || null);
             }
         })
     }
@@ -436,10 +352,10 @@ const AddBooking = ({ route }) => {
             // console.log("floor ", res.floors);
             // console.log("floor List Building Baesd ",res.floors);
             setItemsFloors([]);
-            !params?.floorID && setCheckedFloors({});
+            !params?.floorID && Object.keys(checkedFloors).length > 0 && setCheckedFloors({});
 
             if (res.status) {
-                setItemsFloors(res.floors);
+                setItemsFloors(res.floors ? res?.floors : []);
             }
         })
     }
@@ -832,7 +748,6 @@ const AddBooking = ({ route }) => {
 
 
     //Special Service Api
-
     const specialServiceApi = (selectedLocation) => {
         // console.log("selectedLocation  Addbooking ",selectedLocation);
         findCustomerSpecialSettingBasedonCustomerLocationId(selectedLocation).then((res) => {
@@ -901,184 +816,6 @@ const AddBooking = ({ route }) => {
     const selectedSpecialServiceNames = Object.entries(checkedSpecialService)
         .filter(([id, isChecked]) => isChecked)
         .map(([id]) => specialService.find(item => item.id === Number(id))?.name || '');
-
-
-    useEffect(() => {
-
-        // console.log("selectedLocation ",selectedLocation);
-        // console.log("selectedBuilding ",selectedBuilding);
-        // console.log("checkedEquipments ",checkedEquipments);
-        // console.log("selectedCapacity ",selectedCapacity);
-        // console.log("checkedFloors ",checkedFloors);
-
-        if (Object.keys(checkedEquipments).length > 0 && selectedCapacity !== null) {
-            // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding);
-            getMeetingRoomListForEquipmentAndCapacity(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedEquipments, selectedCapacity, checkedFloors).then((res) => {
-                // console.log("Equipment And Capacity ",res);
-                setMeetingRoom([]);
-                if (res?.status) {
-                    // console.log("Equipment And Capacity ",res.meetingRoomDTOs);
-
-                    const mappedItems = res?.meetingRoomDTOs.map(resource => ({
-                        label: resource.name,
-                        value: resource.id,
-                    }));
-
-                    setMeetingRoom(mappedItems);
-                    setSelectedMeetingRoom(null || params?.meetingRoom);
-
-                }
-            })
-
-        } else if (Object.keys(checkedEquipments).length > 0) {
-            getMeetingRoomListForEquipmentAndCapacity(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedEquipments, selectedCapacity, checkedFloors).then((res) => {
-                // console.log("Equipment",res);
-                setMeetingRoom([]);
-                if (res?.status) {
-
-                    const mappedItems = res?.meetingRoomDTOs.map(resource => ({
-                        label: resource.name,
-                        value: resource.id,
-                    }));
-
-                    setMeetingRoom(mappedItems);
-                    setSelectedMeetingRoom(null || params?.meetingRoom);
-                }
-            })
-
-        } else if (selectedCapacity !== null) {
-            getMeetingRoomListForEquipmentAndCapacity(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedEquipments, selectedCapacity, checkedFloors).then((res) => {
-                // console.log("Capacity ",res);
-                setMeetingRoom([]);
-                if (res?.status) {
-
-                    const mappedItems = res?.meetingRoomDTOs.map(resource => ({
-                        label: resource.name,
-                        value: resource.id,
-                    }));
-
-                    setMeetingRoom(mappedItems);
-                    setSelectedMeetingRoom(null || params?.meetingRoom);
-
-                }
-            })
-        } else if (Object.keys(checkedFloors).length > 0) {
-            // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding," checkedFloors ",checkedFloors);
-            getMeetingRoomListForEquipmentAndCapacity(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedEquipments, selectedCapacity, checkedFloors).then((res) => {
-                // console.log("mroom ",res);
-                setMeetingRoom([]);
-                if (res?.status) {
-
-                    const mappedItems = res.meetingRoomDTOs.map(resource => ({
-                        label: resource.name,
-                        value: resource.id,
-                    }));
-
-                    setMeetingRoom(mappedItems);
-                    setSelectedMeetingRoom(null || params?.meetingRoom);
-
-                }
-            })
-
-            getDesk(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors);
-            getParkingSeats(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors);
-
-            getChargingCarListGetFloorBased(selectedLocation, selectedBuilding, checkedFloors, startDate, startTime, endDate1, endTime).then((res) => {
-                // console.log("getChargingCarListGetFloorBased ",res);
-                setChargingCar([]);
-                if (res?.status) {
-                    setChargingCar(res?.chargingCarDTOs);
-                }
-            })
-
-            getFloorbasedCars(selectedLocation, selectedBuilding, checkedFloors, startDate, startTime, endDate1, endTime).then((res) => {
-                console.log("cars floor based ", res);
-                setCars([]);
-                if (res?.status) {
-                    const mappedItems = res.carDTOs.map(resource => ({
-                        label: resource.name,
-                        value: resource.id,
-                    }));
-                    setCars(mappedItems);
-                }
-
-            })
-
-
-        } else if (selectedLocation && selectedBuilding) {
-            // console.log("Both ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
-            // getMettingRooms(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
-            getMeetingRoomListForEquipmentAndCapacity(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedEquipments, selectedCapacity, checkedFloors).then((res) => {
-                // console.log("mroom ",res);
-                setMeetingRoom([]);
-                if (res?.status) {
-
-                    const mappedItems = res.meetingRoomDTOs.map(resource => ({
-                        label: resource.name,
-                        value: resource.id,
-                    }));
-
-                    setMeetingRoom(mappedItems);
-                    setSelectedMeetingRoom(null || params?.[params?.resource]);
-
-                }
-            })
-            getDesk(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors);
-            getParkingSeats(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors);
-
-            getChargingCarListGetBuildingBased(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime).then((res) => {
-                // console.log(" Building Based Charging Car ",res);
-                setChargingCar([]);
-                if (res?.status) {
-                    setChargingCar(res?.chargingCarDTOs);
-                }
-            })
-
-            getBuildingbasedCars(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime).then((res) => {
-                console.log("cars building based ", res);
-                setCars([]);
-                if (res?.status) {
-                    const mappedItems = res.carDTOs.map(resource => ({
-                        label: resource.name,
-                        value: resource.id,
-                    }));
-                    setCars(mappedItems);
-                }
-
-            })
-
-        } else if (selectedLocation) {
-            // console.log("Location ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
-            getMettingRooms(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime);
-            getDesk(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedFloors);
-            getParkingSeats(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedFloors);
-
-            getChargingCarListGetLocationBased(selectedLocation, startDate, startTime, endDate1, endTime).then((res) => {
-                // console.log(" getChargingCarListGetLocationBased ",res);
-                setChargingCar([]);
-                if (res?.status) {
-                    setChargingCar(res?.chargingCarDTOs);
-                }
-            })
-
-            getLocationbasedCars(selectedLocation, startDate, startTime, endDate1, endTime).then((res) => {
-                console.log("cars Location based ", res);
-                setCars([]);
-                if (res?.status) {
-                    const mappedItems = res.carDTOs.map(resource => ({
-                        label: resource.name,
-                        value: resource.id,
-                    }));
-
-                    setCars(mappedItems);
-                }
-            })
-
-        }
-
-    }, [selectedLocation, selectedBuilding, startDate, endDate1, startTime, endTime, checkedEquipments, selectedCapacity, checkedFloors])
-
-
 
 
     const formatDate = (date1) => {
@@ -1183,100 +920,6 @@ const AddBooking = ({ route }) => {
     const selectedChargingCarNames = Object.entries(checkedChargingCar)
         .filter(([id, isChecked]) => isChecked)
         .map(([id]) => chargingCar.find(item => item.id === Number(id))?.name || '');
-
-
-
-
-    useEffect(() => {
-        // const backendResponse = [
-        //     { id: "meetingRoom", resource: "Meeting Room" },
-        //     { id: "desk", resource: "Desk" },
-        //     { id: "parkingSeat", resource: "Parking seat" },
-        // ];
-        // console.log("rights ",rights);
-        let enableRooms = false;
-        let enableDesks = false;
-        let enableParkingSeats = false;
-        let enableChargingCar = false;
-        let enableAll = false;
-        let enableCar = false;
-
-        const backendResponse = [];
-        enableRooms = rights?.includes('BOOK A ROOM');
-        enableDesks = rights?.includes('BOOK A DESK');
-        enableParkingSeats = rights?.includes('BOOK A PARKING SEAT');
-        enableChargingCar = rights?.includes('BOOK A CHARGING CAR');
-        enableCar = rights?.includes('BOOK A CAR');
-        enableAll = rights?.includes('ALL');
-        //   console.log("enableRooms ",enableRooms, rights?.includes('BOOK A ROOM')," enableDesks",enableDesks,rights?.includes('BOOK A DESK')," enableParkingSeats",enableParkingSeats ,rights?.includes('BOOK A PARKING SEAT'));
-        if (enableRooms || enableAll) {
-            backendResponse.push({ id: "meetingRoom", resource: translate?.ROOMS?.MEETINGROOM });
-        }
-        if (enableDesks || enableAll) {
-            backendResponse.push({ id: "desk", resource: translate?.ROOMS?.DESK });
-        }
-        if (enableParkingSeats || enableAll) {
-            backendResponse.push({ id: "parkingSeat", resource: translate?.DISPLAYMODALFORM?.PARKINGSEAT });
-            setRightsEnableParkingSeat(true);
-
-        }
-        if (enableChargingCar || enableAll) {
-            backendResponse.push({ id: "chargingCar", resource: translate?.DISPLAYMODALFORM?.CHARGINGCAR });
-            setRightsEnableChargingCar(true);
-        }
-        if (enableCar || enableAll) {
-            backendResponse.push({ id: "car", resource: translate?.ROOMS?.CAR });
-        }
-
-
-
-
-        // console.log("backendResponse ",backendResponse);
-
-
-        const resourceOptions = backendResponse?.map(item => ({
-            label: item.resource,
-            value: item.id
-        }));
-
-        setItemsResources(resourceOptions);
-        if (resourceOptions?.length > 0) {
-            if (selectedResource === null && !params?.resource) {
-                setSelectedResource(resourceOptions[0].value);
-
-            }
-        }
-
-
-        setDuration([]);
-
-        if (selectedResource !== 'chargingCar') {
-            const duration = [{ label: 'Select Duration', value: null, disabled: true },
-            { label: '15 min', value: '15' },
-            { label: '30 min', value: '30' },
-            { label: '45 min', value: '45' },
-            { label: '60 min', value: '60' },
-            { label: '75 min', value: '75' },
-            { label: '90 min', value: '90' },
-            { label: '105 min', value: '105' },
-            { label: '120 min', value: '120' },
-            { label: 'All Day', value: '1440' }]
-            setDuration(duration);
-        } else {
-            const duration = [{ label: 'Select Duration', value: null, disabled: true },
-            { label: '15 min', value: '15' },
-            { label: '30 min', value: '30' },
-            { label: '1 Hour', value: '60' },
-            ]
-            setDuration(duration);
-        }
-
-
-
-    }, [rights]);
-
-
-
 
     // console.log("mobileEquipment ",mobileEquipment);
 
@@ -1386,7 +1029,7 @@ const AddBooking = ({ route }) => {
         setCheckedParkingSeat({});
         setIsOpenParkingSeat(!isOpenParkingSeat);
 
-      setSelectedCars(null);
+        setSelectedCars(null);
 
 
 
@@ -1410,12 +1053,9 @@ const AddBooking = ({ route }) => {
 
     }
 
-
     const handleClickCancel = () => {
         params?.from ? navigation.navigate(params?.from) : navigation.navigate('CalendarScreen', { type: selectedResource });
     }
-
-    // console.log("praking seat ", parkingseat);
 
     const handleClickSubmit = () => {
         props?.setLoading(true);
@@ -1432,8 +1072,6 @@ const AddBooking = ({ route }) => {
         const chargingCarIds = Object.keys(checkedChargingCar).filter(key => checkedChargingCar[key] === true);
         const parkingSeatIdsList = Object.keys(checkedParkingSeat).filter(key => checkedParkingSeat[key] === true);
 
-        
-
         if (catringdataId.length > 0) {
             catringdataId.forEach((item) => {
                 bookingCatringdtoresponse.push({
@@ -1447,12 +1085,7 @@ const AddBooking = ({ route }) => {
             })
         }
 
-        // console.log("user id submit ", loginUser?.user?.id);
-
         const parkingSeatIds = selectedParkingSeat ? [selectedParkingSeat] : parkingSeatIdsList;
-
-        // console.log("parking seat ids ", parkingSeatIds);
-
 
         datas = {
             locationId: selectedLocation,
@@ -1510,25 +1143,379 @@ const AddBooking = ({ route }) => {
                 ToastColor.ERROR
             );
             if (res.status) {
-                params?.from ? navigation.navigate(params?.from) : navigation.navigate('CalendarScreen', { type: selectedResource });
+                // params?.from ? navigation.navigate(params?.from) : navigation.navigate('CalendarScreen', { type: selectedResource })
+                navigation.navigate('CalendarScreen', { type: selectedResource });
             }
         }).finally(() => {
             props?.setLoading(false);
         })
     }
 
-    // console.log("cateringFormEnable",cateringFormEnable);
-
     const handleFilter = () => {
         setFilterOptionsEnabled(!filterOptionsEnabled);
         // console.log("filterOptionsEnabled ", filterOptionsEnabled);
     }
 
+    const initialLoad = async () => {
+        let res = await getLoginUser();
+        getlocationApi();
+        getEndUsers();
+        getVisitors();
+        setSelectedBuilding(params?.buildingID ? params?.buildingID : params?.from ? null : res?.user?.buildingId || null)
+        setCheckedFloors(params?.floorID ? { [params.floorID]: true } : params?.from ? {} : res?.user?.floorId ? { [res?.user?.floorId]: true } : {});
+
+        setSelectedLocation(params?.locationID ? params?.locationID : res?.customerDetails?.location?.id || res?.user?.location?.id);
+
+        //from calendar view and rooms view
+        if (params) {
+            setSelectedResource(params.resource);
+            if (params?.resource === 'meetingRoom') {
+                params?.meetingRoom && setSelectedMeetingRoom(params?.meetingRoom);
+            } else if (params?.resource === 'desk') {
+                params?.desk && setSelectedDesk(params?.desk);
+            } else if (params?.resource === 'parkingSeat') {
+                params?.parkingSeat && setSelectedParkingSeat(params?.parkingSeat);
+            } else if (params?.resource === 'chargingCar') {
+                params?.chargingCar && setCheckedChargingCar({ [params?.chargingCar]: true });
+            }
+        } else {
+            setSelectedMeetingRoom(null);
+            setSelectedDesk(null);
+            setSelectedParkingSeat(null);
+        }
+    }
+
+
+    useEffect(() => {
+        scrollRef.current?.scrollTo({ x: 0, y: 0, animated: true });
+        setFilterOptionsEnabled(false);
+        initialLoad();
+    }, [params]);
+
+    useEffect(() => {
+
+        if (selectedResource === 'meetingRoom' || selectedResource === 'parkingSeat' || selectedResource === 'car') {
+            setDurationValue(duration.find((d) => d.value === '30').value);
+
+        } else if (selectedResource === 'desk') {
+            setDurationValue(duration.find((d) => d.value === '120').value);
+        } else if (selectedResource === 'chargingCar') {
+            setDurationValue(duration.find((d) => d.value === '60').value);
+        }
+
+    }, [selectedResource])
+
+    useEffect(() => {
+        const startDate = formatDate(date);
+        const startTime = formatTime(date);
+        const endDate1 = formatDate(endDate);
+        const endTime = formatTime(endDate);
+
+        setStartDate(startDate);
+        setStartTime(startTime);
+        setEndDate1(endDate1);
+        setEndTime(endTime);
+    }, [date, endDate]);
+
+    useEffect(() => {
+        if (durationValue !== null) {
+            const endDateTime = new Date(date.getTime() + durationValue * 60000);
+            setEndDate(endDateTime);
+        }
+    }, [durationValue, date]);
+
+
+    useEffect(() => {
+        // const backendResponse = [
+        //     { id: "meetingRoom", resource: "Meeting Room" },
+        //     { id: "desk", resource: "Desk" },
+        //     { id: "parkingSeat", resource: "Parking seat" },
+        // ];
+        // console.log("rights ",rights);
+        let enableRooms = false;
+        let enableDesks = false;
+        let enableParkingSeats = false;
+        let enableChargingCar = false;
+        let enableAll = false;
+        let enableCar = false;
+
+        const backendResponse = [];
+        enableRooms = rights?.includes('BOOK A ROOM');
+        enableDesks = rights?.includes('BOOK A DESK');
+        enableParkingSeats = rights?.includes('BOOK A PARKING SEAT');
+        enableChargingCar = rights?.includes('BOOK A CHARGING CAR');
+        enableCar = rights?.includes('BOOK A CAR');
+        enableAll = rights?.includes('ALL');
+        //   console.log("enableRooms ",enableRooms, rights?.includes('BOOK A ROOM')," enableDesks",enableDesks,rights?.includes('BOOK A DESK')," enableParkingSeats",enableParkingSeats ,rights?.includes('BOOK A PARKING SEAT'));
+        if (enableRooms || enableAll) {
+            backendResponse.push({ id: "meetingRoom", resource: translate?.ROOMS?.MEETINGROOM });
+        }
+        if (enableDesks || enableAll) {
+            backendResponse.push({ id: "desk", resource: translate?.ROOMS?.DESK });
+        }
+        if (enableParkingSeats || enableAll) {
+            backendResponse.push({ id: "parkingSeat", resource: translate?.DISPLAYMODALFORM?.PARKINGSEAT });
+            setRightsEnableParkingSeat(true);
+
+        }
+        if (enableChargingCar || enableAll) {
+            backendResponse.push({ id: "chargingCar", resource: translate?.DISPLAYMODALFORM?.CHARGINGCAR });
+            setRightsEnableChargingCar(true);
+        }
+        if (enableCar || enableAll) {
+            backendResponse.push({ id: "car", resource: translate?.ROOMS?.CAR });
+        }
+
+        const resourceOptions = backendResponse?.map(item => ({
+            label: item.resource,
+            value: item.id
+        }));
+
+        setItemsResources(resourceOptions);
+        if (resourceOptions?.length > 0) {
+            if (selectedResource === null && !params?.resource) {
+                setSelectedResource(resourceOptions[0].value);
+
+            }
+        }
+
+        setDuration([]);
+
+        if (selectedResource !== 'chargingCar') {
+            const duration = [{ label: 'Select Duration', value: null, disabled: true },
+            { label: '15 min', value: '15' },
+            { label: '30 min', value: '30' },
+            { label: '45 min', value: '45' },
+            { label: '60 min', value: '60' },
+            { label: '75 min', value: '75' },
+            { label: '90 min', value: '90' },
+            { label: '105 min', value: '105' },
+            { label: '120 min', value: '120' },
+            { label: 'All Day', value: '1440' }]
+            setDuration(duration);
+        } else {
+            const duration = [{ label: 'Select Duration', value: null, disabled: true },
+            { label: '15 min', value: '15' },
+            { label: '30 min', value: '30' },
+            { label: '1 Hour', value: '60' },
+            ]
+            setDuration(duration);
+        }
+    }, [rights]);
+
+    useEffect(() => {
+        if (Object.keys(checkedEquipments).length > 0 && selectedCapacity !== null) {
+            // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding);
+            getMeetingRoomListForEquipmentAndCapacity(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedEquipments, selectedCapacity, checkedFloors).then((res) => {
+                // console.log("Equipment And Capacity ",res);
+                setMeetingRoom([]);
+                if (res?.status) {
+                    // console.log("Equipment And Capacity ",res.meetingRoomDTOs);
+
+                    const mappedItems = res?.meetingRoomDTOs.map(resource => ({
+                        label: resource.name,
+                        value: resource.id,
+                    }));
+
+                    setMeetingRoom(mappedItems);
+                    setSelectedMeetingRoom(null || params?.meetingRoom);
+
+                }
+            })
+
+        } else if (Object.keys(checkedEquipments).length > 0) {
+            getMeetingRoomListForEquipmentAndCapacity(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedEquipments, selectedCapacity, checkedFloors).then((res) => {
+                // console.log("Equipment",res);
+                setMeetingRoom([]);
+                if (res?.status) {
+
+                    const mappedItems = res?.meetingRoomDTOs.map(resource => ({
+                        label: resource.name,
+                        value: resource.id,
+                    }));
+
+                    setMeetingRoom(mappedItems);
+                    setSelectedMeetingRoom(null || params?.meetingRoom);
+                }
+            })
+
+        } else if (selectedCapacity !== null) {
+            getMeetingRoomListForEquipmentAndCapacity(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedEquipments, selectedCapacity, checkedFloors).then((res) => {
+                // console.log("Capacity ",res);
+                setMeetingRoom([]);
+                if (res?.status) {
+
+                    const mappedItems = res?.meetingRoomDTOs.map(resource => ({
+                        label: resource.name,
+                        value: resource.id,
+                    }));
+
+                    setMeetingRoom(mappedItems);
+                    setSelectedMeetingRoom(null || params?.meetingRoom);
+
+                }
+            })
+        } else if (Object.keys(checkedFloors).length > 0) {
+            // console.log("selectedCapacity ",selectedCapacity," checkedEquipments ",checkedEquipments," selectedLocation ",selectedLocation," selectedBuilding ",selectedBuilding," checkedFloors ",checkedFloors);
+            getMeetingRoomListForEquipmentAndCapacity(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedEquipments, selectedCapacity, checkedFloors).then((res) => {
+                // console.log("mroom ",res);
+                setMeetingRoom([]);
+                if (res?.status) {
+
+                    const mappedItems = res.meetingRoomDTOs.map(resource => ({
+                        label: resource.name,
+                        value: resource.id,
+                    }));
+
+                    setMeetingRoom(mappedItems);
+                    setSelectedMeetingRoom(null || params?.meetingRoom);
+
+                }
+            })
+
+            getDesk(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors);
+            getParkingSeats(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors);
+
+            getChargingCarListGetFloorBased(selectedLocation, selectedBuilding, checkedFloors, startDate, startTime, endDate1, endTime).then((res) => {
+                // console.log("getChargingCarListGetFloorBased ",res);
+                setChargingCar([]);
+                if (res?.status) {
+                    setChargingCar(res?.chargingCarDTOs);
+                }
+            })
+
+            getFloorbasedCars(selectedLocation, selectedBuilding, checkedFloors, startDate, startTime, endDate1, endTime).then((res) => {
+                // console.log("cars floor based ", res);
+                setCars([]);
+                if (res?.status) {
+                    const mappedItems = res.carDTOs.map(resource => ({
+                        label: resource.name,
+                        value: resource.id,
+                    }));
+                    setCars(mappedItems);
+                }
+
+            })
+
+
+        } else if (selectedLocation && selectedBuilding) {
+            // console.log("Both ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
+            // getMettingRooms(selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
+            getMeetingRoomListForEquipmentAndCapacity(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedEquipments, selectedCapacity, checkedFloors).then((res) => {
+                // console.log("mroom ",res);
+                setMeetingRoom([]);
+                if (res?.status) {
+
+                    const mappedItems = res.meetingRoomDTOs.map(resource => ({
+                        label: resource.name,
+                        value: resource.id,
+                    }));
+
+                    setMeetingRoom(mappedItems);
+                    setSelectedMeetingRoom(null || params?.[params?.resource]);
+
+                }
+            })
+            getDesk(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors);
+            getParkingSeats(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors);
+
+            getChargingCarListGetBuildingBased(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime).then((res) => {
+                // console.log(" Building Based Charging Car ",res);
+                setChargingCar([]);
+                if (res?.status) {
+                    setChargingCar(res?.chargingCarDTOs);
+                }
+            })
+
+            getBuildingbasedCars(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime).then((res) => {
+                // console.log("cars building based ", res);
+                setCars([]);
+                if (res?.status) {
+                    const mappedItems = res.carDTOs.map(resource => ({
+                        label: resource.name,
+                        value: resource.id,
+                    }));
+                    setCars(mappedItems);
+                }
+
+            })
+
+        } else if (selectedLocation) {
+            // console.log("Location ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
+            getMettingRooms(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime);
+            getDesk(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedFloors);
+            getParkingSeats(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedFloors);
+
+            getChargingCarListGetLocationBased(selectedLocation, startDate, startTime, endDate1, endTime).then((res) => {
+                // console.log(" getChargingCarListGetLocationBased ",res);
+                setChargingCar([]);
+                if (res?.status) {
+                    setChargingCar(res?.chargingCarDTOs);
+                }
+            })
+
+            getLocationbasedCars(selectedLocation, startDate, startTime, endDate1, endTime).then((res) => {
+                // console.log("cars Location based ", res);
+                setCars([]);
+                if (res?.status) {
+                    const mappedItems = res.carDTOs.map(resource => ({
+                        label: resource.name,
+                        value: resource.id,
+                    }));
+
+                    setCars(mappedItems);
+                }
+            })
+
+        }
+
+    }, [selectedLocation, selectedBuilding, startDate, endDate1, startTime, endTime, checkedEquipments, selectedCapacity, checkedFloors])
+
+    useEffect(() => {
+        // console.log("selectedLocation ",selectedLocation);
+        if (selectedLocation) {
+            props?.setLoading(true);
+            getBulidingListApi(selectedLocation);
+            getEqupmentListApi(selectedLocation);
+            getCustomerITSupporting(selectedLocation);
+            cateringApi(selectedLocation);
+            cleaningApi(selectedLocation);
+            MobileEquipmentApi(selectedLocation);
+            specialServiceApi(selectedLocation);
+            capcityAp(selectedLocation);
+        }
+    }, [selectedLocation])
+
+    useEffect(() => {
+        if (selectedBuilding) {
+            getFloorListApi(selectedBuilding);
+            getEquipmentListBuilding(selectedBuilding);
+            capacityBuildingBased(selectedBuilding);
+            cateringApiwithBuilding(selectedBuilding);
+            cleaningApiwithBuilding(selectedBuilding);
+            MobileEquipmentApiwithBuilding(selectedBuilding);
+            specialServiceApiwithBuilding(selectedBuilding);
+            getCustomerITSupportingwithBuildingId(selectedBuilding);
+        } else if (selectedLocation) {
+            props?.setLoading(true);
+            getBulidingListApi(selectedLocation);
+            getEqupmentListApi(selectedLocation);
+            getCustomerITSupporting(selectedLocation);
+            cateringApi(selectedLocation);
+            cleaningApi(selectedLocation);
+            MobileEquipmentApi(selectedLocation);
+            specialServiceApi(selectedLocation);
+            capcityAp(selectedLocation);
+
+            setItemsFloors([]);
+            setCheckedFloors({});
+        }
+    }, [selectedBuilding])
 
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.title}>{translate?.ROOMBOOKING?.NEWBOOKING}</Text>
-            <ScrollView>
+            <ScrollView ref={scrollRef}>
 
                 <View style={styles.pickerContainer}>
                     <View style={styles.row}>
@@ -1597,7 +1584,14 @@ const AddBooking = ({ route }) => {
                             <View style={styles.dropdownContainer}>
                                 <TouchableOpacity onPress={handleFloorToggle} style={styles.dropdownHeader}>
                                     {selectedFloorNames.length > 0 ? (
-                                        <Text>{selectedFloorNames.join(', ')}</Text>
+                                        <View style={{ flexDirection: 'row' }}>
+                                            <Text style={{ flex: 10 }}>{selectedFloorNames.join(', ')}</Text>
+                                            <TouchableWithoutFeedback>
+                                                <TouchableOpacity onPress={()=> setCheckedFloors({})} style={{ flex: 1 }}>
+                                                    <MaterialCommunityIcons name="close" size={20} color="#000" />
+                                                </TouchableOpacity>
+                                            </TouchableWithoutFeedback>
+                                        </View>
                                     ) : (
                                         <Text style={styles.dropdownHeaderText}>{translate?.ROOMBOOKING?.SELECTFLOOR}</Text>
                                     )}

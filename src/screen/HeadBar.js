@@ -94,7 +94,7 @@ const HeadBar = () => {
                 <TouchableOpacity>
                   <Image source={require('../assets/passcode.png')} style={styles.passcode} />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => {
+                <TouchableOpacity style={styles.qrCode} onPress={() => {
                   props?.setPre({id: 1, name: 'DashboardScreen'});
                   navigation.navigate('QrCodeScanner');
                 }} >
@@ -192,6 +192,9 @@ const styles = StyleSheet.create({
   passcode: {
     width: 30,
     height: 30,
+    marginRight: 15
+  },
+  qrCode: {
     marginRight: 15
   },
   modal: {

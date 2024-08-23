@@ -162,13 +162,14 @@ const CalendarView = ({ route }) => {
       loginHomeAccess(userId).then((res) => {
         if (res.status) {
           setLoginUser(res);
-          getlocationApi(res?.customerDetails?.location?.id || res?.user?.location?.id);
+          getlocationApi(res?.customerDetails?.location?.id || res?.user?.location?.id, params?.type || "meetingRoom", res?.user);
         }
       });
     }
   };
 
-  const getlocationApi = (userLocation) => {
+  const getlocationApi = (userLocation, resourceType, userData) => {
+    !userData?.buildingId && clearSelection();
     getLocationlist().then((res) => {
       setItemsLocations([]);
       if (res.status) {
@@ -179,39 +180,48 @@ const CalendarView = ({ route }) => {
         setItemsLocations(locationOptions);
         locationOptions.forEach((item) => {
           if (item.value === userLocation) {
-            handleChangeLocation({ value: item.value }, params?.type || "meetingRoom");
+            setSelectedBuilding(userData?.buildingId || null);
+            setSelectFloors(userData?.floorId || null);
+
+            getBulidingListApi(item.value, true);
+            userData?.buildingId && getFloorListApi(userData?.buildingId, true);
+
+            setSelectedLocation(item.value);
+            userData?.buildingId ? getDataByBuildingAndFloor(userData?.buildingId, userData?.floorId) : getDataByLocation(item.value, resourceType);
           }
         });
       }
     }).finally(() => {
-      // setLoading(false);
+      setLoading(false);
     });
   };
 
-  const getBulidingListApi = (id) => {
+  const getBulidingListApi = (id, notClear) => {
     findBuildingListBasedonLocationId(id).then((res) => {
-      setItemsBuildings([defaultBuilding]);
-      setSelectedBuilding(null);
+      !notClear && setSelectedBuilding(null);
       if (res.status) {
-        const buildingOptions = res?.buildings?.map((item) => ({
+        const buildingOptions = res?.buildings ? res?.buildings?.map((item) => ({
           label: item.name,
           value: item.id,
-        }));
+        })) : [];
         setItemsBuildings([defaultBuilding, ...buildingOptions]);
+      } else {
+        setItemsBuildings([defaultBuilding]);
       }
     });
   };
 
-  const getFloorListApi = (id) => {
+  const getFloorListApi = (id, notClear) => {
     findFloorsListBasedonBuildingId(id).then((res) => {
-      setItemsFloors([]);
-      setSelectFloors(null);
+      !notClear && setSelectFloors(null);
       if (res.status) {
-        const floorOption = res?.floors?.map((item) => ({
+        const floorOption = res?.floors ? res?.floors?.map((item) => ({
           label: item.name,
           value: item.id,
-        }));
+        })) : [];
         setItemsFloors([defaultFloor, ...floorOption]);
+      } else {
+        setItemsFloors([]);
       }
     });
   };
@@ -222,10 +232,10 @@ const CalendarView = ({ route }) => {
       setMeetingRoom([]);
       setSelectedMeetingRoom(null);
       if (res.status) {
-        const meetingOption = res?.meetingRoomDTOs?.map((item) => ({
+        const meetingOption = res?.meetingRoomDTOs ? res?.meetingRoomDTOs?.map((item) => ({
           label: item.name,
           value: item.id,
-        }));
+        })) : [];
         setMeetingRoom([defaultRoom, ...meetingOption]);
       }
     });
@@ -237,10 +247,10 @@ const CalendarView = ({ route }) => {
       setMeetingRoom([]);
       setSelectedMeetingRoom(null);
       if (res.status) {
-        const meetingOption = res?.meetingRoomDTOs?.map((item) => ({
+        const meetingOption = res?.meetingRoomDTOs ? res?.meetingRoomDTOs?.map((item) => ({
           label: item.name,
           value: item.id,
-        }));
+        })) : [];
         setMeetingRoom([defaultRoom, ...meetingOption]);
       }
     });
@@ -252,10 +262,10 @@ const CalendarView = ({ route }) => {
       setDesk([]);
       setSelectedDesk(null);
       if (res.status) {
-        const deskOption = res?.deskDTOs?.map((item) => ({
+        const deskOption = res?.deskDTOs ? res?.deskDTOs?.map((item) => ({
           label: item.name,
           value: item.id,
-        }));
+        })) : [];
         setDesk([defaultDesk, ...deskOption]);
       }
     });
@@ -267,10 +277,10 @@ const CalendarView = ({ route }) => {
       setDesk([]);
       setSelectedDesk(null);
       if (res.status) {
-        const deskOption = res?.deskDTOs?.map((item) => ({
+        const deskOption = res?.deskDTOs ? res?.deskDTOs?.map((item) => ({
           label: item.name,
           value: item.id,
-        }));
+        })) : [];
         setDesk([defaultDesk, ...deskOption]);
       }
     });
@@ -283,10 +293,10 @@ const CalendarView = ({ route }) => {
       setSelectedParkingSeat(null);
       // console.log("parking seats", res);
       if (res.status) {
-        const parkingseatOption = res?.parkingSeatDTOs?.map((item) => ({
+        const parkingseatOption = res?.parkingSeatDTOs ? res?.parkingSeatDTOs?.map((item) => ({
           label: item.name,
           value: item.id,
-        }));
+        })) : [];
         setParkingSeat([defaultParkingSeat, ...parkingseatOption]);
       }
     });
@@ -298,10 +308,10 @@ const CalendarView = ({ route }) => {
       setParkingSeat([]);
       setSelectedParkingSeat(null);
       if (res.status) {
-        const parkingseatOption = res?.parkingSeatDTOs?.map((item) => ({
+        const parkingseatOption = res?.parkingSeatDTOs ? res?.parkingSeatDTOs?.map((item) => ({
           label: item.name,
           value: item.id,
-        }));
+        })) : [];
         setParkingSeat([defaultParkingSeat, ...parkingseatOption]);
       }
     });
@@ -313,10 +323,10 @@ const CalendarView = ({ route }) => {
     getChargingCarList(id).then((res) => {
       setSelectedChargingCar(null);
       if (res.status) {
-        const chargingCarOption = res?.chargingCarDTOs?.map((item) => ({
+        const chargingCarOption = res?.chargingCarDTOs ? res?.chargingCarDTOs?.map((item) => ({
           label: item.name,
           value: item.id,
-        }));
+        })) : [];
         setChargingCars([defaultChargingCar, ...chargingCarOption]);
       } else {
         setChargingCars([]);
@@ -333,10 +343,10 @@ const CalendarView = ({ route }) => {
     getChargingCarByBuildingFloor(selectedBuilding, selectFloors).then((res) => {
       setSelectedChargingCar(null);
       if (res.status) {
-        const chargingCarOption = res?.chargingCarDTOs?.map((item) => ({
+        const chargingCarOption = res?.chargingCarDTOs ? res?.chargingCarDTOs?.map((item) => ({
           label: item.name,
           value: item.id,
-        }));
+        })) : [];
         setChargingCars([defaultChargingCar, ...chargingCarOption]);
       } else {
         setChargingCars([]);
@@ -353,10 +363,10 @@ const CalendarView = ({ route }) => {
       setSelectedCar(null);
       console.log("car location", res);
       if (res.status) {
-        const carOption = res?.carDTOs?.map((item) => ({
+        const carOption = res?.carDTOs ? res?.carDTOs?.map((item) => ({
           label: item.name,
           value: item.id,
-        }));
+        })) : [];
         setCars([defaultCar, ...carOption]);
       } else {
         setCars([]);
@@ -371,10 +381,10 @@ const CalendarView = ({ route }) => {
     getCarByBuildingFloor(selectedBuilding, selectFloors).then((res) => {
       setSelectedCar(null);
       if (res.status) {
-        const carOption = res?.carDTOs?.map((item) => ({
+        const carOption = res?.carDTOs ? res?.carDTOs?.map((item) => ({
           label: item.name,
           value: item.id,
-        }));
+        })) : [];
         setCars([defaultCar, ...carOption]);
       } else {
         setCars([]);
@@ -499,10 +509,6 @@ const CalendarView = ({ route }) => {
       const today = new Date().toISOString().split('T')[0];
       setSelectedDate(today);
       setEvents({});
-
-      // Set empty
-      clearSelection();
-      handleChangeLocation({ value: selectedLocation }, value);
     }
   };
 
@@ -814,14 +820,15 @@ const styles = StyleSheet.create({
   },
   resourceButtonText: {
     color: '#FFFFFF',
-    // fontSize: 13,
+    fontSize: 13,
+    padding: 2,
     textAlign: 'center',
     flexWrap: 'wrap', // Allow text to wrap inside the button
   },
   selectedResource: {
     borderRadius: 5,
     borderColor: '#000',
-    borderWidth: 3,
+    borderWidth: 2,
   }
 });
 
