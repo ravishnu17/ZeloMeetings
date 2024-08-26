@@ -1063,7 +1063,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#00000060',
   },
   filterModalContainer: {
-    backgroundColor: '#fcfcfc',
+    backgroundColor: '#f8f8f8',
   },
   filterView: {
     flexDirection: 'row',

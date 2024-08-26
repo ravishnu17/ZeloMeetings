@@ -2456,7 +2456,7 @@ const EditBooking = ({ route }) => {
                             data={cars}
                             labelField="label"
                             valueField="value"
-                            placeholder="Select Car"
+                            placeholder={translate?.ROOMBOOKING?.SELECTCAR}
                             value={selecteCars}
                              onChange={item => setSelectedCars(item.value)}
                         />

@@ -164,7 +164,7 @@ function Pincheckin() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#eeeeee',
+        backgroundColor:'#f8f8f8',// '#eeeeee',
         // alignItems: 'center',
         justifyContent: 'center',
         padding: 10
