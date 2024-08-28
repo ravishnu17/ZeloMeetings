@@ -141,17 +141,17 @@ const HeadBar = () => {
               <View style={styles.modalContainer}>
                 <Text style={{ fontWeight: 'bold', fontSize: 18, textAlign: 'center', marginBottom: 20 }}>{translate?.MYPROFILE?.LANGUAGE}</Text>
                 <TouchableOpacity style={styles.modelItem} onPress={() => ChangeLanguage('en')}>
-                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('en')} />
+                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('en')} onPress={() => ChangeLanguage('en')} />
                   <Image source={require('../assets/US.png')} style={styles.modelImg} />
                   <Text>English</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.modelItem} onPress={() => ChangeLanguage('pt')} >
-                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('pt')} />
+                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('pt')} onPress={() => ChangeLanguage('pt')} />
                   <Image source={require('../assets/portugal.png')} style={styles.modelImg} />
                   <Text>Portuguese</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.modelItem} onPress={() => ChangeLanguage('es')} >
-                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('es')} />
+                  <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('es')} onPress={() => ChangeLanguage('es')} />
                   <Image source={require('../assets/spain.png')} style={styles.modelImg} />
                   <Text>Spanish</Text>
                 </TouchableOpacity>
@@ -191,9 +191,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 7,
     alignSelf: 'flex-start',
-    flexWrap:'nowrap',
-    width: 130,
-    height: 30,
+    // width: 130,
+    // height: 30,
   },
   passcode: {
     width: 30,

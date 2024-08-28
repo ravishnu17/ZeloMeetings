@@ -1166,7 +1166,7 @@ const EditBooking = ({ route }) => {
         // console.log("checkedEquipments ",checkedEquipments);
         // console.log("selectedCapacity ",selectedCapacity);
         // console.log("checkedFloors ",checkedFloors);
-        console.log("bookingResponse ",bookingResponse);
+        console.log("bookingResponse ", bookingResponse);
 
         const bookingId = bookingResponse?.id;
 
@@ -1285,29 +1285,29 @@ const EditBooking = ({ route }) => {
             getParkingSeats(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
             getChargingcarApis(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
 
-         getEditBookingFloorbasedCars(selectedLocation,selectedBuilding,checkedFloors, startDate,startTime, endDate1, endTime,bookingId).then((res)=>{
-            setCars([]);
-            if (res?.status) {
-                const mappedItems = res.carDTOs.map(resource => ({
-                    label: resource.name,
-                    value: resource.id,
-                }));
-                setCars(mappedItems);
+            getEditBookingFloorbasedCars(selectedLocation, selectedBuilding, checkedFloors, startDate, startTime, endDate1, endTime, bookingId).then((res) => {
+                setCars([]);
+                if (res?.status) {
+                    const mappedItems = res.carDTOs.map(resource => ({
+                        label: resource.name,
+                        value: resource.id,
+                    }));
+                    setCars(mappedItems);
 
-                if(selecteCars === null){
-                   
-                    mappedItems?.map((item) => {
-                        // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
-                        // console.log("car.id",bookingResponse.car.id);
-                        if (item.value ===  bookingResponse?.car?.id) {
-                            setSelectedCars(item.value);
-                        }
+                    if (selecteCars === null) {
 
-                    })
+                        mappedItems?.map((item) => {
+                            // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
+                            // console.log("car.id",bookingResponse.car.id);
+                            if (item.value === bookingResponse?.car?.id) {
+                                setSelectedCars(item.value);
+                            }
 
+                        })
+
+                    }
                 }
-            }
-         })
+            })
         } else if (selectedBuilding) {
             // console.log(" call selectedBuilding",selectedBuilding,"booking id ",bookingId);
             // console.log("Both ",selectedLocation,selectedBuilding,startDate,startTime,endDate1,endTime);
@@ -1341,28 +1341,28 @@ const EditBooking = ({ route }) => {
             getDesk(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
             getParkingSeats(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
             getChargingcarApis(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
-            getEditBookingBuildingbasedCars(selectedLocation,selectedBuilding, startDate,startTime, endDate1, endTime,bookingId).then((res)=>{
+            getEditBookingBuildingbasedCars(selectedLocation, selectedBuilding, startDate, startTime, endDate1, endTime, bookingId).then((res) => {
                 setCars([]);
-            if (res?.status) {
-                const mappedItems = res.carDTOs.map(resource => ({
-                    label: resource.name,
-                    value: resource.id,
-                }));
-                setCars(mappedItems);
+                if (res?.status) {
+                    const mappedItems = res.carDTOs.map(resource => ({
+                        label: resource.name,
+                        value: resource.id,
+                    }));
+                    setCars(mappedItems);
 
-                if(selecteCars === null){
-                   
-                    mappedItems?.map((item) => {
-                        // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
-                        // console.log("car.id",bookingResponse.car.id);
-                        if (item.value ===  bookingResponse?.car?.id) {
-                            setSelectedCars(item.value);
-                        }
+                    if (selecteCars === null) {
 
-                    })
+                        mappedItems?.map((item) => {
+                            // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
+                            // console.log("car.id",bookingResponse.car.id);
+                            if (item.value === bookingResponse?.car?.id) {
+                                setSelectedCars(item.value);
+                            }
 
+                        })
+
+                    }
                 }
-            }
             })
         } else if (selectedLocation) {
 
@@ -1372,30 +1372,30 @@ const EditBooking = ({ route }) => {
             getDesk(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
             getParkingSeats(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
             getChargingcarApis(selectedLocation, selectedBuilding ? selectedBuilding : 0, startDate, startTime, endDate1, endTime, checkedFloors, bookingId);
-            
-            getEditBookingLocationbasedCars(selectedLocation,startDate,startTime, endDate1, endTime,bookingId).then((res)=>{
+
+            getEditBookingLocationbasedCars(selectedLocation, startDate, startTime, endDate1, endTime, bookingId).then((res) => {
                 // console.log( " edit location based  cars ",res);
                 setCars([]);
-            if (res?.status) {
-                const mappedItems = res.carDTOs.map(resource => ({
-                    label: resource.name,
-                    value: resource.id,
-                }));
-                setCars(mappedItems);
+                if (res?.status) {
+                    const mappedItems = res.carDTOs.map(resource => ({
+                        label: resource.name,
+                        value: resource.id,
+                    }));
+                    setCars(mappedItems);
 
-                if(selecteCars === null){
-                   
-                    mappedItems?.map((item) => {
-                        // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
-                        // console.log("car.id",bookingResponse.car.id);
-                        if (item.value ===  bookingResponse?.car?.id) {
-                            setSelectedCars(item.value);
-                        }
+                    if (selecteCars === null) {
 
-                    })
+                        mappedItems?.map((item) => {
+                            // console.log("bookingResponse?.building?.id ",bookingResponse?.building?.id);
+                            // console.log("car.id",bookingResponse.car.id);
+                            if (item.value === bookingResponse?.car?.id) {
+                                setSelectedCars(item.value);
+                            }
 
+                        })
+
+                    }
                 }
-            }
             })
         }
 
@@ -2444,7 +2444,7 @@ const EditBooking = ({ route }) => {
                     </View>
                 }
 
-{
+                {
                     selectedResource === 'car' &&
                     <View style={styles.pickerContainer}>
                         <Text>{translate?.ROOMS?.CAR}</Text>
@@ -2458,7 +2458,7 @@ const EditBooking = ({ route }) => {
                             valueField="value"
                             placeholder={translate?.ROOMBOOKING?.SELECTCAR}
                             value={selecteCars}
-                             onChange={item => setSelectedCars(item.value)}
+                            onChange={item => setSelectedCars(item.value)}
                         />
                     </View>
                 }
@@ -2910,11 +2910,6 @@ const styles = StyleSheet.create({
         padding: 7,
         marginBottom: 20,
     },
-    dateTimeContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 8,
-    },
     dateText: {
         fontSize: 16,
         marginLeft: 8,
@@ -2965,14 +2960,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
-
-    dateTimeContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        marginTop: 10,
-    },
-
     dateTimeContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -2980,6 +2967,7 @@ const styles = StyleSheet.create({
     },
     dateTimePicker: {
         flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
         padding: 10,
         backgroundColor: '#f0f0f0',

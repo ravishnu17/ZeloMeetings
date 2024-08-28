@@ -748,7 +748,7 @@ const CalendarView = ({ route }) => {
             navigation.navigate('AddBooking', { resource: selectResource });
             props?.setPre({ id: 2, name: 'CalendarScreen' });
           }}>
-          <Icon name="plus-circle" size={30} color="#007bff" />
+          <Icon name="plus-circle" size={35} color="#007bff" />
         </TouchableOpacity>
       </View>
     </SafeAreaView>

@@ -456,12 +456,12 @@ const styles = StyleSheet.create({
         elevation: 3,  // Elevation for Android
     },
     authIcon: {
-        width: 35,
-        height: 35,
+        width: 40,
+        height: 40,
         marginRight: 10,
     },
     text: {
-        fontSize: 17,
+        fontSize: 16,
         color: '#ffffff',  // Text color
         fontWeight: 'bold',
         marginRight: 10,

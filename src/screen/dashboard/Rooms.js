@@ -371,12 +371,11 @@ const Rooms = () => {
   }
 
   const onChangeStartDateTime = (event, selectedDate, type) => {
-    if (event.type === 'dismissed')
-      return;
-
     setShowStartDate(false);
     setShowStartTime(false);
-
+    if (event.type === 'dismissed')
+      return;
+    
     const currentDate = selectedDate || date;
     if (type === 'date') {
       setStartDateTime(currentDate);
@@ -386,11 +385,10 @@ const Rooms = () => {
   };
 
   const onChangeEndDateTime = (event, selectedDate, type, e) => {
-    if (event.type === 'dismissed')
-      return
-    
     setShowEndDate(false);
     setShowEndTime(false);
+    if (event.type === 'dismissed')
+      return
 
     const currentDate = selectedDate || date;
     if (type === 'date') {
