@@ -1238,3 +1238,14 @@ export const checkInWithPin =async (bookingId, pin) =>{
     throw error;
   }
 }
+
+// Ms login verify
+export const mslogin = async (email) =>{
+  try {
+    const res=await axiosInstance.get(`https://zelo.zelomeetings.com/mrroom/user/mslogin?emailParam=${email}`);
+    return res.data;
+  }catch(error){
+    console.error('API Error:', error);
+    throw error;
+  }
+}

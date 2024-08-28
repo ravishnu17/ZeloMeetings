@@ -191,6 +191,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 7,
     alignSelf: 'flex-start',
+    flexWrap:'nowrap',
     width: 130,
     height: 30,
   },

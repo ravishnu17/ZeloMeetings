@@ -2319,11 +2319,6 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         padding: 7,
     },
-    dateTimeContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 8,
-    },
     dateText: {
         fontSize: 16,
         marginLeft: 8,
@@ -2374,14 +2369,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
-
-    dateTimeContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
-        marginTop: 10,
-    },
-
     dateTimeContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -2389,7 +2376,8 @@ const styles = StyleSheet.create({
     },
     dateTimePicker: {
         flexDirection: 'row',
-        alignItems: 'center',
+        justifyContent: 'space-between',
+        // alignItems: 'center',
         padding: 10,
         backgroundColor: '#f0f0f0',
         borderRadius: 5,

@@ -1,11 +1,11 @@
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Dimensions, ActivityIndicator, Image, ScrollView, Linking, Modal, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Dimensions, ActivityIndicator, Image, ScrollView, Modal, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Text, RadioButton } from 'react-native-paper';
 import { useForm, Controller } from 'react-hook-form';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-import { loginUser } from '../../apiservices/Apiservices';
+import { loginUser, mslogin } from '../../apiservices/Apiservices';
 import LaiaLogo from '../../assets/zelo_logo.png';
 import Toast from 'react-native-simple-toast';
 import { ToastColor } from '../utils/ToastColors';
@@ -13,6 +13,11 @@ import m_logo from '../../assets/M_logo.png';
 import g_logo from '../../assets/google_logo.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { translation } from '../../Languages/translate';
+
+import { authorize } from 'react-native-app-auth';
+import { GOOGLE_CLIENT_ID, GOOGLE_REDIRECT_URI, MICROSOFT_CLIENT_ID, MICROSOFT_REDIRECT_URI, SCOPE } from '../utils/Utils';
+import axios from 'axios';
+import LoadingIndicator from '../LoadingIndicator';
 
 const Login = () => {
     const navigation = useNavigation();
@@ -36,15 +41,135 @@ const Login = () => {
         setTranslate((await translation()).data);
     }
 
-    const microsoftLoginUrl = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?scope=service%3A%3Aaccount.microsoft.com%3A%3AMBI_SSL+openid+profile+offline_access&response_type=code&client_id=81feaced-5ddd-41e7-8bef-3e20a2689bb7&redirect_uri=https%3A%2F%2Faccount.microsoft.com%2Fauth%2Fcomplete-signin-oauth&client-request-id=2a6c9fa8-ca32-4061-a5c3-d28ec17177d3&x-client-SKU=MSAL.Desktop&x-client-Ver=4.61.3.0&x-client-OS=Windows+Server+2019+Datacenter&prompt=login&client_info=1&state=H4sIAAAAAAAEAAXBy6JCQAAA0H9pa4FkmEULlAnJzSvsyMxg8iiv8vX3nJ2F1PmnVFmwgHvOJ_Xh2UUc_4l7ODgLo4sFC4GWZEOqX8xrPAme8s0_LAaUYWexfsMMZDKQBOBX0bAQf-cB5NLhMXYxT2UAfBFXqjkKlKHlnHmjkOp9deVgZD_sv7RMulif_RRS6MzCVqZSPxRYD4zX5JBa23Tea5s6SiqOJ_RlIjH_Jf5ACOspuRjrxuZEbmpDy0au23CvFoul8Gi19p4pRZ4JBXVfgxs60xTXT1scDYYyk7Sl2FSoKnCbCHrO8Yhjxkl-XgO3zG9UnJTbtFlhSqThLbYs1C58GqubroWnzcQItu4yQrcmH_1h3x0gL1CurPeK7MAmZV6Urbsej7t_B3E1NVoBAAA&msaoauth2=true&lc=2057';
     const onPressMicrosoftLogin = async () => {
-        console.log("microsoft login url");
-        Linking.openURL(microsoftLoginUrl);
+        setLoading(true);
+        const config = {
+            issuer: 'https://login.microsoftonline.com/common',
+            clientId: MICROSOFT_CLIENT_ID,
+            redirectUrl: MICROSOFT_REDIRECT_URI,
+            scopes: SCOPE,
+            serviceConfiguration: {
+                authorizationEndpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
+                tokenEndpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+                revocationEndpoint: 'https://login.microsoftonline.com/common/oauth2/v2.0/logout',
+            },
+            useNonce: true,
+            usePKCE: true, //For iOS, we have added the useNonce and usePKCE parameters, which are recommended for security reasons.
+            additionalParameters: {
+                prompt: 'consent',
+            },
+        };
+
+        try {
+            // Log in to get an authentication token
+            const result = await authorize(config);
+
+            //   Get the user's profile
+            const userData = await axios({
+                method: 'get',
+                url: 'https://graph.microsoft.com//oidc/userinfo',
+                headers: {
+                    Authorization: `Bearer ${result.accessToken}`,
+                },
+            });
+            // Check Email with zelo
+            if (userData.data?.email) {
+                checkEmail(userData.data?.email);
+            } else {
+                setLoading(false);
+                Toast.showWithGravity(
+                    'Microsoft Login Failed',
+                    Toast.SHORT,
+                    Toast.BOTTOM,
+                    ToastColor.ERROR
+                )
+            }
+        } catch (e) {
+            setLoading(false);
+            console.log(e);
+            Toast.showWithGravity(
+                'Microsoft Login Failed',
+                Toast.SHORT,
+                Toast.BOTTOM,
+                ToastColor.ERROR                
+            )
+        }
     };
 
-    const onPressGoogleLogin = () => {
-        console.log("google login url");
+    const onPressGoogleLogin = async () => {
+        setLoading(true);
+        const config = {
+            issuer: 'https://accounts.google.com',
+            clientId: GOOGLE_CLIENT_ID,
+            redirectUrl: GOOGLE_REDIRECT_URI,
+            scopes: SCOPE,
+        };
+
+        try {
+            // Log in to get an authentication token
+            const authState = await authorize(config);
+            // Get the user's profile
+            const userData = await axios({
+                method: 'get',
+                url: 'https://www.googleapis.com/oauth2/v3/userinfo',
+                headers: {
+                    Authorization: `Bearer ${authState.accessToken}`,
+                },
+            });
+            // Check Email with zelo
+            if (userData.data?.email) {
+                checkEmail(userData.data?.email);
+            } else {
+                setLoading(false);
+                Toast.showWithGravity(
+                    'Google Login Failed',
+                    Toast.SHORT,
+                    Toast.BOTTOM,
+                    ToastColor.ERROR
+                )
+            }
+        } catch (e) {
+            setLoading(false);
+            console.log(e);
+            Toast.showWithGravity(
+                'Google Login Failed',
+                Toast.SHORT,
+                Toast.BOTTOM,
+                ToastColor.ERROR
+            )
+        }
     };
+
+    const checkEmail = (email) => {
+        setLoading(true);
+        mslogin(email).then((result) => {
+            if (result?.status) {
+                let rights = result?.response?.rights.toUpperCase()
+                AsyncStorage.setItem('user_token', result?.response?.Authorization);
+                AsyncStorage.setItem('language', language);
+                AsyncStorage.setItem('rights', rights);
+                AsyncStorage.setItem('userId', result?.response?.id);
+                navigation?.navigate('HomeScreen');
+            } else {
+                Toast.showWithGravity(
+                    translate?.LOGINGPAGE?.THELOGINDETAILSAREINCORRECT,
+                    Toast.LONG,
+                    Toast.BOTTOM,
+                    ToastColor.ERROR
+                )
+            }
+        }).catch(error => {
+            console.log("Error user data", error);
+            Toast.showWithGravity(
+                translate?.LOGINGPAGE?.THELOGINDETAILSAREINCORRECT,
+                Toast.LONG,
+                Toast.BOTTOM,
+                ToastColor.ERROR
+            )
+        }).finally(() => {
+            setLoading(false);
+        })
+    }
 
     const onSignInPress = async (logindata) => {
         // AsyncStorage.removeItem('user_token');
@@ -115,7 +240,7 @@ const Login = () => {
 
     return (
         <View style={styles.container}>
-
+            {loading && <LoadingIndicator />}
             <ScrollView>
                 {/* Top Container with 50% border-radius */}
                 <View style={styles.topContainer}>
@@ -132,7 +257,7 @@ const Login = () => {
 
                 {/* Login Page */}
                 <View style={styles.loginContainer}>
-                    {/* <Text style={styles.title}>Sign In</Text> */}
+                    <Text style={styles.title}>Sign In</Text>
 
                     <Controller
                         control={control}
@@ -144,7 +269,7 @@ const Login = () => {
                                 onChangeText={field.onChange}
                                 value={field.value}
                                 error={errors.username && errors.username.message}
-                                theme={{ roundness: 10 }} // Set roundness for rounded corners
+                                theme={{ roundness: 20 }} // Set roundness for rounded corners
                             />
                         )}
                         name="username"
@@ -171,7 +296,7 @@ const Login = () => {
                                     onChangeText={field.onChange}
                                     value={field.value}
                                     error={errors.password && errors.password.message}
-                                    theme={{ roundness: 10 }} // Set roundness for rounded corners
+                                    theme={{ roundness: 20 }} // Set roundness for rounded corners
                                 />
 
                             )}
@@ -190,46 +315,31 @@ const Login = () => {
                         {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
                     </View>
                     {/* <Text style={styles.forgotPasswordText} onPress={onForgotPasswordPress}>
-        Forgot Password?
-      </Text> */}
+                        Forgot Password?
+                    </Text> */}
                     <Button mode="contained" buttonColor='#64b15d' onPress={handleSubmit(onSignInPress)} style={styles.button}>
                         {translate?.LOGINGPAGE?.SIGNIN}
                     </Button>
 
 
                     <View style={styles.imageContainer}>
-
-                        {/* <TouchableOpacity
-                    style={styles.imageWrapper}
-                    onPress={onPressMicrosoftLogin}>
-                    <Image source={m_logo} style={styles.image} />
-                    <Text style={styles.text}>Microsoft</Text>
-                    </TouchableOpacity> */}
-
                         <TouchableOpacity
-                            style={styles.imageWrapper}
+                            style={[styles.imageWrapper,{backgroundColor: '#3B5998'}]}
                             onPress={onPressMicrosoftLogin}>
-                            <Image source={m_logo} style={styles.image} />
+                            <Image source={m_logo} style={styles.authIcon} />
                             <Text style={styles.text}>Microsoft</Text>
                         </TouchableOpacity>
-
-
-                        {/* <View style={styles.imageWrapper}>
-                        <Image source={g_logo} style={styles.image} />
-                        <Text style={styles.text}>Google</Text>
-                    </View> */}
                         <TouchableOpacity
-                            style={styles.imageWrapper}
+                            style={[styles.imageWrapper,{backgroundColor: '#4285F4'}]}
                             onPress={onPressGoogleLogin}>
-                            <Image source={g_logo} style={styles.image} />
+                            <Image source={g_logo} style={styles.authIcon} />
                             <Text style={styles.text}>Google</Text>
                         </TouchableOpacity>
 
                     </View>
-
-                    {loading && <ActivityIndicator size="large" color="#3498db" />}
                 </View>
             </ScrollView>
+            {/* Language Modal */}
             <Modal animationType="fade" transparent={true} visible={showModel} onDismiss={() => setShowModel(false)}
                 onRequestClose={() => setShowModel(false)} >
                 <TouchableWithoutFeedback onPress={() => setShowModel(false)}>
@@ -264,6 +374,7 @@ const Login = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor : '#fff'
     },
     topContainer: {
         flex: 1,
@@ -273,17 +384,12 @@ const styles = StyleSheet.create({
     },
     loginContainer: {
         flex: 1,
-        marginTop: '10%',
+        marginTop: '15%',
         justifyContent: 'center',
         padding: 16,
-        backgroundColor: '#ffffff',
-        borderTopLeftRadius: 40,
-        borderTopRightRadius: 40,
-        height: '100%',
-        maxHeight: '100%',
     },
     title: {
-        fontSize: 24,
+        fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 16,
         textAlign: 'center',
@@ -291,7 +397,8 @@ const styles = StyleSheet.create({
     input: {
         marginBottom: 8,
         position: 'relative',
-        fontSize: 18
+        fontSize: 18,
+        backgroundColor: '#fff',
     },
     errorText: {
         color: 'red',
@@ -322,70 +429,40 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 20,
     },
-    welcomeText: {
-        fontSize: 30,
-        fontWeight: 'bold',
-        // marginBottom: 8,
-        position: 'absolute',
-        // top: 5,
-    },
     welcomeImage: {
         width: 200, // Adjust the width as needed
         height: 280, // Adjust the height as needed
         resizeMode: 'contain',
     },
-    // imageContainer: {
-    //     flexDirection: 'row',
-    //     justifyContent: 'space-around',
-    //     alignItems: 'center',
-    //     width: '100%',
-    //     // padding: 20,
-    // },
-    // imageWrapper: {
-    //     marginTop: 10,
-    //     flexDirection: 'row',
-    //     alignItems: 'center',
-    //     marginHorizontal: 10,
-    // },
-    // image: {
-    //     width: 50,
-    //     height: 50,
-    //     marginRight: 10,
-    // },
-    // text: {
-    //     fontSize: 16,
-    // },
-
     imageContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
         alignItems: 'center',
         width: '100%',
-        padding: 5,  // Optional: Add padding to the container
-        marginTop: 10,
+        padding: 5,
+        marginTop: 20,
     },
     imageWrapper: {
-        marginTop: 10,
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         marginHorizontal: 10,
-        backgroundColor: '#f8f8f8',  // Background color for the card
-        // borderRadius: 10,  // Rounded corners
-        // padding: 10,  // Space inside the card
-        shadowColor: '#000',  // Shadow color
+        borderRadius: 3,
+        padding: 2,
+        shadowColor: '#000000',  // Shadow color
         shadowOffset: { width: 0, height: 2 },  // Shadow offset
         shadowOpacity: 0.2,  // Shadow opacity
         shadowRadius: 5,  // Shadow radius
         elevation: 3,  // Elevation for Android
     },
-    image: {
-        width: 50,
-        height: 50,
+    authIcon: {
+        width: 35,
+        height: 35,
         marginRight: 10,
     },
     text: {
-        fontSize: 18,
-        color: '#333',  // Text color
+        fontSize: 17,
+        color: '#ffffff',  // Text color
         fontWeight: 'bold',
         marginRight: 10,
     },

@@ -203,7 +203,7 @@ function Profile() {
     return (
         <ScrollView style={styles.container}>
             <View style={styles.profile}>
-                <Image style={styles.img} source={userData?.customerDetails?.user?.profileImg ? { uri: userData?.customerDetails?.user?.profileImg } : require('../../assets/user.png')} />
+                <Image style={styles.img} source={userData?.user?.profileImg ? { uri: userData?.user?.profileImg } : require('../../assets/user.png')} />
                 <Text style={{ marginTop: 8, marginBottom: 4, fontWeight: 'bold' }}>{userData?.user?.firstName}</Text>
                 <Text>{userData?.user?.role?.role}</Text>
             </View>

@@ -144,9 +144,9 @@ const styles = StyleSheet.create({
 
   },
   img: {
-    width: '18%',
+    width: 65,
     height: 65,
-    borderRadius: 60,
+    borderRadius: 100,
     marginLeft: 5
   },
   title: {

@@ -128,10 +128,10 @@ const Dashboard = () => {
             <View style={styles.row}>
                 {/* Room */}
                 <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.ROOMS}</Text>
+                    <Text style={styles.itemText}>{translate?.ENDUSERDASHBOARD?.ROOMS}</Text>
                     <View style={styles?.progressText} >
-                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.percentageOfRoomsBooked}%</Text>
-                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.availableRooms}/{dashboard?.engagedRooms}</Text>
+                        <Text style={styles.itemText}>{dashboard?.percentageOfRoomsBooked}%</Text>
+                        <Text style={styles.itemText}>{dashboard?.availableRooms}/{dashboard?.engagedRooms}</Text>
                     </View>
                     <View style={styles.progressContainer}>
                         <View style={[styles.filler, { width: `${dashboard?.percentageOfRoomsBooked ? dashboard?.percentageOfRoomsBooked : 0}%` }]} />
@@ -140,10 +140,10 @@ const Dashboard = () => {
 
                 {/* Desk */}
                 <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.DESKS}</Text>
+                    <Text style={styles.itemText}>{translate?.ENDUSERDASHBOARD?.DESKS}</Text>
                     <View style={styles?.progressText} >
-                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.percentageOfDesksBooked}%</Text>
-                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.availableDesks}/{dashboard?.engagedDesks}</Text>
+                        <Text style={styles.itemText}>{dashboard?.percentageOfDesksBooked}%</Text>
+                        <Text style={styles.itemText}>{dashboard?.availableDesks}/{dashboard?.engagedDesks}</Text>
                     </View>
                     <View style={styles.progressContainer}>
                         <View style={[styles.filler, { width: `${dashboard?.percentageOfDesksBooked ? dashboard?.percentageOfDesksBooked : 0}%` }]} />
@@ -151,10 +151,10 @@ const Dashboard = () => {
                 </View>
                 {/* Parking */}
                 <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.PARKINGSEATS}</Text>
+                    <Text style={styles.itemText}>{translate?.ENDUSERDASHBOARD?.PARKINGSEATS}</Text>
                     <View style={styles?.progressText} >
-                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.percentageOfParkingSeatsBooked}%</Text>
-                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.availableParkingSeats}/{dashboard?.engagedParkingSeats}</Text>
+                        <Text style={styles.itemText}>{dashboard?.percentageOfParkingSeatsBooked}%</Text>
+                        <Text style={styles.itemText}>{dashboard?.availableParkingSeats}/{dashboard?.engagedParkingSeats}</Text>
                     </View>
                     <View style={styles.progressContainer}>
                         <View style={[styles.filler, { width: `${dashboard?.percentageOfParkingSeatsBooked ? dashboard?.percentageOfParkingSeatsBooked : 0}%` }]} />
@@ -162,27 +162,38 @@ const Dashboard = () => {
                 </View>
                 {/* Charging car */}
                 <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{translate?.ROOMBOOKING?.CHARGINGCARS}</Text>
+                    <Text style={styles.itemText}>{translate?.ROOMBOOKING?.CHARGINGCARS}</Text>
                     <View style={styles?.progressText} >
-                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.percentageOfChargingCarsBooked}%</Text>
-                        <Text style={{ fontSize: 11, fontWeight: 'bold' }}>{dashboard?.availableChargingCars}/{dashboard?.engagedChargingCars}</Text>
+                        <Text style={styles.itemText}>{dashboard?.percentageOfChargingCarsBooked}%</Text>
+                        <Text style={styles.itemText}>{dashboard?.availableChargingCars}/{dashboard?.engagedChargingCars}</Text>
                     </View>
                     <View style={styles.progressContainer}>
                         <View style={[styles.filler, { width: `${dashboard?.percentageOfChargingCarsBooked ? dashboard?.percentageOfChargingCarsBooked : 0}%` }]} />
+                    </View>
+                </View>
+                {/*car */}
+                <View style={{ flex: 1 }}>
+                    <Text style={styles.itemText}>{translate?.ROOMBOOKING?.CARS}</Text>
+                    <View style={styles?.progressText} >
+                        <Text style={styles.itemText}>{dashboard?.percentageOfCarsBooked}%</Text>
+                        <Text style={styles.itemText}>{dashboard?.availableCars}/{dashboard?.engagedCars}</Text>
+                    </View>
+                    <View style={styles.progressContainer}>
+                        <View style={[styles.filler, { width: `${dashboard?.percentageOfCarsBooked ? dashboard?.percentageOfCarsBooked : 0}%` }]} />
                     </View>
                 </View>
             </View>
 
             <View style={{ ...styles.row, marginTop: 15, alignItems: 'center' }}>
                 <View style={{ width: 25, height: 25, backgroundColor: 'green' }} />
-                <Text>{translate?.ROOMS?.AVILABLE}</Text>
+                <Text style={{ color: '#757575'}}>{translate?.ROOMS?.AVILABLE}</Text>
 
                 <View style={{ width: 25, height: 25, backgroundColor: '#c40404' }} />
-                <Text>{translate?.ROOMS?.FULL}</Text>
+                <Text style={{ color: '#757575'}}>{translate?.ROOMS?.FULL}</Text>
             </View>
 
             <View style={{ marginTop: 25 }}>
-                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{translate?.ENDUSERDASHBOARD?.ROOMDESKBOOKINGREQUESTS}</Text>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#757575' }}>{translate?.ENDUSERDASHBOARD?.ROOMDESKBOOKINGREQUESTS}</Text>
                 {/* {translate?.ENDUSERDASHBOARD?.ROOMS} / {translate?.ENDUSERDASHBOARD?.DESKS} {translate?.ENDUSERDASHBOARD?.ROOMDESKBOOKINGREQUESTS} */}
                 <Table
                     cols={[translate?.ENDUSERDASHBOARD?.TYPE,
@@ -227,6 +238,11 @@ const styles = StyleSheet.create({
         backgroundColor: 'green',
         borderRadius: 5,
         overflow: 'hidden',
+    },
+    itemText: {
+        fontSize: 11, 
+        fontWeight: 'bold',
+        color:'#757575'
     },
     progressText: {
         flexDirection: 'row',

@@ -758,7 +758,7 @@ const CalendarView = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: 20,
+    padding: 3,
   },
   pickerContainer: {
     flexDirection: 'column',
@@ -782,6 +782,7 @@ const styles = StyleSheet.create({
   },
   selectedTextStyle: {
     fontSize: 16,
+    color: '#000'
   },
   inputSearchStyle: {
     height: 40,

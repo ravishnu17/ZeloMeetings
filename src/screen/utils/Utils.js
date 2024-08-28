@@ -8,3 +8,15 @@ export const loading = () => {
         </View>
     );
 }
+
+// Google 
+export const GOOGLE_CLIENT_ID = "245989026495-mk374knehmq7ktu6h3st0g18u1rcbd7s.apps.googleusercontent.com";
+export const GOOGLE_OAUTH_APP_GUID = "245989026495-mk374knehmq7ktu6h3st0g18u1rcbd7s";
+export const GOOGLE_REDIRECT_URI = `com.googleusercontent.apps.${GOOGLE_OAUTH_APP_GUID}:/oauth2redirect/google`;
+export const SCOPE = ['openid', 'profile', 'email'];
+// ["user.read","mailboxsettings.read","calendars.readwrite","Bookings.Manage.All","Bookings.ReadWrite.All","BookingsAppointment.ReadWrite.All","Calendars.ReadWrite.Shared","openid","profile","offline_access"];
+
+// Microsoft
+export const MICROSOFT_CLIENT_ID = 'f6e906f5-82ba-46f2-b3f0-73c4ad692718';
+export const MICROSOFT_REDIRECT_URI = 'msauth://com.zelomeetings/lPZSqV6dsYwY8YGcZxHGS5grkQM%3D';
+//    redirectUrl: "msauth://com.zelomeetings/lPZSqV6dsYwY8YGcZxHGS5grkQM%3D", //Platform.OS === 'android' ? 'com.ZeloMeetings://com.ZeloMeetings/android/callback' : 'com.ZeloMeetings://com.ZeloMeetings/ios/callback',
