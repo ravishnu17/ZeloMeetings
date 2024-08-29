@@ -18,6 +18,7 @@ import { authorize } from 'react-native-app-auth';
 import { GOOGLE_CLIENT_ID, GOOGLE_REDIRECT_URI, MICROSOFT_CLIENT_ID, MICROSOFT_REDIRECT_URI, SCOPE } from '../utils/Utils';
 import axios from 'axios';
 import LoadingIndicator from '../LoadingIndicator';
+import HeadBar from '../HeadBar';
 
 const Login = () => {
     const navigation = useNavigation();
@@ -25,16 +26,9 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [translate, setTranslate] = useState();
     const [language, setLanguage] = useState();
-    const [showModel, setShowModel] = useState(false);
     const isFocus = useIsFocused();
 
-    const {
-        control,
-        clearErrors,
-        reset,
-        handleSubmit,
-        formState: { errors },
-    } = useForm();
+    const { control, clearErrors, reset, handleSubmit, formState: { errors } } = useForm();
 
     const getTranslate = async () => {
         setLanguage(await AsyncStorage.getItem('language') || 'en');
@@ -203,21 +197,11 @@ const Login = () => {
         setLoading(false);
     };
 
-    const getChecked = (type) => {
-        if (language === type) {
-            return 'checked'
-        } else {
-            return 'unchecked'
-        }
-    }
-
     const ChangeLanguage = (language) => {
-        setShowModel(!showModel);
         setLanguage(language);
         AsyncStorage.setItem('language', language);
         getTranslate();
     }
-
 
     useEffect(() => {
         clearErrors();
@@ -241,15 +225,10 @@ const Login = () => {
     return (
         <View style={styles.container}>
             {loading && <LoadingIndicator />}
+            <HeadBar route='login' handleLanguage={ChangeLanguage} />
             <ScrollView>
                 {/* Top Container with 50% border-radius */}
                 <View style={styles.topContainer}>
-                    <TouchableOpacity onPress={() => setShowModel(!showModel)} style={{ position: 'absolute', alignSelf: 'flex-end', padding: 15, marginTop: 15 }}>
-                        <Image
-                            source={language === 'pt' ? require('../../assets/portugal.png') :
-                                language === 'es' ? require('../../assets/spain.png') :
-                                    require('../../assets/US.png')} style={{ width: 50, height: 30 }} />
-                    </TouchableOpacity>
                     <View style={styles.welcomeContainer}>
                         <Image source={LaiaLogo} style={styles.welcomeImage} />
                     </View>
@@ -321,7 +300,6 @@ const Login = () => {
                         {translate?.LOGINGPAGE?.SIGNIN}
                     </Button>
 
-
                     <View style={styles.imageContainer}>
                         <TouchableOpacity
                             style={[styles.imageWrapper,{backgroundColor: '#3B5998'}]}
@@ -339,34 +317,6 @@ const Login = () => {
                     </View>
                 </View>
             </ScrollView>
-            {/* Language Modal */}
-            <Modal animationType="fade" transparent={true} visible={showModel} onDismiss={() => setShowModel(false)}
-                onRequestClose={() => setShowModel(false)} >
-                <TouchableWithoutFeedback onPress={() => setShowModel(false)}>
-                    <View style={styles.modal} >
-                        <TouchableWithoutFeedback>
-                            <View style={styles.modalContainer}>
-                                <Text style={{ fontWeight: 'bold', fontSize: 18, textAlign: 'center', marginBottom: 20 }}>{translate?.MYPROFILE?.LANGUAGE}</Text>
-                                <TouchableOpacity style={styles.modelItem} onPress={() => ChangeLanguage('en')}>
-                                    <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('en')} />
-                                    <Image source={require('../../assets/US.png')} style={styles.modelImg} />
-                                    <Text>English</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.modelItem} onPress={() => ChangeLanguage('pt')} >
-                                    <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('pt')} />
-                                    <Image source={require('../../assets/portugal.png')} style={styles.modelImg} />
-                                    <Text>Portuguese</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity style={styles.modelItem} onPress={() => ChangeLanguage('es')} >
-                                    <RadioButton checkedIcon="dot-circle-o" uncheckedIcon="circle-o" value='language' status={getChecked('es')} />
-                                    <Image source={require('../../assets/spain.png')} style={styles.modelImg} />
-                                    <Text>Spanish</Text>
-                                </TouchableOpacity>
-                            </View>
-                        </TouchableWithoutFeedback>
-                    </View>
-                </TouchableWithoutFeedback>
-            </Modal >
         </View>
     );
 };

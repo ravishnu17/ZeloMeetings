@@ -1202,7 +1202,7 @@ export const resourceCheckIn = async (resourceId)=>{
     const res=await axiosInstance.get(`/checkInCheckOut/verifyCheckin?meetingRoomId=${resourceId}`);
     return res.data;
   }catch(error){
-    console.error('API Error:', error);
+    // console.error('API Error:', error);
     throw error;
   }
 }

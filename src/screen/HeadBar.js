@@ -8,7 +8,7 @@ import { context } from '../navigation/Appnav';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-const HeadBar = () => {
+const HeadBar = ({route , handleLanguage}) => {
   const props = useContext(context);
   const index = props?.active;
   const setActive = props?.setActive;
@@ -48,6 +48,7 @@ const HeadBar = () => {
   }
 
   const ChangeLanguage = (language) => {
+    handleLanguage(language);
     setShowModel(!showModel);
     setLanguage(language);
     AsyncStorage.setItem('language', language);
@@ -62,7 +63,7 @@ const HeadBar = () => {
 
   return (
     <View>
-      <Header placement={headertextStatus ? 'center' : 'left'} backgroundColor='#035676' statusBarProps={{ barStyle: 'light-content', backgroundColor: '#034a66' }}
+      <Header placement={headertextStatus ? 'center' : 'left'}  containerStyle={route === 'login' ? {borderBottomWidth: 0} : {}} backgroundColor={route === 'login' ? '#3498db' : '#035676'} statusBarProps={{ barStyle: 'light-content', backgroundColor: '#034a66' }}
         leftComponent={
           <View>
             {
@@ -122,7 +123,7 @@ const HeadBar = () => {
               </TouchableOpacity>
             }
             {
-              index === 5 &&
+              (index === 5 || route === 'login') &&
               <TouchableOpacity onPress={() => setShowModel(true)} >
                 <Image
                   source={language === 'pt' ? require('../assets/portugal.png') :
