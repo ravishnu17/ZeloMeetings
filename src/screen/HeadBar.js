@@ -48,7 +48,7 @@ const HeadBar = ({route , handleLanguage}) => {
   }
 
   const ChangeLanguage = (language) => {
-    handleLanguage(language);
+    handleLanguage && handleLanguage(language);
     setShowModel(!showModel);
     setLanguage(language);
     AsyncStorage.setItem('language', language);
