@@ -18,5 +18,4 @@ export const SCOPE = ['openid', 'profile', 'email'];
 
 // Microsoft
 export const MICROSOFT_CLIENT_ID = 'f6e906f5-82ba-46f2-b3f0-73c4ad692718';
-export const MICROSOFT_REDIRECT_URI = 'msauth://com.zelomeetings/lPZSqV6dsYwY8YGcZxHGS5grkQM%3D';
-//    redirectUrl: "msauth://com.zelomeetings/lPZSqV6dsYwY8YGcZxHGS5grkQM%3D", //Platform.OS === 'android' ? 'com.ZeloMeetings://com.ZeloMeetings/android/callback' : 'com.ZeloMeetings://com.ZeloMeetings/ios/callback',
+export const MICROSOFT_REDIRECT_URI = Platform.OS === 'android' ? 'msauth://com.zelomeetings/lPZSqV6dsYwY8YGcZxHGS5grkQM%3D' : 'msauth.com.zelomeetings://auth' ;
