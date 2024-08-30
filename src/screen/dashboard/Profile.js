@@ -259,6 +259,7 @@ function Profile() {
                                 search={true}
                                 searchPlaceholder='search'
                                 inputSearchStyle={{ borderRadius: 3 }}
+                                placeholderStyle ={{color: '#a8a8a8'}}
                                 selectedTextStyle={{ color: 'black' }}
                             />
                         )}
@@ -278,6 +279,7 @@ function Profile() {
                                 onChange={(event) => { onChange(event?.value); getBuildings(event?.value) }}
                                 onBlur={onBlur}
                                 value={value}
+                                placeholderStyle ={{color: '#a8a8a8'}}
                                 selectedTextStyle={{ color: 'black' }}
                             />
                         )}
@@ -301,6 +303,7 @@ function Profile() {
                                 onBlur={onBlur}
                                 value={value}
                                 placeholder={translate?.ROOMBOOKING?.SELECTBUILDING}
+                                placeholderStyle ={{color: '#a8a8a8'}}
                                 selectedTextStyle={{ color: 'black' }}
                             />
                         )}
@@ -321,6 +324,7 @@ function Profile() {
                                 onBlur={onBlur}
                                 value={value}
                                 placeholder={translate?.REPORTS?.SELECTFLOOR}
+                                placeholderStyle ={{color: '#a8a8a8'}}
                                 selectedTextStyle={{ color: 'black' }}
                             />
                         )}
@@ -343,6 +347,7 @@ function Profile() {
                             onBlur={onBlur}
                             value={value}
                             placeholder='Select language'
+                            placeholderStyle ={{color: '#a8a8a8'}}
                             selectedTextStyle={{ color: 'black' }}
                         />
                     )}
@@ -405,7 +410,7 @@ const styles = StyleSheet.create({
         // borderWidth: 1,
         // borderColor: '#8a8a8a',
         borderRadius: 4,
-        padding: 9,
+        padding: 10,
         shadowColor: "#000",
         backgroundColor: '#fff',
         shadowOffset: {

@@ -2,7 +2,7 @@ import { useIsFocused } from '@react-navigation/native';
 import React, { useContext, useEffect, useState } from 'react';
 import { Alert, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
-import { Card, Icon } from 'react-native-elements';
+import { Card } from 'react-native-elements';
 import { context } from '../../navigation/Appnav';
 import { EquipmentByRoomId, ResolveEquipmentReport, findBuildingListBasedonLocationId, findFloorsListBasedonBuildingId, getLocationlist, getMeetingRoomListBuildingAndFloor, getMeetingRoomsByLocationId, loginHomeAccess, reportEquipment } from '../../apiservices/Apiservices';
 import AsyncStorage from '@react-native-async-storage/async-storage';
